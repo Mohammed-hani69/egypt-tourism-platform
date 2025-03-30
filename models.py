@@ -13,11 +13,23 @@ class User(UserMixin, db.Model):
     is_student = db.Column(db.Boolean, default=False)
     is_tourist = db.Column(db.Boolean, default=False)
     is_admin = db.Column(db.Boolean, default=False)
+    
+    # Common fields for all users
+    phone = db.Column(db.String(20), nullable=True)
+    country = db.Column(db.String(100), nullable=True)
+    governorate = db.Column(db.String(100), nullable=True)
+    city = db.Column(db.String(100), nullable=True)
+    profile_pic = db.Column(db.String(200), nullable=True)
+    
+    # Fields for guides and students
+    education_level = db.Column(db.String(100), nullable=True)
+    university = db.Column(db.String(200), nullable=True)
+    
+    # Additional fields
     languages = db.Column(db.String(200), nullable=True)
     bio = db.Column(db.Text, nullable=True)
-    phone = db.Column(db.String(20), nullable=True)
     date_joined = db.Column(db.DateTime, default=datetime.utcnow)
-    profile_pic = db.Column(db.String(200), nullable=True)
+    profile_completed = db.Column(db.Boolean, default=False)
     
     # Relationships
     reviews = db.relationship('Review', backref='author', lazy='dynamic')
@@ -27,6 +39,14 @@ class User(UserMixin, db.Model):
         
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+        
+    def is_profile_complete(self):
+        """Check if the user has completed their profile based on their role"""
+        if self.is_tourist:
+            return bool(self.phone and self.country)
+        elif self.is_guide or self.is_student:
+            return bool(self.phone and self.country and self.governorate and 
+                        self.city and self.education_level and self.university)
 
 
 class Region(db.Model):

@@ -13,9 +13,28 @@ class RegistrationForm(FlaskForm):
                              validators=[DataRequired(), Length(min=6)])
     confirm_password = PasswordField('Confirm Password', 
                                      validators=[DataRequired(), EqualTo('password')])
+                                     
+    # User type selection
     is_guide = BooleanField('Register as Tour Guide')
     is_student = BooleanField('Register as Language Student')
     is_tourist = BooleanField('Register as Tourist')
+    
+    # Basic information for all users
+    phone = StringField('Phone Number', validators=[DataRequired(), Length(max=20)])
+    country = StringField('Country', validators=[DataRequired(), Length(max=100)])
+    
+    # Additional fields for non-tourists (guide/student)
+    governorate = StringField('Governorate', validators=[Length(max=100)])
+    city = StringField('City', validators=[Length(max=100)])
+    education_level = SelectField('Education Level', 
+                                 choices=[('', 'Select Education Level'),
+                                         ('high_school', 'High School'),
+                                         ('bachelor', 'Bachelor Degree'),
+                                         ('master', 'Master Degree'),
+                                         ('phd', 'PhD')],
+                                 validators=[])
+    university = StringField('University', validators=[Length(max=200)])
+    
     submit = SubmitField('Sign Up')
     
     def validate_username(self, username):
@@ -75,6 +94,42 @@ class LanguagePracticeForm(FlaskForm):
 class SearchForm(FlaskForm):
     q = StringField('Search', validators=[DataRequired()])
     submit = SubmitField('Search')
+
+
+class ProfileForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=20)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    phone = StringField('Phone Number', validators=[DataRequired(), Length(max=20)])
+    country = StringField('Country', validators=[DataRequired(), Length(max=100)])
+    governorate = StringField('Governorate', validators=[Length(max=100)])
+    city = StringField('City', validators=[Length(max=100)])
+    education_level = SelectField('Education Level', 
+                                choices=[('', 'Select Education Level'),
+                                        ('high_school', 'High School'),
+                                        ('bachelor', 'Bachelor Degree'),
+                                        ('master', 'Master Degree'),
+                                        ('phd', 'PhD')])
+    university = StringField('University', validators=[Length(max=200)])
+    bio = TextAreaField('Bio')
+    profile_pic = StringField('Profile Picture URL', validators=[Length(max=200)])
+    submit = SubmitField('Update Profile')
+    
+    def __init__(self, original_username, original_email, *args, **kwargs):
+        super(ProfileForm, self).__init__(*args, **kwargs)
+        self.original_username = original_username
+        self.original_email = original_email
+        
+    def validate_username(self, username):
+        if username.data != self.original_username:
+            user = User.query.filter_by(username=username.data).first()
+            if user:
+                raise ValidationError('Username already taken. Please choose a different one.')
+                
+    def validate_email(self, email):
+        if email.data != self.original_email:
+            user = User.query.filter_by(email=email.data).first()
+            if user:
+                raise ValidationError('Email already registered. Please use a different one.')
 
 
 class ChatGroupForm(FlaskForm):

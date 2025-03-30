@@ -23,6 +23,8 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "dev_secret_key")
 
 # Configure database
+# Use DATABASE_URL environment variable which points to PostgreSQL
+# Provide a fallback SQLite URI in case DATABASE_URL is not set
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///egypt_tourism.db")
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,

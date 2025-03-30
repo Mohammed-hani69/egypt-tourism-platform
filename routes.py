@@ -8,7 +8,7 @@ from models import (User, Attraction, Region, Review, Restaurant, Activity, Guid
                     TourBooking, TourProgress, TourPhoto)
 from forms import (RegistrationForm, LoginForm, ReviewForm, GuideForm, LanguagePracticeForm, SearchForm,
                    ChatGroupForm, ChatMessageForm, SelectGuideForm, TourPlanForm, TourPlanDestinationForm, 
-                   TourBookingForm, AssignGuideForm, TourProgressForm, TourPhotoForm)
+                   TourBookingForm, AssignGuideForm, TourProgressForm, TourPhotoForm, ProfileForm)
 from datetime import datetime, date, timedelta
 import os
 
@@ -121,14 +121,43 @@ def register():
     
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, 
-                    email=form.email.data,
-                    is_guide=form.is_guide.data,
-                    is_student=form.is_student.data,
-                    is_tourist=form.is_tourist.data)
+        # Check if user selected at least one role
+        if not (form.is_guide.data or form.is_student.data or form.is_tourist.data):
+            flash('Please select at least one user type.', 'danger')
+            return render_template('register.html', title='Register', form=form)
+        
+        # Create new user with basic info
+        user = User(
+            username=form.username.data, 
+            email=form.email.data,
+            is_guide=form.is_guide.data,
+            is_student=form.is_student.data,
+            is_tourist=form.is_tourist.data,
+            phone=form.phone.data,
+            country=form.country.data
+        )
+        
+        # Add additional information for guides and students
+        if form.is_guide.data or form.is_student.data:
+            user.governorate = form.governorate.data
+            user.city = form.city.data
+            user.education_level = form.education_level.data
+            user.university = form.university.data
+        
+        # Set password and save user
         user.set_password(form.password.data)
+        
+        # Check if profile is complete
+        user.profile_completed = user.is_profile_complete()
+        
         db.session.add(user)
         db.session.commit()
+        
+        # If user is a guide, create guide profile
+        if form.is_guide.data:
+            guide = Guide(user_id=user.id)
+            db.session.add(guide)
+            db.session.commit()
         
         flash('Your account has been created! You can now login.', 'success')
         return redirect(url_for('login'))
@@ -210,6 +239,51 @@ def profile():
                            tour_bookings=tour_bookings,
                            reviews=reviews,
                            chat_groups=chat_groups)
+
+
+@app.route('/profile/edit', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = ProfileForm(original_username=current_user.username,
+                      original_email=current_user.email)
+    
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        current_user.phone = form.phone.data
+        current_user.country = form.country.data
+        current_user.governorate = form.governorate.data
+        current_user.city = form.city.data
+        current_user.education_level = form.education_level.data
+        current_user.university = form.university.data
+        current_user.bio = form.bio.data
+        current_user.profile_pic = form.profile_pic.data
+        
+        # Update profile completion status
+        current_user.profile_completed = current_user.is_profile_complete()
+        
+        db.session.commit()
+        flash('Your profile has been updated!', 'success')
+        return redirect(url_for('profile'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+        form.phone.data = current_user.phone
+        form.country.data = current_user.country
+        form.governorate.data = current_user.governorate
+        form.city.data = current_user.city
+        form.education_level.data = current_user.education_level
+        form.university.data = current_user.university
+        form.bio.data = current_user.bio
+        form.profile_pic.data = current_user.profile_pic
+    
+    # Determine which fields to show based on user type
+    is_guide_or_student = current_user.is_guide or current_user.is_student
+    
+    return render_template('edit_profile.html',
+                          title='Edit Profile',
+                          form=form,
+                          is_guide_or_student=is_guide_or_student)
 
 
 @app.route('/add_review/<int:attraction_id>', methods=['GET', 'POST'])
