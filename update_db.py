@@ -1,6 +1,7 @@
 from app import app, db
 import sqlite3
 import os
+from models import User, Guide, LanguagePractice, ChatGroup, ChatGroupMember, ChatMessage, TourPlan, TourPlanDestination, TourBooking, TourProgress, TourPhoto
 
 # Function to check if a column exists in a table
 def column_exists(conn, table_name, column_name):
@@ -8,6 +9,12 @@ def column_exists(conn, table_name, column_name):
     cursor.execute(f"PRAGMA table_info({table_name})")
     columns = [info[1] for info in cursor.fetchall()]
     return column_name in columns
+
+# Function to check if a table exists in the database
+def table_exists(conn, table_name):
+    cursor = conn.cursor()
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,))
+    return cursor.fetchone() is not None
 
 # Main function to update the database
 def update_database():
@@ -38,14 +45,12 @@ def update_database():
         conn = sqlite3.connect(db_path)
         
         # Check if user table exists
-        cursor = conn.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='user'")
-        if not cursor.fetchone():
+        if not table_exists(conn, 'user'):
             print("User table does not exist, skipping migration")
             conn.close()
             return
         
-        # Check and add missing columns
+        # Check and add missing columns in user table
         if not column_exists(conn, 'user', 'is_tourist'):
             print("Adding 'is_tourist' column to User table")
             conn.execute('ALTER TABLE user ADD COLUMN is_tourist BOOLEAN DEFAULT 0')
@@ -53,6 +58,13 @@ def update_database():
         if not column_exists(conn, 'user', 'is_admin'):
             print("Adding 'is_admin' column to User table")
             conn.execute('ALTER TABLE user ADD COLUMN is_admin BOOLEAN DEFAULT 0')
+            
+        # Check for language_practice table
+        if table_exists(conn, 'language_practice'):
+            # Check for guide_id column in language_practice table
+            if not column_exists(conn, 'language_practice', 'guide_id'):
+                print("Adding 'guide_id' column to LanguagePractice table")
+                conn.execute('ALTER TABLE language_practice ADD COLUMN guide_id INTEGER')
         
         # Commit changes and close connection
         conn.commit()
@@ -60,15 +72,33 @@ def update_database():
         
         print("Database migration complete!")
     except Exception as e:
-        print(f"Error connecting to database: {e}")
+        print(f"Error during database update: {e}")
+
+# Function to recreate tables with integrity issues
+def full_db_setup():
+    print("Setting up complete database structure...")
+    with app.app_context():
+        # Drop and recreate all tables
+        db.drop_all()
+        db.create_all()
+        print("All database tables have been recreated!")
 
 # Run the script
 if __name__ == "__main__":
     with app.app_context():
         try:
+            # First try to update existing database
             update_database()
-            # Create all tables (this will create missing tables without affecting existing ones)
+            
+            # Create all tables that don't exist yet
             db.create_all()
             print("All tables created/updated!")
+            
+            # Get argument for full reset if provided
+            import sys
+            if len(sys.argv) > 1 and sys.argv[1] == '--reset':
+                print("Performing full database reset...")
+                full_db_setup()
+                
         except Exception as e:
             print(f"Error during database update: {e}")
