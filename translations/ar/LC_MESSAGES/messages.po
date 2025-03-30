@@ -1,0 +1,195 @@
+# Arabic translations for Egypt Tourism.
+# Copyright (C) 2023 Egypt Tourism
+# This file is distributed under the same license as the Egypt Tourism project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2023-06-01 12:00+0000\n"
+"PO-Revision-Date: 2023-06-01 12:00+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ar\n"
+"Language-Team: ar <LL@li.org>\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: templates/layout.html:8
+msgid "Egypt Tourism"
+msgstr "السياحة في مصر"
+
+#: templates/layout.html:27
+msgid "Home"
+msgstr "الرئيسية"
+
+#: templates/layout.html:30
+msgid "Attractions"
+msgstr "المعالم السياحية"
+
+#: templates/layout.html:33
+msgid "Tour Guides"
+msgstr "المرشدين السياحيين"
+
+#: templates/layout.html:36
+msgid "Language Practice"
+msgstr "تعلم اللغات"
+
+#: templates/layout.html:43
+msgid "Search..."
+msgstr "بحث..."
+
+#: templates/layout.html:62
+msgid "Account"
+msgstr "الحساب"
+
+#: templates/layout.html:67
+msgid "My Profile"
+msgstr "الملف الشخصي"
+
+#: templates/layout.html:69
+msgid "Logout"
+msgstr "تسجيل الخروج"
+
+#: templates/layout.html:71
+msgid "Login"
+msgstr "تسجيل الدخول"
+
+#: templates/layout.html:72
+msgid "Register"
+msgstr "تسجيل جديد"
+
+#: templates/index.html:8
+msgid "Discover Egypt's Wonders"
+msgstr "اكتشف روائع مصر"
+
+#: templates/index.html:9
+msgid "Explore ancient pyramids, stunning temples, vibrant cities, and beautiful beaches all in one destination."
+msgstr "استكشف الأهرامات القديمة، والمعابد المذهلة، والمدن النابضة بالحياة، والشواطئ الجميلة، كل ذلك في وجهة واحدة."
+
+#: templates/index.html:10
+msgid "Explore Now"
+msgstr "استكشف الآن"
+
+#: templates/index.html:17
+msgid "Featured Attractions"
+msgstr "معالم سياحية مميزة"
+
+#: templates/index.html:32
+msgid "Learn More"
+msgstr "اقرأ المزيد"
+
+#: templates/index.html:40
+msgid "No featured attractions available at the moment."
+msgstr "لا توجد معالم سياحية مميزة متاحة في الوقت الحالي."
+
+#: templates/index.html:46
+msgid "View All Attractions"
+msgstr "عرض جميع المعالم السياحية"
+
+#: templates/index.html:52
+msgid "Why Visit Egypt?"
+msgstr "لماذا تزور مصر؟"
+
+#: templates/index.html:59
+msgid "Rich History"
+msgstr "تاريخ غني"
+
+#: templates/index.html:60
+msgid "Discover one of the world's oldest civilizations with monuments dating back thousands of years."
+msgstr "اكتشف واحدة من أقدم الحضارات في العالم مع آثار يعود تاريخها إلى آلاف السنين."
+
+#: templates/index.html:68
+msgid "Beautiful Beaches"
+msgstr "شواطئ جميلة"
+
+#: templates/index.html:69
+msgid "Enjoy pristine beaches and world-class diving along the Red Sea coast."
+msgstr "استمتع بالشواطئ النقية والغوص على مستوى عالمي على طول ساحل البحر الأحمر."
+
+#: templates/index.html:77
+msgid "Delicious Cuisine"
+msgstr "مأكولات لذيذة"
+
+#: templates/index.html:78
+msgid "Savor authentic Egyptian dishes that blend flavors from across the Mediterranean and Middle East."
+msgstr "استمتع بالأطباق المصرية الأصيلة التي تمزج النكهات من جميع أنحاء البحر المتوسط والشرق الأوسط."
+
+#: templates/index.html:86
+msgid "Explore Egypt By Region"
+msgstr "استكشف مصر حسب المنطقة"
+
+#: templates/index.html:93
+msgid "Explore attractions in this region."
+msgstr "استكشف المعالم السياحية في هذه المنطقة."
+
+#: templates/index.html:94
+msgid "View Attractions"
+msgstr "عرض المعالم السياحية"
+
+#: templates/index.html:102
+msgid "Regions information coming soon!"
+msgstr "معلومات المناطق قادمة قريبا!"
+
+#: templates/index.html:112
+msgid "Connect with Professional Tour Guides"
+msgstr "تواصل مع المرشدين السياحيين المحترفين"
+
+#: templates/index.html:113
+msgid "Find experienced guides who speak your language and can show you the best of Egypt."
+msgstr "ابحث عن مرشدين ذوي خبرة يتحدثون لغتك ويمكنهم إظهار أفضل ما في مصر."
+
+#: templates/index.html:114
+msgid "Find a Guide"
+msgstr "ابحث عن مرشد"
+
+#: templates/index.html:124
+msgid "Practice Languages with Locals"
+msgstr "ممارسة اللغات مع السكان المحليين"
+
+#: templates/index.html:125
+msgid "Are you a language student? Connect with Egyptian students and guides to practice your language skills while exploring Egypt."
+msgstr "هل أنت طالب لغة؟ تواصل مع الطلاب المصريين والمرشدين لممارسة مهاراتك اللغوية أثناء استكشاف مصر."
+
+#: templates/index.html:126
+msgid "Learn More"
+msgstr "اقرأ المزيد"
+
+#: templates/attractions.html:4
+msgid "Explore Egyptian Attractions"
+msgstr "استكشف المعالم السياحية المصرية"
+
+#: templates/attractions.html:9
+msgid "Filter by Region:"
+msgstr "تصفية حسب المنطقة:"
+
+#: templates/attractions.html:11
+msgid "All Regions"
+msgstr "جميع المناطق"
+
+#: templates/attractions.html:20
+msgid "Sort by:"
+msgstr "ترتيب حسب:"
+
+#: templates/attractions.html:22
+msgid "Name (A-Z)"
+msgstr "الاسم (أ-ي)"
+
+#: templates/attractions.html:23
+msgid "Rating (High to Low)"
+msgstr "التقييم (من الأعلى إلى الأقل)"
+
+#: templates/attractions.html:30
+msgid "Map View"
+msgstr "عرض الخريطة"
+
+#: templates/attractions.html:56
+msgid "View Details"
+msgstr "عرض التفاصيل"
+
+#: templates/attractions.html:63
+msgid "No attractions found with the selected filters. Please try different filters."
+msgstr "لم يتم العثور على معالم سياحية بالمرشحات المحددة. يرجى تجربة مرشحات مختلفة."

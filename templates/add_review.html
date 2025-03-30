@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="card form-container">
+                    <div class="card-body">
+                        <h2 class="mb-4">Review: {{ attraction.name }}</h2>
+                        <form method="POST" action="{{ url_for('add_review', attraction_id=attraction.id) }}">
+                            {{ form.hidden_tag() }}
+                            
+                            <div class="mb-3">
+                                {{ form.title.label(class="form-label") }}
+                                {% if form.title.errors %}
+                                    {{ form.title(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.title.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.title(class="form-control") }}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.content.label(class="form-label") }}
+                                {% if form.content.errors %}
+                                    {{ form.content(class="form-control is-invalid", rows=5) }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.content.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.content(class="form-control", rows=5) }}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.rating.label(class="form-label") }}
+                                {% if form.rating.errors %}
+                                    {{ form.rating(class="form-select is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.rating.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.rating(class="form-select") }}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ url_for('attraction_detail', attraction_id=attraction.id) }}" class="btn btn-outline-secondary">Cancel</a>
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

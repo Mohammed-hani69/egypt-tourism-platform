@@ -1,0 +1,88 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Search Results for "{{ query }}"</h1>
+        
+        {% if not attractions and not restaurants and not activities %}
+            <div class="alert alert-info">
+                No results found for your search query. Please try different keywords.
+            </div>
+        {% endif %}
+        
+        <!-- Attractions Results -->
+        {% if attractions %}
+            <h2 class="mt-4 mb-3">Attractions</h2>
+            <div class="row">
+                {% for attraction in attractions %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card attraction-card h-100">
+                            <img src="{{ attraction.image_url or 'https://source.unsplash.com/500x300/?egypt,' + attraction.name }}" class="card-img-top" alt="{{ attraction.name }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ attraction.name }}</h5>
+                                <p class="card-text">{{ attraction.description[:100] }}{% if attraction.description|length > 100 %}...{% endif %}</p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="{{ url_for('attraction_detail', attraction_id=attraction.id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <!-- Restaurants Results -->
+        {% if restaurants %}
+            <h2 class="mt-4 mb-3">Restaurants</h2>
+            <div class="row">
+                {% for restaurant in restaurants %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ restaurant.name }}</h5>
+                                {% if restaurant.cuisine_type %}
+                                    <span class="badge bg-info">{{ restaurant.cuisine_type }}</span>
+                                {% endif %}
+                                <p class="card-text mt-2">{{ restaurant.description[:100] if restaurant.description else 'No description available.' }}{% if restaurant.description and restaurant.description|length > 100 %}...{% endif %}</p>
+                                <a href="{{ url_for('attraction_detail', attraction_id=restaurant.attraction_id) }}" class="btn btn-sm btn-outline-primary">View Attraction</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <!-- Activities Results -->
+        {% if activities %}
+            <h2 class="mt-4 mb-3">Activities</h2>
+            <div class="row">
+                {% for activity in activities %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ activity.name }}</h5>
+                                <p class="card-text">{{ activity.description[:100] if activity.description else 'No description available.' }}{% if activity.description and activity.description|length > 100 %}...{% endif %}</p>
+                                {% if activity.price %}
+                                    <p><strong>Price:</strong> {{ activity.price }}</p>
+                                {% endif %}
+                                <a href="{{ url_for('attraction_detail', attraction_id=activity.attraction_id) }}" class="btn btn-sm btn-outline-primary">View Attraction</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <!-- Related Searches -->
+        <div class="mt-5">
+            <h3>You might also be interested in:</h3>
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                <a href="{{ url_for('search', q='pyramids') }}" class="btn btn-outline-secondary">Pyramids</a>
+                <a href="{{ url_for('search', q='nile') }}" class="btn btn-outline-secondary">Nile River</a>
+                <a href="{{ url_for('search', q='museum') }}" class="btn btn-outline-secondary">Museums</a>
+                <a href="{{ url_for('search', q='temple') }}" class="btn btn-outline-secondary">Temples</a>
+                <a href="{{ url_for('search', q='beach') }}" class="btn btn-outline-secondary">Beaches</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

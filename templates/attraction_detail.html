@@ -1,0 +1,176 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="container mt-5">
+        <!-- Attraction Header -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h1>{{ attraction.name }}</h1>
+                <p class="lead">{{ attraction.region.name }}</p>
+                <div class="rating-display" data-rating="{{ avg_rating }}">
+                    <div class="rating">★★★★★</div>
+                    <div class="rating-stars" style="width: {{ (avg_rating / 5) * 100 }}%">★★★★★</div>
+                    <span>({{ reviews|length }} {% if reviews|length == 1 %}review{% else %}reviews{% endif %})</span>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end">
+                {% if attraction.ticket_price %}
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Ticket Price</h5>
+                            <p class="card-text">{{ attraction.ticket_price }}</p>
+                            {% if attraction.opening_hours %}
+                                <p class="card-text"><strong>Opening Hours:</strong> {{ attraction.opening_hours }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Attraction Image and Description -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <img src="{{ attraction.image_url or 'https://source.unsplash.com/800x600/?egypt,' + attraction.name }}" class="img-fluid rounded" alt="{{ attraction.name }}">
+            </div>
+            <div class="col-md-6">
+                <h3>About</h3>
+                <p>{{ attraction.description }}</p>
+                
+                {% if attraction.address %}
+                    <p><strong>Address:</strong> {{ attraction.address }}</p>
+                {% endif %}
+                
+                {% if attraction.website %}
+                    <p><strong>Website:</strong> <a href="{{ attraction.website }}" target="_blank">{{ attraction.website }}</a></p>
+                {% endif %}
+                
+                <!-- Add Review Button -->
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('add_review', attraction_id=attraction.id) }}" class="btn btn-primary mt-3">
+                        <i class="fas fa-star me-2"></i> Write a Review
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-primary mt-3">
+                        <i class="fas fa-sign-in-alt me-2"></i> Login to Write a Review
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Map Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h3>Location</h3>
+                <div id="map"></div>
+            </div>
+        </div>
+        
+        <!-- Nearby Restaurants -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h3>Nearby Restaurants</h3>
+                {% if restaurants %}
+                    <div class="row">
+                        {% for restaurant in restaurants %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100 restaurant-data" 
+                                     data-lat="{{ restaurant.latitude }}" 
+                                     data-lng="{{ restaurant.longitude }}" 
+                                     data-name="{{ restaurant.name }}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ restaurant.name }}</h5>
+                                        <p class="card-text">
+                                            {% if restaurant.cuisine_type %}
+                                                <span class="badge bg-info">{{ restaurant.cuisine_type }}</span>
+                                            {% endif %}
+                                            {% if restaurant.price_range %}
+                                                <span class="badge bg-secondary">{{ restaurant.price_range }}</span>
+                                            {% endif %}
+                                        </p>
+                                        <p class="card-text">{{ restaurant.description[:100] if restaurant.description else 'No description available.' }}{% if restaurant.description and restaurant.description|length > 100 %}...{% endif %}</p>
+                                        {% if restaurant.contact %}
+                                            <p class="card-text"><small class="text-muted"><i class="fas fa-phone me-1"></i> {{ restaurant.contact }}</small></p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No restaurant information available for this attraction.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Activities -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h3>Available Activities</h3>
+                {% if activities %}
+                    <div class="row">
+                        {% for activity in activities %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ activity.name }}</h5>
+                                        <p class="card-text">{{ activity.description[:100] if activity.description else 'No description available.' }}{% if activity.description and activity.description|length > 100 %}...{% endif %}</p>
+                                        {% if activity.price %}
+                                            <p class="card-text"><strong>Price:</strong> {{ activity.price }}</p>
+                                        {% endif %}
+                                        {% if activity.duration %}
+                                            <p class="card-text"><strong>Duration:</strong> {{ activity.duration }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No activity information available for this attraction.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Reviews -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h3>Reviews</h3>
+                {% if reviews %}
+                    {% for review in reviews %}
+                        <div class="card review-card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5 class="card-title mb-0">{{ review.title }}</h5>
+                                    <div class="rating-display" data-rating="{{ review.rating }}">
+                                        <div class="rating">★★★★★</div>
+                                        <div class="rating-stars" style="width: {{ (review.rating / 5) * 100 }}%">★★★★★</div>
+                                    </div>
+                                </div>
+                                <p class="card-text">{{ review.content }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">By {{ review.author.username }}</small>
+                                    <small class="review-date">{{ review.date_posted.strftime('%B %d, %Y') }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No reviews yet. Be the first to share your experience!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <!-- Google Maps JavaScript API -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Call initMap function with attraction coordinates
+            initMap({{ attraction.latitude }}, {{ attraction.longitude }}, "{{ attraction.name }}");
+        });
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+    <script src="{{ url_for('static', filename='js/maps.js') }}"></script>
+{% endblock %}

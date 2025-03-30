@@ -1,0 +1,112 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Language Practice</h1>
+        <p class="text-center mb-4">Connect with language students and practice your language skills while exploring Egypt.</p>
+        
+        <!-- Language Filter -->
+        <div class="row mb-4">
+            <div class="col-md-6 mx-auto">
+                <label for="language-filter" class="form-label">Filter by Language:</label>
+                <select id="language-filter" class="form-select" onchange="window.location.href='{{ url_for('language_practice') }}?language=' + this.value">
+                    <option value="">All Languages</option>
+                    <option value="English" {% if selected_language == 'English' %}selected{% endif %}>English</option>
+                    <option value="Arabic" {% if selected_language == 'Arabic' %}selected{% endif %}>Arabic</option>
+                    <option value="French" {% if selected_language == 'French' %}selected{% endif %}>French</option>
+                    <option value="German" {% if selected_language == 'German' %}selected{% endif %}>German</option>
+                    <option value="Spanish" {% if selected_language == 'Spanish' %}selected{% endif %}>Spanish</option>
+                    <option value="Italian" {% if selected_language == 'Italian' %}selected{% endif %}>Italian</option>
+                    <option value="Russian" {% if selected_language == 'Russian' %}selected{% endif %}>Russian</option>
+                    <option value="Chinese" {% if selected_language == 'Chinese' %}selected{% endif %}>Chinese</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Language Practice Opportunities -->
+        <div class="row">
+            {% if opportunities %}
+                {% for opportunity in opportunities %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card practice-card h-100">
+                            <div class="card-body text-center">
+                                <img src="{{ opportunity.student.profile_pic or 'https://via.placeholder.com/150' }}" class="student-avatar mb-3" alt="{{ opportunity.student.username }}">
+                                <h5 class="card-title">{{ opportunity.student.username }}</h5>
+                                <p class="badge bg-primary mb-2">{{ opportunity.language }} - {{ opportunity.proficiency_level }}</p>
+                                {% if opportunity.availability %}
+                                    <p><strong>Availability:</strong> {{ opportunity.availability }}</p>
+                                {% endif %}
+                                {% if opportunity.interests %}
+                                    <p><strong>Interests:</strong> {{ opportunity.interests }}</p>
+                                {% endif %}
+                                {% if opportunity.student.bio %}
+                                    <p class="card-text">{{ opportunity.student.bio[:150] }}{% if opportunity.student.bio|length > 150 %}...{% endif %}</p>
+                                {% endif %}
+                                <a href="mailto:{{ opportunity.student.email }}" class="btn btn-primary">
+                                    <i class="fas fa-envelope me-2"></i>Contact
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center">
+                    <p>No language practice opportunities found matching your criteria. Please try a different language filter.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Join as Language Student Section -->
+        <div class="card bg-light mt-5">
+            <div class="card-body text-center p-5">
+                <h3>Are You a Language Student?</h3>
+                <p class="mb-4">Join our platform to practice your language skills with locals and tourists in Egypt.</p>
+                {% if current_user.is_authenticated %}
+                    {% if current_user.is_student %}
+                        <p class="text-success"><i class="fas fa-check-circle me-2"></i>You are registered as a language student!</p>
+                    {% else %}
+                        <a href="{{ url_for('profile') }}" class="btn btn-primary">Register as Language Student</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{{ url_for('register') }}" class="btn btn-primary">Register Now</a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Benefits Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3 class="text-center mb-4">Benefits of Language Practice</h3>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-graduation-cap fa-3x mb-3 text-primary"></i>
+                                <h5>Improve Your Skills</h5>
+                                <p>Practice with native speakers and improve your language skills in real-world situations.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-users fa-3x mb-3 text-primary"></i>
+                                <h5>Cultural Exchange</h5>
+                                <p>Learn about Egyptian culture and share your own culture with others.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-map-marked-alt fa-3x mb-3 text-primary"></i>
+                                <h5>Explore Egypt</h5>
+                                <p>Discover hidden gems and local spots while practicing your language skills.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

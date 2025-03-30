@@ -1,0 +1,201 @@
+/* General Styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    padding-top: 60px;
+}
+
+.bg-egypt {
+    background-color: #E7D4AB;
+}
+
+.bg-egypt-dark {
+    background-color: #B09359;
+}
+
+.text-egypt {
+    color: #B09359;
+}
+
+.text-egypt-dark {
+    color: #8A6D3B;
+}
+
+/* Header and Navigation */
+.navbar-brand img {
+    max-height: 40px;
+}
+
+.nav-link {
+    font-weight: 500;
+}
+
+.language-selector {
+    margin-left: 10px;
+}
+
+/* Hero Section */
+.hero-section {
+    position: relative;
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://source.unsplash.com/1600x900/?egypt,pyramids');
+    background-size: cover;
+    background-position: center;
+}
+
+.hero-content h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    max-width: 700px;
+    margin: 0 auto 2rem auto;
+}
+
+/* Card Styles */
+.attraction-card {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.attraction-card:hover {
+    transform: translateY(-5px);
+}
+
+.attraction-card img {
+    height: 200px;
+    object-fit: cover;
+}
+
+.card-footer {
+    background-color: transparent;
+    border-top: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+/* Rating Stars */
+.rating {
+    display: inline-block;
+    unicode-bidi: bidi-override;
+    color: #ccc;
+    font-size: 1.25rem;
+    position: relative;
+}
+
+.rating-stars {
+    color: #FFD700;
+    padding: 0;
+    z-index: 1;
+    display: inline-block;
+    position: absolute;
+    overflow: hidden;
+    left: 0;
+    top: 0;
+    white-space: nowrap;
+}
+
+/* Reviews */
+.review-card {
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.review-date {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+/* Guide and Language Practice Sections */
+.guide-card, .practice-card {
+    border-radius: 10px;
+    margin-bottom: 20px;
+    transition: transform 0.2s ease;
+}
+
+.guide-card:hover, .practice-card:hover {
+    transform: translateY(-3px);
+}
+
+.guide-avatar, .student-avatar {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* Maps */
+#map {
+    height: 400px;
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero-section {
+        height: 40vh;
+    }
+    
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-content p {
+        font-size: 1rem;
+    }
+}
+
+/* Arabic language support - RTL */
+[lang="ar"] {
+    direction: rtl;
+    text-align: right;
+}
+
+[lang="ar"] .navbar-nav {
+    padding-right: 0;
+}
+
+[lang="ar"] .ml-auto {
+    margin-right: auto !important;
+    margin-left: 0 !important;
+}
+
+/* Footer */
+footer {
+    background-color: #343a40;
+    color: white;
+    padding: 30px 0;
+    margin-top: 50px;
+}
+
+footer a {
+    color: #E7D4AB;
+}
+
+footer a:hover {
+    color: #B09359;
+    text-decoration: none;
+}
+
+/* Search Box */
+.search-box {
+    max-width: 500px;
+    margin: 20px auto;
+}
+
+/* Form Styles */
+.form-container {
+    max-width: 700px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 10px;
+}

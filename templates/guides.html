@@ -1,0 +1,91 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Tour Guides</h1>
+        <p class="text-center mb-4">Connect with professional tour guides who can enhance your Egyptian experience.</p>
+        
+        <!-- Language Filter -->
+        <div class="row mb-4">
+            <div class="col-md-6 mx-auto">
+                <label for="language-filter" class="form-label">Filter by Language:</label>
+                <select id="language-filter" class="form-select" onchange="window.location.href='{{ url_for('guides') }}?language=' + this.value">
+                    <option value="">All Languages</option>
+                    <option value="English" {% if selected_language == 'English' %}selected{% endif %}>English</option>
+                    <option value="Arabic" {% if selected_language == 'Arabic' %}selected{% endif %}>Arabic</option>
+                    <option value="French" {% if selected_language == 'French' %}selected{% endif %}>French</option>
+                    <option value="German" {% if selected_language == 'German' %}selected{% endif %}>German</option>
+                    <option value="Spanish" {% if selected_language == 'Spanish' %}selected{% endif %}>Spanish</option>
+                    <option value="Italian" {% if selected_language == 'Italian' %}selected{% endif %}>Italian</option>
+                    <option value="Russian" {% if selected_language == 'Russian' %}selected{% endif %}>Russian</option>
+                    <option value="Chinese" {% if selected_language == 'Chinese' %}selected{% endif %}>Chinese</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Guides List -->
+        <div class="row">
+            {% if guides %}
+                {% for guide in guides %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card guide-card h-100">
+                            <div class="card-body text-center">
+                                <img src="{{ guide.user.profile_pic or 'https://via.placeholder.com/150' }}" class="guide-avatar mb-3" alt="{{ guide.user.username }}">
+                                <h5 class="card-title">{{ guide.user.username }}</h5>
+                                <p class="text-muted">
+                                    {% if guide.years_experience %}
+                                        {{ guide.years_experience }} years experience
+                                    {% endif %}
+                                    {% if guide.specialization %}
+                                        • {{ guide.specialization }}
+                                    {% endif %}
+                                </p>
+                                {% if guide.user.languages %}
+                                    <p><strong>Languages:</strong> {{ guide.user.languages }}</p>
+                                {% endif %}
+                                {% if guide.user.bio %}
+                                    <p class="card-text">{{ guide.user.bio[:150] }}{% if guide.user.bio|length > 150 %}...{% endif %}</p>
+                                {% endif %}
+                                {% if guide.certification %}
+                                    <p><strong>Certification:</strong> {{ guide.certification }}</p>
+                                {% endif %}
+                                {% if guide.available %}
+                                    <span class="badge bg-success mb-3">Available</span>
+                                {% else %}
+                                    <span class="badge bg-secondary mb-3">Unavailable</span>
+                                {% endif %}
+                                {% if guide.user.phone %}
+                                    <p><i class="fas fa-phone me-2"></i>{{ guide.user.phone }}</p>
+                                {% endif %}
+                                <a href="mailto:{{ guide.user.email }}" class="btn btn-primary">
+                                    <i class="fas fa-envelope me-2"></i>Contact
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center">
+                    <p>No guides found matching your criteria. Please try a different language filter.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Become a Guide Section -->
+        <div class="card bg-light mt-5">
+            <div class="card-body text-center p-5">
+                <h3>Are You a Professional Tour Guide?</h3>
+                <p class="mb-4">Join our platform to connect with tourists from around the world.</p>
+                {% if current_user.is_authenticated %}
+                    {% if current_user.is_guide %}
+                        <p class="text-success"><i class="fas fa-check-circle me-2"></i>You are registered as a guide!</p>
+                    {% else %}
+                        <a href="{{ url_for('profile') }}" class="btn btn-primary">Register as Guide</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{{ url_for('register') }}" class="btn btn-primary">Register Now</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

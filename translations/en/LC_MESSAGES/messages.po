@@ -1,0 +1,194 @@
+# English translations for Egypt Tourism.
+# Copyright (C) 2023 Egypt Tourism
+# This file is distributed under the same license as the Egypt Tourism project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2023-06-01 12:00+0000\n"
+"PO-Revision-Date: 2023-06-01 12:00+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: templates/layout.html:8
+msgid "Egypt Tourism"
+msgstr "Egypt Tourism"
+
+#: templates/layout.html:27
+msgid "Home"
+msgstr "Home"
+
+#: templates/layout.html:30
+msgid "Attractions"
+msgstr "Attractions"
+
+#: templates/layout.html:33
+msgid "Tour Guides"
+msgstr "Tour Guides"
+
+#: templates/layout.html:36
+msgid "Language Practice"
+msgstr "Language Practice"
+
+#: templates/layout.html:43
+msgid "Search..."
+msgstr "Search..."
+
+#: templates/layout.html:62
+msgid "Account"
+msgstr "Account"
+
+#: templates/layout.html:67
+msgid "My Profile"
+msgstr "My Profile"
+
+#: templates/layout.html:69
+msgid "Logout"
+msgstr "Logout"
+
+#: templates/layout.html:71
+msgid "Login"
+msgstr "Login"
+
+#: templates/layout.html:72
+msgid "Register"
+msgstr "Register"
+
+#: templates/index.html:8
+msgid "Discover Egypt's Wonders"
+msgstr "Discover Egypt's Wonders"
+
+#: templates/index.html:9
+msgid "Explore ancient pyramids, stunning temples, vibrant cities, and beautiful beaches all in one destination."
+msgstr "Explore ancient pyramids, stunning temples, vibrant cities, and beautiful beaches all in one destination."
+
+#: templates/index.html:10
+msgid "Explore Now"
+msgstr "Explore Now"
+
+#: templates/index.html:17
+msgid "Featured Attractions"
+msgstr "Featured Attractions"
+
+#: templates/index.html:32
+msgid "Learn More"
+msgstr "Learn More"
+
+#: templates/index.html:40
+msgid "No featured attractions available at the moment."
+msgstr "No featured attractions available at the moment."
+
+#: templates/index.html:46
+msgid "View All Attractions"
+msgstr "View All Attractions"
+
+#: templates/index.html:52
+msgid "Why Visit Egypt?"
+msgstr "Why Visit Egypt?"
+
+#: templates/index.html:59
+msgid "Rich History"
+msgstr "Rich History"
+
+#: templates/index.html:60
+msgid "Discover one of the world's oldest civilizations with monuments dating back thousands of years."
+msgstr "Discover one of the world's oldest civilizations with monuments dating back thousands of years."
+
+#: templates/index.html:68
+msgid "Beautiful Beaches"
+msgstr "Beautiful Beaches"
+
+#: templates/index.html:69
+msgid "Enjoy pristine beaches and world-class diving along the Red Sea coast."
+msgstr "Enjoy pristine beaches and world-class diving along the Red Sea coast."
+
+#: templates/index.html:77
+msgid "Delicious Cuisine"
+msgstr "Delicious Cuisine"
+
+#: templates/index.html:78
+msgid "Savor authentic Egyptian dishes that blend flavors from across the Mediterranean and Middle East."
+msgstr "Savor authentic Egyptian dishes that blend flavors from across the Mediterranean and Middle East."
+
+#: templates/index.html:86
+msgid "Explore Egypt By Region"
+msgstr "Explore Egypt By Region"
+
+#: templates/index.html:93
+msgid "Explore attractions in this region."
+msgstr "Explore attractions in this region."
+
+#: templates/index.html:94
+msgid "View Attractions"
+msgstr "View Attractions"
+
+#: templates/index.html:102
+msgid "Regions information coming soon!"
+msgstr "Regions information coming soon!"
+
+#: templates/index.html:112
+msgid "Connect with Professional Tour Guides"
+msgstr "Connect with Professional Tour Guides"
+
+#: templates/index.html:113
+msgid "Find experienced guides who speak your language and can show you the best of Egypt."
+msgstr "Find experienced guides who speak your language and can show you the best of Egypt."
+
+#: templates/index.html:114
+msgid "Find a Guide"
+msgstr "Find a Guide"
+
+#: templates/index.html:124
+msgid "Practice Languages with Locals"
+msgstr "Practice Languages with Locals"
+
+#: templates/index.html:125
+msgid "Are you a language student? Connect with Egyptian students and guides to practice your language skills while exploring Egypt."
+msgstr "Are you a language student? Connect with Egyptian students and guides to practice your language skills while exploring Egypt."
+
+#: templates/index.html:126
+msgid "Learn More"
+msgstr "Learn More"
+
+#: templates/attractions.html:4
+msgid "Explore Egyptian Attractions"
+msgstr "Explore Egyptian Attractions"
+
+#: templates/attractions.html:9
+msgid "Filter by Region:"
+msgstr "Filter by Region:"
+
+#: templates/attractions.html:11
+msgid "All Regions"
+msgstr "All Regions"
+
+#: templates/attractions.html:20
+msgid "Sort by:"
+msgstr "Sort by:"
+
+#: templates/attractions.html:22
+msgid "Name (A-Z)"
+msgstr "Name (A-Z)"
+
+#: templates/attractions.html:23
+msgid "Rating (High to Low)"
+msgstr "Rating (High to Low)"
+
+#: templates/attractions.html:30
+msgid "Map View"
+msgstr "Map View"
+
+#: templates/attractions.html:56
+msgid "View Details"
+msgstr "View Details"
+
+#: templates/attractions.html:63
+msgid "No attractions found with the selected filters. Please try different filters."
+msgstr "No attractions found with the selected filters. Please try different filters."

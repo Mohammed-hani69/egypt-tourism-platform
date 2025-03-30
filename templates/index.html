@@ -1,0 +1,125 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>Discover Egypt's Wonders</h1>
+            <p>Explore ancient pyramids, stunning temples, vibrant cities, and beautiful beaches all in one destination.</p>
+            <a href="{{ url_for('attractions') }}" class="btn btn-primary btn-lg">Explore Now</a>
+        </div>
+    </section>
+    
+    <!-- Featured Attractions -->
+    <section class="container my-5">
+        <h2 class="text-center mb-4">Featured Attractions</h2>
+        <div class="row">
+            {% if featured_attractions %}
+                {% for attraction in featured_attractions %}
+                    <div class="col-md-3 mb-4">
+                        <div class="card attraction-card h-100">
+                            <img src="{{ attraction.image_url or 'https://source.unsplash.com/500x300/?egypt,' + attraction.name }}" class="card-img-top" alt="{{ attraction.name }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ attraction.name }}</h5>
+                                <p class="card-text">{{ attraction.description[:100] }}{% if attraction.description|length > 100 %}...{% endif %}</p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="{{ url_for('attraction_detail', attraction_id=attraction.id) }}" class="btn btn-sm btn-outline-primary">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center">
+                    <p>No featured attractions available at the moment.</p>
+                </div>
+            {% endif %}
+        </div>
+        <div class="text-center mt-3">
+            <a href="{{ url_for('attractions') }}" class="btn btn-outline-primary">View All Attractions</a>
+        </div>
+    </section>
+    
+    <!-- Why Visit Egypt -->
+    <section class="container my-5">
+        <h2 class="text-center mb-4">Why Visit Egypt?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-landmark fa-3x mb-3 text-primary"></i>
+                        <h5 class="card-title">Rich History</h5>
+                        <p class="card-text">Discover one of the world's oldest civilizations with monuments dating back thousands of years.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-water fa-3x mb-3 text-primary"></i>
+                        <h5 class="card-title">Beautiful Beaches</h5>
+                        <p class="card-text">Enjoy pristine beaches and world-class diving along the Red Sea coast.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-utensils fa-3x mb-3 text-primary"></i>
+                        <h5 class="card-title">Delicious Cuisine</h5>
+                        <p class="card-text">Savor authentic Egyptian dishes that blend flavors from across the Mediterranean and Middle East.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Regions Section -->
+    <section class="container my-5">
+        <h2 class="text-center mb-4">Explore Egypt By Region</h2>
+        <div class="row">
+            {% if regions %}
+                {% for region in regions %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card region-card h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">{{ region.name }}</h5>
+                                <p class="card-text">{{ region.description[:100] if region.description else 'Explore attractions in this region.' }}</p>
+                                <a href="{{ url_for('attractions', region=region.id) }}" class="btn btn-outline-primary">View Attractions</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center">
+                    <p>Regions information coming soon!</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+    
+    <!-- Connect with Guides -->
+    <section class="container my-5">
+        <div class="card bg-light">
+            <div class="card-body text-center py-5">
+                <h2 class="mb-3">Connect with Professional Tour Guides</h2>
+                <p class="mb-4">Find experienced guides who speak your language and can show you the best of Egypt.</p>
+                <a href="{{ url_for('guides') }}" class="btn btn-primary">Find a Guide</a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Language Practice Section -->
+    <section class="container my-5">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h2>Practice Languages with Locals</h2>
+                <p>Are you a language student? Connect with Egyptian students and guides to practice your language skills while exploring Egypt.</p>
+                <a href="{{ url_for('language_practice') }}" class="btn btn-outline-primary">Learn More</a>
+            </div>
+            <div class="col-md-6 text-center">
+                <i class="fas fa-comments fa-6x text-primary"></i>
+            </div>
+        </div>
+    </section>
+{% endblock %}
