@@ -6,35 +6,62 @@
             <div class="col-md-4">
                 <div class="card mb-4">
                     <div class="card-body text-center">
-                        <img src="{{ current_user.profile_pic or 'https://via.placeholder.com/150' }}" class="rounded-circle mb-3" width="150" height="150" alt="Profile Picture">
+                        <img src="{{ current_user.profile_pic or 'https://via.placeholder.com/150' }}" class="rounded-circle mb-3" width="150" height="150" alt="{{ _('Profile Picture') }}">
                         <h4>{{ current_user.username }}</h4>
                         <p class="text-muted">{{ current_user.email }}</p>
                         
                         {% if current_user.is_guide %}
-                            <span class="badge bg-primary mb-2">Tour Guide</span>
+                            <span class="badge bg-primary mb-2">{{ _('Tour Guide') }}</span>
                         {% endif %}
                         
                         {% if current_user.is_student %}
-                            <span class="badge bg-info mb-2">Language Student</span>
+                            <span class="badge bg-info mb-2">{{ _('Language Student') }}</span>
                         {% endif %}
                         
-                        <p class="mt-2">Member since: {{ current_user.date_joined.strftime('%B %d, %Y') }}</p>
+                        {% if current_user.is_tourist %}
+                            <span class="badge bg-warning mb-2">{{ _('Tourist') }}</span>
+                        {% endif %}
+                        
+                        {% if current_user.is_admin %}
+                            <span class="badge bg-danger mb-2">{{ _('Admin') }}</span>
+                        {% endif %}
+                        
+                        <p class="mt-2">{{ _('Member since') }}: {{ current_user.date_joined.strftime('%B %d, %Y') }}</p>
                         
                         {% if current_user.bio %}
                             <div class="mt-3">
-                                <h6>Bio</h6>
+                                <h6>{{ _('Bio') }}</h6>
                                 <p>{{ current_user.bio }}</p>
                             </div>
                         {% endif %}
                         
                         {% if current_user.languages %}
                             <div class="mt-3">
-                                <h6>Languages</h6>
+                                <h6>{{ _('Languages') }}</h6>
                                 <p>{{ current_user.languages }}</p>
                             </div>
                         {% endif %}
                         
-                        <a href="#" class="btn btn-outline-primary mt-3">Edit Profile</a>
+                        <a href="#" class="btn btn-outline-primary mt-3">{{ _('Edit Profile') }}</a>
+                        
+                        <!-- Dashboard Links -->
+                        <div class="mt-3">
+                            {% if current_user.is_admin %}
+                                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary d-block mb-2">{{ _('Admin Dashboard') }}</a>
+                            {% endif %}
+                            
+                            {% if current_user.is_guide %}
+                                <a href="{{ url_for('guide_dashboard') }}" class="btn btn-success d-block mb-2">{{ _('Guide Dashboard') }}</a>
+                            {% endif %}
+                            
+                            {% if current_user.is_student %}
+                                <a href="{{ url_for('student_dashboard') }}" class="btn btn-info d-block mb-2">{{ _('Student Dashboard') }}</a>
+                            {% endif %}
+                            
+                            {% if current_user.is_tourist %}
+                                <a href="{{ url_for('tourist_dashboard') }}" class="btn btn-warning d-block mb-2">{{ _('Tourist Dashboard') }}</a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -44,30 +71,30 @@
                 {% if current_user.is_guide %}
                     <div class="card mb-4">
                         <div class="card-header">
-                            <h5>Guide Information</h5>
+                            <h5>{{ _('Guide Information') }}</h5>
                         </div>
                         <div class="card-body">
                             {% if guide_info %}
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <p><strong>Years of Experience:</strong> {{ guide_info.years_experience }}</p>
-                                        <p><strong>Specialization:</strong> {{ guide_info.specialization }}</p>
+                                        <p><strong>{{ _('Years of Experience') }}:</strong> {{ guide_info.years_experience }}</p>
+                                        <p><strong>{{ _('Specialization') }}:</strong> {{ guide_info.specialization }}</p>
                                     </div>
                                     <div class="col-md-6">
-                                        <p><strong>Certification:</strong> {{ guide_info.certification }}</p>
-                                        <p><strong>Status:</strong> 
+                                        <p><strong>{{ _('Certification') }}:</strong> {{ guide_info.certification }}</p>
+                                        <p><strong>{{ _('Status') }}:</strong> 
                                             {% if guide_info.available %}
-                                                <span class="badge bg-success">Available</span>
+                                                <span class="badge bg-success">{{ _('Available') }}</span>
                                             {% else %}
-                                                <span class="badge bg-secondary">Unavailable</span>
+                                                <span class="badge bg-secondary">{{ _('Unavailable') }}</span>
                                             {% endif %}
                                         </p>
                                     </div>
                                 </div>
-                                <a href="#" class="btn btn-sm btn-outline-primary mt-2">Update Guide Information</a>
+                                <a href="#" class="btn btn-sm btn-outline-primary mt-2">{{ _('Update Guide Information') }}</a>
                             {% else %}
-                                <p>You have not completed your guide profile yet.</p>
-                                <a href="#" class="btn btn-primary">Complete Guide Profile</a>
+                                <p>{{ _('You have not completed your guide profile yet.') }}</p>
+                                <a href="#" class="btn btn-primary">{{ _('Complete Guide Profile') }}</a>
                             {% endif %}
                         </div>
                     </div>
@@ -77,24 +104,24 @@
                 {% if current_user.is_student %}
                     <div class="card mb-4">
                         <div class="card-header">
-                            <h5>Language Practice Information</h5>
+                            <h5>{{ _('Language Practice Information') }}</h5>
                         </div>
                         <div class="card-body">
                             {% if language_practice %}
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <p><strong>Language:</strong> {{ language_practice.language }}</p>
-                                        <p><strong>Proficiency Level:</strong> {{ language_practice.proficiency_level }}</p>
+                                        <p><strong>{{ _('Language') }}:</strong> {{ language_practice.language }}</p>
+                                        <p><strong>{{ _('Proficiency Level') }}:</strong> {{ language_practice.proficiency_level }}</p>
                                     </div>
                                     <div class="col-md-6">
-                                        <p><strong>Availability:</strong> {{ language_practice.availability }}</p>
-                                        <p><strong>Interests:</strong> {{ language_practice.interests }}</p>
+                                        <p><strong>{{ _('Availability') }}:</strong> {{ language_practice.availability }}</p>
+                                        <p><strong>{{ _('Interests') }}:</strong> {{ language_practice.interests }}</p>
                                     </div>
                                 </div>
-                                <a href="#" class="btn btn-sm btn-outline-primary mt-2">Update Language Information</a>
+                                <a href="{{ url_for('language_setup') }}" class="btn btn-sm btn-outline-primary mt-2">{{ _('Update Language Information') }}</a>
                             {% else %}
-                                <p>You have not completed your language practice profile yet.</p>
-                                <a href="#" class="btn btn-primary">Complete Language Practice Profile</a>
+                                <p>{{ _('You have not completed your language practice profile yet.') }}</p>
+                                <a href="{{ url_for('language_setup') }}" class="btn btn-primary">{{ _('Complete Language Practice Profile') }}</a>
                             {% endif %}
                         </div>
                     </div>
@@ -103,7 +130,7 @@
                 <!-- My Reviews -->
                 <div class="card">
                     <div class="card-header">
-                        <h5>My Reviews</h5>
+                        <h5>{{ _('My Reviews') }}</h5>
                     </div>
                     <div class="card-body">
                         {% if reviews %}
@@ -130,8 +157,8 @@
                                 {% endfor %}
                             </div>
                         {% else %}
-                            <p>You haven't written any reviews yet.</p>
-                            <a href="{{ url_for('attractions') }}" class="btn btn-outline-primary">Browse Attractions</a>
+                            <p>{{ _('You haven\'t written any reviews yet.') }}</p>
+                            <a href="{{ url_for('attractions') }}" class="btn btn-outline-primary">{{ _('Browse Attractions') }}</a>
                         {% endif %}
                     </div>
                 </div>

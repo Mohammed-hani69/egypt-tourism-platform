@@ -15,6 +15,7 @@ class RegistrationForm(FlaskForm):
                                      validators=[DataRequired(), EqualTo('password')])
     is_guide = BooleanField('Register as Tour Guide')
     is_student = BooleanField('Register as Language Student')
+    is_tourist = BooleanField('Register as Tourist')
     submit = SubmitField('Sign Up')
     
     def validate_username(self, username):
@@ -74,3 +75,65 @@ class LanguagePracticeForm(FlaskForm):
 class SearchForm(FlaskForm):
     q = StringField('Search', validators=[DataRequired()])
     submit = SubmitField('Search')
+
+
+class ChatGroupForm(FlaskForm):
+    name = StringField('Group Name', validators=[DataRequired(), Length(max=100)])
+    description = TextAreaField('Description')
+    language = SelectField('Language', 
+                          choices=[('English', 'English'), ('Arabic', 'Arabic'), 
+                                   ('French', 'French'), ('German', 'German'),
+                                   ('Spanish', 'Spanish'), ('Italian', 'Italian'),
+                                   ('Russian', 'Russian'), ('Chinese', 'Chinese')],
+                          validators=[DataRequired()])
+    submit = SubmitField('Create Chat Group')
+
+
+class ChatMessageForm(FlaskForm):
+    content = TextAreaField('Message', validators=[DataRequired()])
+    submit = SubmitField('Send')
+
+
+class SelectGuideForm(FlaskForm):
+    guide_id = SelectField('Select Guide', coerce=int, validators=[DataRequired()])
+    submit = SubmitField('Select Guide')
+
+
+class TourPlanForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired(), Length(max=200)])
+    title_ar = StringField('Title (Arabic)', validators=[Length(max=200)])
+    description = TextAreaField('Description', validators=[DataRequired()])
+    description_ar = TextAreaField('Description (Arabic)')
+    duration = IntegerField('Duration (days)', validators=[DataRequired(), NumberRange(min=1)])
+    price = IntegerField('Price (EGP)', validators=[DataRequired(), NumberRange(min=0)])
+    image_url = StringField('Image URL')
+    submit = SubmitField('Create Tour Plan')
+
+
+class TourPlanDestinationForm(FlaskForm):
+    attraction_id = SelectField('Attraction', coerce=int, validators=[DataRequired()])
+    day_number = IntegerField('Day Number', validators=[DataRequired(), NumberRange(min=1)])
+    description = TextAreaField('Description')
+    description_ar = TextAreaField('Description (Arabic)')
+    submit = SubmitField('Add Destination')
+
+
+class TourBookingForm(FlaskForm):
+    start_date = StringField('Start Date', validators=[DataRequired()])
+    submit = SubmitField('Book Tour')
+
+
+class AssignGuideForm(FlaskForm):
+    guide_id = SelectField('Select Guide', coerce=int, validators=[DataRequired()])
+    submit = SubmitField('Assign Guide')
+
+
+class TourProgressForm(FlaskForm):
+    notes = TextAreaField('Notes')
+    submit = SubmitField('Mark as Completed')
+
+
+class TourPhotoForm(FlaskForm):
+    image_url = StringField('Image URL', validators=[DataRequired()])
+    caption = StringField('Caption', validators=[Length(max=200)])
+    submit = SubmitField('Add Photo')

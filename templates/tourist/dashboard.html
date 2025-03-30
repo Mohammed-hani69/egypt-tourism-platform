@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ _('Tourist Dashboard') }}</h1>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    {{ _('My Bookings') }}
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ bookings|length }} {{ _('Tour Bookings') }}</h5>
+                    
+                    {% if bookings %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>{{ _('Tour Plan') }}</th>
+                                    <th>{{ _('Dates') }}</th>
+                                    <th>{{ _('Status') }}</th>
+                                    <th>{{ _('Guide') }}</th>
+                                    <th>{{ _('Actions') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in bookings %}
+                                <tr>
+                                    <td>{{ booking.tour_plan.title }}</td>
+                                    <td>{{ booking.start_date.strftime('%d/%m/%Y') }} - {{ booking.end_date.strftime('%d/%m/%Y') }}</td>
+                                    <td>
+                                        {% if booking.status == 'pending' %}
+                                        <span class="badge bg-warning">{{ _('Pending') }}</span>
+                                        {% elif booking.status == 'confirmed' %}
+                                        <span class="badge bg-success">{{ _('Confirmed') }}</span>
+                                        {% elif booking.status == 'completed' %}
+                                        <span class="badge bg-primary">{{ _('Completed') }}</span>
+                                        {% elif booking.status == 'cancelled' %}
+                                        <span class="badge bg-danger">{{ _('Cancelled') }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if booking.guide %}
+                                        {{ booking.guide.username }}
+                                        {% else %}
+                                        <span class="text-muted">{{ _('Not assigned') }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('tour_detail', booking_id=booking.id) }}" class="btn btn-sm btn-outline-primary">{{ _('View Details') }}</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">{{ _('You have no tour bookings yet.') }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    {{ _('Available Tour Plans') }}
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ _('Explore Egypt') }}</h5>
+                    <p>{{ _('Discover our carefully curated tour plans for exploring Egypt.') }}</p>
+                    <a href="{{ url_for('tour_plans') }}" class="btn btn-outline-success">{{ _('Browse All Tour Plans') }}</a>
+                    
+                    {% if tour_plans %}
+                    <hr>
+                    <div class="row row-cols-1 row-cols-md-2 g-4 mt-2">
+                        {% for plan in tour_plans[:4] %}
+                        <div class="col">
+                            <div class="card h-100">
+                                {% if plan.image_url %}
+                                <img src="{{ plan.image_url }}" class="card-img-top" alt="{{ plan.title }}">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ plan.title }}</h5>
+                                    <p class="card-text">
+                                        <small>{{ _('Duration') }}: {{ plan.duration }} {{ _('days') }}</small><br>
+                                        <small>{{ _('Price') }}: {{ plan.price }} {{ _('EGP') }}</small>
+                                    </p>
+                                    <a href="{{ url_for('tour_plan_detail', plan_id=plan.id) }}" class="btn btn-sm btn-primary">{{ _('Details') }}</a>
+                                    <a href="{{ url_for('book_tour', plan_id=plan.id) }}" class="btn btn-sm btn-success">{{ _('Book') }}</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

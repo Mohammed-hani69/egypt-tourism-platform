@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ _('Admin Dashboard') }}</h1>
+    
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    {{ _('Users') }}
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ users_count }} {{ _('Total Users') }}</h5>
+                    <p>{{ _('Guides') }}: {{ guides_count }}<br>
+                       {{ _('Students') }}: {{ students_count }}<br>
+                       {{ _('Tourists') }}: {{ tourists_count }}</p>
+                    <a href="{{ url_for('admin_users') }}" class="btn btn-sm btn-outline-primary">{{ _('Manage Users') }}</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    {{ _('Attractions') }}
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ attractions_count }} {{ _('Attractions') }}</h5>
+                    <p>{{ _('Regions') }}: {{ regions_count }}</p>
+                    <a href="{{ url_for('admin_regions') }}" class="btn btn-sm btn-outline-success">{{ _('Manage Regions') }}</a>
+                    <a href="{{ url_for('admin_attractions') }}" class="btn btn-sm btn-outline-success">{{ _('Manage Attractions') }}</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    {{ _('Tour Plans') }}
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ _('Tour Management') }}</h5>
+                    <p>{{ _('Bookings') }}: {{ bookings_count }}<br>
+                       {{ _('Pending') }}: {{ pending_bookings }}</p>
+                    <a href="{{ url_for('admin_tour_plans') }}" class="btn btn-sm btn-outline-info">{{ _('Manage Tour Plans') }}</a>
+                    <a href="{{ url_for('admin_bookings') }}" class="btn btn-sm btn-outline-info">{{ _('Manage Bookings') }}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-2">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    {{ _('Chat Groups') }}
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ chat_groups_count }} {{ _('Chat Groups') }}</h5>
+                    <p>{{ _('Manage language learning chat groups') }}</p>
+                    <a href="{{ url_for('admin_chat_groups') }}" class="btn btn-sm btn-outline-warning">{{ _('Manage Chat Groups') }}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

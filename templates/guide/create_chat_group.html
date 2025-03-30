@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ _('Create Chat Group') }}</h1>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.name.label(class="form-label") }}
+                            {{ form.name(class="form-control") }}
+                            {% if form.name.errors %}
+                                {% for error in form.name.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control", rows=4) }}
+                            {% if form.description.errors %}
+                                {% for error in form.description.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.language.label(class="form-label") }}
+                            {{ form.language(class="form-select") }}
+                            {% if form.language.errors %}
+                                {% for error in form.language.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>{{ _('About Chat Groups') }}</h5>
+                </div>
+                <div class="card-body">
+                    <p>{{ _('Chat groups are a great way to help language students practice their language skills in a group setting.') }}</p>
+                    
+                    <h6>{{ _('Tips for successful language groups:') }}</h6>
+                    <ul>
+                        <li>{{ _('Choose a specific topic for each session') }}</li>
+                        <li>{{ _('Encourage all members to participate') }}</li>
+                        <li>{{ _('Correct errors gently') }}</li>
+                        <li>{{ _('Use a mix of writing and conversation practice') }}</li>
+                        <li>{{ _('Share cultural insights related to the language') }}</li>
+                    </ul>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> {{ _('You can add students to your chat groups after creation.') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

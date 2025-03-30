@@ -1,0 +1,125 @@
+{% extends "layout.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ _('Book Tour') }}</h1>
+    <h4>{{ plan.title }}</h4>
+    
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            <label for="tour_details" class="form-label">{{ _('Tour Details') }}</label>
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <p><strong>{{ _('Duration') }}:</strong> {{ plan.duration }} {{ _('days') }}</p>
+                                    <p><strong>{{ _('Price') }}:</strong> {{ plan.price }} {{ _('EGP') }}</p>
+                                    
+                                    <div class="mb-3">
+                                        <p><strong>{{ _('Attractions Included') }}:</strong></p>
+                                        <ul>
+                                            {% for day, destinations in plan.destinations|groupby('day_number') %}
+                                                {% for destination in destinations %}
+                                                <li>{{ destination.attraction.name }}</li>
+                                                {% endfor %}
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.start_date.label(class="form-label") }}
+                            {{ form.start_date(class="form-control datepicker", placeholder="YYYY-MM-DD") }}
+                            {% if form.start_date.errors %}
+                                {% for error in form.start_date.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                            <div class="form-text">{{ _('Tour will end on') }}: <span id="end_date">--</span></div>
+                        </div>
+                        
+                        <div class="alert alert-info mb-3">
+                            <p><i class="bi bi-info-circle"></i> {{ _('Your booking will be reviewed by an administrator who will assign a guide.') }}</p>
+                            <p>{{ _('You will receive confirmation within 24 hours.') }}</p>
+                        </div>
+                        
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-success btn-lg") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>{{ _('Booking Information') }}</h5>
+                </div>
+                <div class="card-body">
+                    <h6>{{ _('Cancellation Policy') }}</h6>
+                    <ul>
+                        <li>{{ _('Free cancellation up to 3 days before the tour') }}</li>
+                        <li>{{ _('50% refund for cancellations 1-2 days before') }}</li>
+                        <li>{{ _('No refund for same-day cancellations') }}</li>
+                    </ul>
+                    
+                    <h6>{{ _('Payment') }}</h6>
+                    <p>{{ _('Payment is collected upon confirmation by the guide at the start of the tour.') }}</p>
+                    
+                    <h6>{{ _('Requirements') }}</h6>
+                    <ul>
+                        <li>{{ _('Valid ID/Passport') }}</li>
+                        <li>{{ _('Comfortable walking shoes') }}</li>
+                        <li>{{ _('Sun protection') }}</li>
+                        <li>{{ _('Water bottle') }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize date picker
+        const datePicker = flatpickr(".datepicker", {
+            minDate: "today",
+            dateFormat: "Y-m-d",
+            onChange: function(selectedDates, dateStr, instance) {
+                updateEndDate(dateStr);
+            }
+        });
+        
+        // Calculate end date based on tour duration
+        function updateEndDate(startDateStr) {
+            const tourDuration = {{ plan.duration }};
+            const startDate = new Date(startDateStr);
+            
+            if (isNaN(startDate.getTime())) {
+                document.getElementById('end_date').textContent = '--';
+                return;
+            }
+            
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + tourDuration - 1);
+            
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('end_date').textContent = endDate.toLocaleDateString(undefined, options);
+        }
+    });
+</script>
+{% endblock %}

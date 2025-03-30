@@ -1,0 +1,118 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Tour Plan Header -->
+    <div class="row">
+        <div class="col-md-8">
+            <h1>{{ plan.title }}</h1>
+            <p class="lead">{{ plan.description }}</p>
+            
+            <div class="d-flex align-items-center mb-4">
+                <span class="badge bg-primary me-2">{{ plan.duration }} {{ _('days') }}</span>
+                <span class="badge bg-success me-3">{{ plan.price }} {{ _('EGP') }}</span>
+                
+                {% if current_user.is_authenticated and current_user.is_tourist %}
+                <a href="{{ url_for('book_tour', plan_id=plan.id) }}" class="btn btn-success">{{ _('Book This Tour') }}</a>
+                {% elif not current_user.is_authenticated %}
+                <a href="{{ url_for('login') }}" class="btn btn-outline-primary">{{ _('Login to Book') }}</a>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if plan.image_url %}
+        <div class="col-md-4">
+            <img src="{{ plan.image_url }}" class="img-fluid rounded" alt="{{ plan.title }}">
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Daily Itinerary -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h3>{{ _('Daily Itinerary') }}</h3>
+        </div>
+        <div class="card-body">
+            {% for day, destinations in destinations_by_day.items() %}
+            <div class="mb-4">
+                <h4>{{ _('Day') }} {{ day }}</h4>
+                <div class="row">
+                    {% for destination in destinations %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            {% if destination.attraction.image_url %}
+                            <img src="{{ destination.attraction.image_url }}" class="card-img-top" alt="{{ destination.attraction.name }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ destination.attraction.name }}</h5>
+                                {% if destination.description %}
+                                <p class="card-text">{{ destination.description }}</p>
+                                {% else %}
+                                <p class="card-text">{{ destination.attraction.description[:200] }}{% if destination.attraction.description|length > 200 %}...{% endif %}</p>
+                                {% endif %}
+                                <a href="{{ url_for('attraction_detail', attraction_id=destination.attraction.id) }}" class="btn btn-sm btn-outline-primary">{{ _('View Attraction') }}</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% if not loop.last %}<hr>{% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- What's Included -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>{{ _('What\'s Included') }}</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            {{ _('Expert guide throughout the tour') }}
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            {{ _('Entrance fees to all attractions') }}
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            {{ _('Transportation between attractions') }}
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            {{ _('Personalized itinerary') }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>{{ _('Important Information') }}</h3>
+                </div>
+                <div class="card-body">
+                    <p>{{ _('Our tour plans are designed to provide comprehensive exploration of Egypt\'s most fascinating attractions.') }}</p>
+                    
+                    <ul>
+                        <li>{{ _('Booking should be made at least 3 days in advance') }}</li>
+                        <li>{{ _('Tours can be customized based on your preferences') }}</li>
+                        <li>{{ _('Accommodation and meals are not included unless specified') }}</li>
+                        <li>{{ _('Comfortable walking shoes and sun protection recommended') }}</li>
+                    </ul>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> {{ _('An administrator will confirm your booking and assign a guide within 24 hours of booking.') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

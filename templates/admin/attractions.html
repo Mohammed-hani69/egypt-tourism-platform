@@ -1,0 +1,122 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ _('Manage Attractions') }}</h1>
+    
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>{{ _('Attractions List') }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>{{ _('ID') }}</th>
+                                    <th>{{ _('Name') }}</th>
+                                    <th>{{ _('Region') }}</th>
+                                    <th>{{ _('Featured') }}</th>
+                                    <th>{{ _('Reviews') }}</th>
+                                    <th>{{ _('Actions') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for attraction in attractions %}
+                                <tr>
+                                    <td>{{ attraction.id }}</td>
+                                    <td>{{ attraction.name }}</td>
+                                    <td>{{ attraction.region.name }}</td>
+                                    <td>
+                                        {% if attraction.featured %}
+                                        <span class="badge bg-success">{{ _('Yes') }}</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ _('No') }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ attraction.reviews.count() }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('attraction_detail', attraction_id=attraction.id) }}" class="btn btn-sm btn-outline-primary">{{ _('View') }}</a>
+                                            <button type="button" class="btn btn-sm btn-outline-danger">{{ _('Delete') }}</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>{{ _('Add New Attraction') }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">{{ _('Attraction Name') }}</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="name_ar" class="form-label">{{ _('Attraction Name (Arabic)') }}</label>
+                            <input type="text" class="form-control" id="name_ar" name="name_ar">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">{{ _('Description') }}</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description_ar" class="form-label">{{ _('Description (Arabic)') }}</label>
+                            <textarea class="form-control" id="description_ar" name="description_ar" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="region_id" class="form-label">{{ _('Region') }}</label>
+                            <select class="form-select" id="region_id" name="region_id" required>
+                                <option value="" selected disabled>{{ _('Select a region') }}</option>
+                                {% for region in regions %}
+                                <option value="{{ region.id }}">{{ region.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="image_url" class="form-label">{{ _('Image URL') }}</label>
+                            <input type="url" class="form-control" id="image_url" name="image_url">
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="latitude" class="form-label">{{ _('Latitude') }}</label>
+                                <input type="number" class="form-control" id="latitude" name="latitude" step="0.000001">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="longitude" class="form-label">{{ _('Longitude') }}</label>
+                                <input type="number" class="form-control" id="longitude" name="longitude" step="0.000001">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="featured" name="featured">
+                            <label class="form-check-label" for="featured">{{ _('Featured Attraction') }}</label>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">{{ _('Add Attraction') }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

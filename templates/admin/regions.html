@@ -1,0 +1,83 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ _('Manage Regions') }}</h1>
+    
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>{{ _('Regions List') }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>{{ _('ID') }}</th>
+                                    <th>{{ _('Name') }}</th>
+                                    <th>{{ _('Arabic Name') }}</th>
+                                    <th>{{ _('Attractions') }}</th>
+                                    <th>{{ _('Actions') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for region in regions %}
+                                <tr>
+                                    <td>{{ region.id }}</td>
+                                    <td>{{ region.name }}</td>
+                                    <td>{{ region.name_ar }}</td>
+                                    <td>{{ region.attractions.count() }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-primary">{{ _('Edit') }}</button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger">{{ _('Delete') }}</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>{{ _('Add New Region') }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">{{ _('Region Name') }}</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="name_ar" class="form-label">{{ _('Region Name (Arabic)') }}</label>
+                            <input type="text" class="form-control" id="name_ar" name="name_ar">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">{{ _('Description') }}</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description_ar" class="form-label">{{ _('Description (Arabic)') }}</label>
+                            <textarea class="form-control" id="description_ar" name="description_ar" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">{{ _('Add Region') }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ _('Manage Bookings') }}</h1>
+    
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div class="btn-group" role="group" aria-label="Filter bookings">
+                        <a href="{{ url_for('admin_bookings', status='all') }}" class="btn btn-{{ 'primary' if selected_status == 'all' else 'outline-primary' }}">{{ _('All Bookings') }}</a>
+                        <a href="{{ url_for('admin_bookings', status='pending') }}" class="btn btn-{{ 'primary' if selected_status == 'pending' else 'outline-primary' }}">{{ _('Pending') }}</a>
+                        <a href="{{ url_for('admin_bookings', status='confirmed') }}" class="btn btn-{{ 'primary' if selected_status == 'confirmed' else 'outline-primary' }}">{{ _('Confirmed') }}</a>
+                        <a href="{{ url_for('admin_bookings', status='completed') }}" class="btn btn-{{ 'primary' if selected_status == 'completed' else 'outline-primary' }}">{{ _('Completed') }}</a>
+                        <a href="{{ url_for('admin_bookings', status='cancelled') }}" class="btn btn-{{ 'primary' if selected_status == 'cancelled' else 'outline-primary' }}">{{ _('Cancelled') }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>{{ _('ID') }}</th>
+                            <th>{{ _('Tour Plan') }}</th>
+                            <th>{{ _('Tourist') }}</th>
+                            <th>{{ _('Dates') }}</th>
+                            <th>{{ _('Guide') }}</th>
+                            <th>{{ _('Status') }}</th>
+                            <th>{{ _('Actions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                        <tr>
+                            <td>{{ booking.id }}</td>
+                            <td>{{ booking.tour_plan.title }}</td>
+                            <td>{{ booking.tourist.username }}</td>
+                            <td>{{ booking.start_date.strftime('%d/%m/%Y') }} - {{ booking.end_date.strftime('%d/%m/%Y') }}</td>
+                            <td>
+                                {% if booking.guide %}
+                                {{ booking.guide.username }}
+                                {% else %}
+                                <span class="text-muted">{{ _('Not assigned') }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if booking.status == 'confirmed' else 'warning' if booking.status == 'pending' else 'danger' if booking.status == 'cancelled' else 'primary' }}">
+                                    {{ _('Confirmed') if booking.status == 'confirmed' else _('Pending') if booking.status == 'pending' else _('Cancelled') if booking.status == 'cancelled' else _('Completed') }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('admin_booking_detail', booking_id=booking.id) }}" class="btn btn-sm btn-primary">{{ _('Manage') }}</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

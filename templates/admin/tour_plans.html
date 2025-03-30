@@ -1,0 +1,139 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ _('Manage Tour Plans') }}</h1>
+    
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>{{ _('Tour Plans List') }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>{{ _('ID') }}</th>
+                                    <th>{{ _('Title') }}</th>
+                                    <th>{{ _('Duration') }}</th>
+                                    <th>{{ _('Price') }}</th>
+                                    <th>{{ _('Destinations') }}</th>
+                                    <th>{{ _('Actions') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for plan in plans %}
+                                <tr>
+                                    <td>{{ plan.id }}</td>
+                                    <td>{{ plan.title }}</td>
+                                    <td>{{ plan.duration }} {{ _('days') }}</td>
+                                    <td>{{ plan.price }} {{ _('EGP') }}</td>
+                                    <td>{{ plan.destinations.count() }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('admin_tour_plan_edit', plan_id=plan.id) }}" class="btn btn-sm btn-outline-primary">{{ _('Edit') }}</a>
+                                            <a href="{{ url_for('tour_plan_detail', plan_id=plan.id) }}" class="btn btn-sm btn-outline-info">{{ _('View') }}</a>
+                                            <button type="button" class="btn btn-sm btn-outline-danger">{{ _('Delete') }}</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>{{ _('Create New Tour Plan') }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label") }}
+                            {{ form.title(class="form-control") }}
+                            {% if form.title.errors %}
+                                {% for error in form.title.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.title_ar.label(class="form-label") }}
+                            {{ form.title_ar(class="form-control") }}
+                            {% if form.title_ar.errors %}
+                                {% for error in form.title_ar.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control", rows=3) }}
+                            {% if form.description.errors %}
+                                {% for error in form.description.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.description_ar.label(class="form-label") }}
+                            {{ form.description_ar(class="form-control", rows=3) }}
+                            {% if form.description_ar.errors %}
+                                {% for error in form.description_ar.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form.duration.label(class="form-label") }}
+                                {{ form.duration(class="form-control", min=1) }}
+                                {% if form.duration.errors %}
+                                    {% for error in form.duration.errors %}
+                                        <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.price.label(class="form-label") }}
+                                {{ form.price(class="form-control", min=0) }}
+                                {% if form.price.errors %}
+                                    {% for error in form.price.errors %}
+                                        <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.image_url.label(class="form-label") }}
+                            {{ form.image_url(class="form-control") }}
+                            {% if form.image_url.errors %}
+                                {% for error in form.image_url.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

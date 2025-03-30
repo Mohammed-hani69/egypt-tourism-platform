@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ _('Language Practice Setup') }}</h1>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.language.label(class="form-label") }}
+                            {{ form.language(class="form-select") }}
+                            {% if form.language.errors %}
+                                {% for error in form.language.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.proficiency_level.label(class="form-label") }}
+                            {{ form.proficiency_level(class="form-select") }}
+                            {% if form.proficiency_level.errors %}
+                                {% for error in form.proficiency_level.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.availability.label(class="form-label") }}
+                            {{ form.availability(class="form-control", placeholder=_("e.g. Weekdays after 6 PM, Weekends in the morning")) }}
+                            {% if form.availability.errors %}
+                                {% for error in form.availability.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.interests.label(class="form-label") }}
+                            {{ form.interests(class="form-control", placeholder=_("e.g. Travel, Food, Movies, Sports")) }}
+                            {% if form.interests.errors %}
+                                {% for error in form.interests.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>{{ _('Language Learning Tips') }}</h5>
+                </div>
+                <div class="card-body">
+                    <p>{{ _('Setting up your language practice profile will help us match you with the right guide and practice opportunities.') }}</p>
+                    
+                    <h6>{{ _('Tips for effective language learning:') }}</h6>
+                    <ul>
+                        <li>{{ _('Practice consistently, even if it\'s just for a few minutes each day') }}</li>
+                        <li>{{ _('Don\'t be afraid to make mistakes - they\'re an essential part of learning') }}</li>
+                        <li>{{ _('Immerse yourself in the language through music, TV shows, and movies') }}</li>
+                        <li>{{ _('Join language exchange groups to practice with native speakers') }}</li>
+                        <li>{{ _('Use language learning apps to supplement your formal learning') }}</li>
+                    </ul>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> {{ _('Your availability and interests help guides plan sessions that are convenient and engaging for you.') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

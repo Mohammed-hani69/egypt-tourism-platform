@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ _('Manage Users') }}</h1>
+    
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div class="btn-group" role="group" aria-label="Filter users">
+                        <a href="{{ url_for('admin_users', role='all') }}" class="btn btn-{{ 'primary' if selected_role == 'all' else 'outline-primary' }}">{{ _('All Users') }}</a>
+                        <a href="{{ url_for('admin_users', role='guide') }}" class="btn btn-{{ 'primary' if selected_role == 'guide' else 'outline-primary' }}">{{ _('Guides') }}</a>
+                        <a href="{{ url_for('admin_users', role='student') }}" class="btn btn-{{ 'primary' if selected_role == 'student' else 'outline-primary' }}">{{ _('Students') }}</a>
+                        <a href="{{ url_for('admin_users', role='tourist') }}" class="btn btn-{{ 'primary' if selected_role == 'tourist' else 'outline-primary' }}">{{ _('Tourists') }}</a>
+                        <a href="{{ url_for('admin_users', role='admin') }}" class="btn btn-{{ 'primary' if selected_role == 'admin' else 'outline-primary' }}">{{ _('Admins') }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>{{ _('ID') }}</th>
+                            <th>{{ _('Username') }}</th>
+                            <th>{{ _('Email') }}</th>
+                            <th>{{ _('Roles') }}</th>
+                            <th>{{ _('Joined') }}</th>
+                            <th>{{ _('Actions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                {% if user.is_admin %}
+                                <span class="badge bg-danger me-1">{{ _('Admin') }}</span>
+                                {% endif %}
+                                
+                                {% if user.is_guide %}
+                                <span class="badge bg-primary me-1">{{ _('Guide') }}</span>
+                                {% endif %}
+                                
+                                {% if user.is_student %}
+                                <span class="badge bg-info me-1">{{ _('Student') }}</span>
+                                {% endif %}
+                                
+                                {% if user.is_tourist %}
+                                <span class="badge bg-warning me-1">{{ _('Tourist') }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.date_joined.strftime('%d/%m/%Y') }}</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary">{{ _('Edit') }}</button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger">{{ _('Disable') }}</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

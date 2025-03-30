@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ _('Add Members to Chat') }}</h1>
+    <h4>{{ chat_group.name }}</h4>
+    
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>{{ _('Available Students Learning') }} {{ chat_group.language }}</h5>
+                </div>
+                <div class="card-body">
+                    {% if potential_members %}
+                        <form method="POST" action="">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>{{ _('Student') }}</th>
+                                            <th>{{ _('Proficiency') }}</th>
+                                            <th>{{ _('Interests') }}</th>
+                                            <th>{{ _('Action') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for practice in potential_members %}
+                                        <tr>
+                                            <td>{{ practice.student.username }}</td>
+                                            <td>{{ practice.proficiency_level }}</td>
+                                            <td>{{ practice.interests }}</td>
+                                            <td>
+                                                <button type="submit" class="btn btn-sm btn-primary" name="student_id" value="{{ practice.student_id }}">
+                                                    {{ _('Add') }}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="alert alert-info">
+                            {{ _('No available students learning') }} {{ chat_group.language }} {{ _('found.') }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <a href="{{ url_for('chat_detail', chat_id=chat_group.id) }}" class="btn btn-outline-secondary">{{ _('Back to Chat') }}</a>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>{{ _('Chat Group Information') }}</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>{{ _('Name') }}:</strong> {{ chat_group.name }}</p>
+                    <p><strong>{{ _('Language') }}:</strong> {{ chat_group.language }}</p>
+                    <p><strong>{{ _('Description') }}:</strong> {{ chat_group.description }}</p>
+                    
+                    <div class="alert alert-info mt-3">
+                        <i class="bi bi-info-circle"></i> {{ _('Only students who are learning the language of this chat group and who aren\'t already members are shown.') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
