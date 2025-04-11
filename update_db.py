@@ -76,12 +76,17 @@ def update_database():
 
 # Function to recreate tables with integrity issues
 def full_db_setup():
-    print("Setting up complete database structure...")
+    print("إعداد هيكل قاعدة البيانات الكامل...")
     with app.app_context():
-        # Drop and recreate all tables
+        # إنشاء مجلد instance إذا لم يكن موجودًا
+        import os
+        if not os.path.exists('instance'):
+            os.makedirs('instance')
+            
+        # حذف وإعادة إنشاء جميع الجداول
         db.drop_all()
         db.create_all()
-        print("All database tables have been recreated!")
+        print("تم إعادة إنشاء جميع جداول قاعدة البيانات!")
 
 # Run the script
 if __name__ == "__main__":

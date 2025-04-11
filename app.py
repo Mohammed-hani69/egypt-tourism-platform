@@ -15,7 +15,7 @@ def create_app():
     # Database configuration
     app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
         "DATABASE_URL",
-        "postgresql://postgres:postgres@localhost:5432/egypt_tourism"
+        "sqlite:///instance/egypt_tourism.db"
     )
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
         "pool_recycle": 300,

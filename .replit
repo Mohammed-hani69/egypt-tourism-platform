@@ -43,6 +43,15 @@ mode = "sequential"
 task = "shell.exec"
 args = "python main.py"
 
+[[workflows.workflow]]
+name = "إعداد قاعدة البيانات"
+author = 41419533
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -c \"from app import app, db; from models import *; app.app_context().push(); db.create_all()\""
+
 [[ports]]
 localPort = 5000
 externalPort = 80
