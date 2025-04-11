@@ -1,125 +1,985 @@
-{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="{{ lang_code|default('ar') }}" dir="{{ 'rtl' if lang_code == 'ar' else 'ltr' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اكتشف مصر - الصفحة الرئيسية</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-red: #e74c3c;
+            --secondary-red: #c0392b;
+            --light-red: #ff6b6b;
+            --white: #ffffff;
+            --off-white: #fff5f5;
+            --light-gray: #f8d7da;
+            --gold: #ffd700;
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, var(--off-white) 0%, var(--white) 100%);
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        .navbar {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-red);
+            font-size: 1.8rem;
+        }
+        
+        .nav-link {
+            color: #333;
+            font-weight: 600;
+            margin: 0 10px;
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-red);
+        }
+        
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-red);
+            bottom: -5px;
+            left: 0;
+            transform: scaleX(1);
+            transition: transform 0.3s;
+        }
+        
+        .hero-section {
+            height: 80vh;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(rgba(231, 76, 60, 0.9), rgba(192, 57, 43, 0.8));
+            margin-bottom: 0;
+        }
+        
+        .hero-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            z-index: 2;
+            color: var(--white);
+        }
+        
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .hero-content p {
+            font-size: 1.5rem;
+            max-width: 800px;
+            margin-bottom: 2rem;
+            color: var(--white);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-red);
+            border-color: var(--primary-red);
+            padding: 12px 30px;
+            font-weight: 600;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-red);
+            border-color: var(--primary-red);
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-red);
+            color: var(--white);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        section {
+            padding: 3rem 0;
+        }
+        
+        section h2 {
+            font-weight: 700;
+            color: var(--primary-red);
+            margin-bottom: 2.5rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        section h2::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 3px;
+            background-color: var(--gold);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+            border: 2px solid var(--light-red);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        
+        .attraction-card .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .card-title {
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+        
+        .card-footer {
+            background-color: var(--white);
+            border-top: none;
+            padding-top: 0;
+        }
+        
+        .region-card {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('https://source.unsplash.com/500x300/?egypt');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .text-primary {
+            color: var(--primary-red) !important;
+        }
+        
+        .bg-light {
+            background-color: var(--off-white) !important;
+        }
+        
+        .language-practice {
+            background-color: var(--off-white);
+            border-radius: 15px;
+            padding: 3rem;
+        }
+        
+        .floating-shape {
+            position: absolute;
+            opacity: 0.1;
+            z-index: 1;
+        }
+        
+        .floating-shape.circle {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background-color: var(--light-red);
+            top: -150px;
+            right: -150px;
+            animation: float 15s infinite linear;
+        }
+        
+        .floating-shape.triangle {
+            width: 0;
+            height: 0;
+            border-left: 200px solid transparent;
+            border-right: 200px solid transparent;
+            border-bottom: 350px solid var(--light-red);
+            bottom: -200px;
+            left: -200px;
+            animation: float 20s infinite linear reverse;
+        }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(30px, 20px) rotate(180deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--off-white);
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            color: var(--primary-red);
+            font-size: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        
+        .card:hover .feature-icon {
+            background-color: var(--primary-red);
+            color: var(--white);
+            transform: scale(1.1);
+        }
+        
+        .attractions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        
+        footer {
+            background-color: var(--off-white);
+            padding: 3rem 0;
+        }
+        
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: var(--white);
+            border-radius: 50%;
+            color: var(--primary-red);
+            margin: 0 5px;
+            transition: all 0.3s;
+        }
+        
+        .social-icons a:hover {
+            background-color: var(--primary-red);
+            color: var(--white);
+            transform: translateY(-3px);
+        }
+        
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+        
+        .slide-up {
+            animation: slideUp 0.8s ease-out;
+        }
+        
+        .zoom-in {
+            animation: zoomIn 0.8s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes zoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-content p {
+                font-size: 1.2rem;
+            }
+            
+            section {
+                padding: 3rem 0;
+            }
+        }
 
-{% block content %}
-    <!-- Hero Section -->
+        /* Background Slider Styles */
+        .slider-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .slider-image {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            object-fit: cover;
+        }
+
+        .slider-image.active {
+            opacity: 1;
+        }
+
+        /* Map Section Styles */
+        #map-section {
+            height: 500px;
+            margin: 4rem auto;
+            position: relative;
+            background: linear-gradient(135deg, var(--primary-red) 0%, #8B0000 100%);
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 1000px;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(139, 0, 0, 0.3);
+        }
+
+        /* Advertisement Banner Styles */
+        .ad-banner-section {
+            padding: 2rem 0;
+        }
+
+        .ad-banner {
+            background: linear-gradient(135deg, var(--white) 0%, var(--off-white) 100%);
+            border-left: 4px solid var(--primary-red);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+
+        .ad-banner:hover {
+            transform: translateY(-5px);
+            border-color: var(--secondary-red);
+        }
+
+        .ad-banner img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        /* Header Styles */
+        .top-header {
+            background: var(--primary-red);
+            padding: 8px 0;
+            color: var(--white);
+        }
+
+        .top-header .contact-info {
+            font-size: 0.9rem;
+        }
+
+        .main-header {
+            padding: 15px 0;
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .main-header .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            text-decoration: none;
+        }
+
+        .main-nav {
+            display: flex;
+            gap: 20px;
+            justify-content: flex-end;
+        }
+
+        .main-nav a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .main-nav a:hover {
+            background: var(--light-red);
+            color: var(--white);
+        }
+
+        /* Footer Styles */
+        .main-footer {
+            background: var(--primary-red);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                var(--primary-red),
+                var(--primary-red) 10px,
+                var(--secondary-red) 10px,
+                var(--secondary-red) 20px
+            );
+            opacity: 0.1;
+        }
+
+        .footer-heading {
+            color: var(--white);
+            position: relative;
+        }
+
+        .footer-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--white);
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: var(--white);
+            text-decoration: none;
+            transition: color 0.3s;
+            opacity: 0.9;
+        }
+
+        .footer-links a:hover {
+            color: var(--gold);
+            opacity: 1;
+        }
+
+        .footer-bottom {
+            background: var(--secondary-red);
+            padding: 20px 0;
+            margin-top: 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* New diagonal design elements */
+        .diagonal-section {
+            position: relative;
+            padding: 4rem 0;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--secondary-red) 100%);
+            transform: skewY(-3deg);
+            margin: 2rem 0;
+        }
+
+        .diagonal-section > * {
+            transform: skewY(3deg);
+        }
+
+        .diagonal-section h2, 
+        .diagonal-section p {
+            color: var(--white);
+        }
+
+        /* New decorative elements */
+        .red-accent {
+            position: absolute;
+            background: var(--primary-red);
+            opacity: 0.1;
+            z-index: 0;
+        }
+
+        .accent-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+        }
+
+        .accent-square {
+            width: 150px;
+            height: 150px;
+            transform: rotate(45deg);
+        }
+
+        /* Additional Navigation Styles */
+        .nav-item .btn {
+            padding: 5px 15px;
+            margin: 5px;
+            border-radius: 20px;
+        }
+        
+        .dropdown-menu {
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .dropdown-item {
+            padding: 8px 20px;
+        }
+        
+        .dropdown-item i {
+            margin-right: 8px;
+            width: 20px;
+        }
+
+        .navbar-nav {
+            align-items: center;
+        }
+
+        /* Add these styles to your existing CSS */
+        .tour-plans-section {
+            background: linear-gradient(135deg, var(--off-white) 0%, var(--white) 100%);
+            padding: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tour-card {
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+            border: 1px solid rgba(231, 76, 60, 0.1);
+        }
+
+        .tour-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(231, 76, 60, 0.15);
+        }
+
+        .tour-card-image {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .tour-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .tour-card:hover .tour-card-image img {
+            transform: scale(1.1);
+        }
+
+        .tour-duration {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: rgba(231, 76, 60, 0.9);
+            color: var(--white);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .tour-card-body {
+            padding: 1.5rem;
+        }
+
+        .tour-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            margin-bottom: 1rem;
+        }
+
+        .tour-description {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .tour-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding: 0.5rem 0;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .tour-price, .tour-destinations {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .tour-price i, .tour-destinations i {
+            color: var(--primary-red);
+            margin-right: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .tour-card {
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="contact-info">
+                        <span class="me-3"><i class="fas fa-phone me-2"></i>+20 123 456 789</span>
+                        <span><i class="fas fa-envelope me-2"></i>info@discovergypt.com</span>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <header class="main-header">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg">
+                <a class="navbar-brand logo" href="{{ url_for('main.index') }}">
+                    <i class="fas fa-pyramid"></i> {{ _('اكتشف مصر') }}
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.index') }}">{{ _('الرئيسية') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.attractions') }}">{{ _('المعالم السياحية') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.guides') }}">{{ _('المرشدين السياحيين') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.language_practice') }}">{{ _('تعلم اللغات') }}</a>
+                        </li>
+                        {% if current_user.is_authenticated %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user-circle"></i> {{ _('حسابي') }}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="{{ url_for('main.profile') }}"><i class="fas fa-user"></i> {{ _('الملف الشخصي') }}</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt"></i> {{ _('تسجيل الخروج') }}</a></li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="btn btn-outline-primary btn-sm ms-2" href="{{ url_for('main.login') }}">{{ _('تسجيل الدخول') }}</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-primary btn-sm ms-2" href="{{ url_for('main.register') }}">{{ _('التسجيل') }}</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <!-- Hero Section with Slider -->
     <section class="hero-section">
+        <div class="slider-container">
+            <img class="slider-image active" src="https://www.emaratalyoum.com/polopoly_fs/1.1127101.1534438109!/image/image.jpg" alt="Egypt 1">
+            <img class="slider-image" src="https://www.sis.gov.eg/Content/Upload/slider/4201612105041387.jpg" alt="Egypt 2">
+            <img class="slider-image" src="https://c.myholidays.com/blog/2024/6/101021_PlacestoVisitinLuxor-ezgif.com-jpg-to-webp-converter.webp" alt="Egypt 3">
+            <img class="slider-image" src="https://marmara-tours.com/sites/default/files/2024-04/Picture2.png" alt="Egypt 4">
+            <img class="slider-image" src="https://travilia.com/uploads/0000/8/2024/08/23/sharm-2.jpg" alt="Egypt 5">
+        </div>
+        <div class="floating-shape circle"></div>
+        <div class="floating-shape triangle"></div>
         <div class="hero-content">
-            <h1>Discover Egypt's Wonders</h1>
-            <p>Explore ancient pyramids, stunning temples, vibrant cities, and beautiful beaches all in one destination.</p>
-            <a href="{{ url_for('attractions') }}" class="btn btn-primary btn-lg">Explore Now</a>
+            <h1 class="animate__animated animate__fadeInDown">{{ _('Discover Egypt\'s Wonders') }}</h1>
+            <p class="animate__animated animate__fadeIn animate__delay-1s">{{ _('Explore ancient pyramids, stunning temples, vibrant cities, and beautiful beaches all in one destination.') }}</p>
+            <a href="{{ url_for('main.attractions') }}" class="btn btn-primary btn-lg animate__animated animate__fadeInUp animate__delay-2s">
+                {{ _('Explore Now') }} <i class="fas fa-arrow-left ms-2"></i>
+            </a>
         </div>
     </section>
-    
+
+    <!-- Add these decorative elements in the main content section -->
+    <div class="red-accent accent-circle" style="top: 20%; right: -100px;"></div>
+    <div class="red-accent accent-square" style="bottom: 30%; left: -75px;"></div>
+
     <!-- Featured Attractions -->
-    <section class="container my-5">
-        <h2 class="text-center mb-4">Featured Attractions</h2>
-        <div class="row">
+    <section class="container">
+        <h2 class="text-center slide-up">{{ _('Featured Attractions') }}</h2>
+        <div class="attractions-grid">
             {% if featured_attractions %}
                 {% for attraction in featured_attractions %}
-                    <div class="col-md-3 mb-4">
-                        <div class="card attraction-card h-100">
-                            <img src="{{ attraction.image_url or 'https://source.unsplash.com/500x300/?egypt,' + attraction.name }}" class="card-img-top" alt="{{ attraction.name }}">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ attraction.name }}</h5>
-                                <p class="card-text">{{ attraction.description[:100] }}{% if attraction.description|length > 100 %}...{% endif %}</p>
-                            </div>
-                            <div class="card-footer">
-                                <a href="{{ url_for('attraction_detail', attraction_id=attraction.id) }}" class="btn btn-sm btn-outline-primary">Learn More</a>
-                            </div>
+                    <div class="card attraction-card fade-in" style="animation-delay: {{ loop.index0 * 0.1 }}s">
+                        <img src="{{ attraction.image_url or 'https://source.unsplash.com/500x300/?egypt,' + attraction.name }}" 
+                             class="card-img-top" alt="{{ attraction.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ attraction.name }}</h5>
+                            <p class="card-text">{{ attraction.description[:100] }}{% if attraction.description|length > 100 %}...{% endif %}</p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{{ url_for('main.attraction_detail', attraction_id=attraction.id) }}" 
+                               class="btn btn-sm btn-outline-primary">{{ _('Learn More') }}</a>
                         </div>
                     </div>
                 {% endfor %}
             {% else %}
                 <div class="col-12 text-center">
-                    <p>No featured attractions available at the moment.</p>
+                    <p>{{ _('No featured attractions available at the moment.') }}</p>
                 </div>
             {% endif %}
         </div>
-        <div class="text-center mt-3">
-            <a href="{{ url_for('attractions') }}" class="btn btn-outline-primary">View All Attractions</a>
-        </div>
     </section>
-    
-    <!-- Why Visit Egypt -->
-    <section class="container my-5">
-        <h2 class="text-center mb-4">Why Visit Egypt?</h2>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <i class="fas fa-landmark fa-3x mb-3 text-primary"></i>
-                        <h5 class="card-title">Rich History</h5>
-                        <p class="card-text">Discover one of the world's oldest civilizations with monuments dating back thousands of years.</p>
+
+    <!-- Update the regions section to use diagonal design -->
+    <section class="diagonal-section">
+        <div class="container">
+            <h2 class="text-center slide-up">{{ _('Explore Egypt By Region') }}</h2>
+            <div class="row">
+                {% if regions %}
+                    {% for region in regions %}
+                        <div class="col-md-4 mb-4 fade-in" style="animation-delay: {{ loop.index0 * 0.1 }}s">
+                            <div class="card region-card h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">{{ region.name }}</h5>
+                                    <p class="card-text">{{ region.description[:100] if region.description else _('Explore attractions in this region.') }}</p>
+                                    <a href="{{ url_for('main.attractions', filters={'region': region.id}) }}" class="btn btn-outline-primary">{{ _('View Attractions') }}</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12 text-center">
+                        <p>{{ _('Regions information coming soon!') }}</p>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <i class="fas fa-water fa-3x mb-3 text-primary"></i>
-                        <h5 class="card-title">Beautiful Beaches</h5>
-                        <p class="card-text">Enjoy pristine beaches and world-class diving along the Red Sea coast.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <i class="fas fa-utensils fa-3x mb-3 text-primary"></i>
-                        <h5 class="card-title">Delicious Cuisine</h5>
-                        <p class="card-text">Savor authentic Egyptian dishes that blend flavors from across the Mediterranean and Middle East.</p>
-                    </div>
-                </div>
+                {% endif %}
             </div>
         </div>
     </section>
-    
-    <!-- Regions Section -->
-    <section class="container my-5">
-        <h2 class="text-center mb-4">Explore Egypt By Region</h2>
-        <div class="row">
-            {% if regions %}
-                {% for region in regions %}
-                    <div class="col-md-4 mb-4">
-                        <div class="card region-card h-100">
-                            <div class="card-body text-center">
-                                <h5 class="card-title">{{ region.name }}</h5>
-                                <p class="card-text">{{ region.description[:100] if region.description else 'Explore attractions in this region.' }}</p>
-                                <a href="{{ url_for('attractions', region=region.id) }}" class="btn btn-outline-primary">View Attractions</a>
+
+    <!-- Map Section -->
+    <section class="container" id="map-section">
+        <h2 class="text-center slide-up">{{ _('Explore Egypt Map') }}</h2>
+        <div id="map"></div>
+    </section>
+
+    <!-- Tour Plans Section -->
+    <section class="tour-plans-section">
+        <div class="container">
+            <h2 class="text-center slide-up">{{ _('خطط الرحلات السياحية') }}</h2>
+            <div class="row">
+                {% if tour_plans %}
+                    {% for tour in tour_plans %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="tour-card">
+                            <div class="tour-card-image">
+                                <img src="{{ tour.image_url or 'https://source.unsplash.com/800x600/?egypt,travel' }}" alt="{{ tour.title }}">
+                                <div class="tour-duration">
+                                    <i class="fas fa-clock"></i> {{ tour.duration }} {{ _('أيام') }}
+                                </div>
+                            </div>
+                            <div class="tour-card-body">
+                                <h3 class="tour-title">{{ tour.title if not lang_code == 'ar' else tour.title_ar }}</h3>
+                                <p class="tour-description">{{ tour.description[:150] if not lang_code == 'ar' else tour.description_ar[:150] }}...</p>
+                                <div class="tour-info">
+                                    <span class="tour-price">
+                                        <i class="fas fa-tag"></i> {{ tour.price }} {{ _('جنيه') }}
+                                    </span>
+                                    <span class="tour-destinations">
+                                        <i class="fas fa-map-marker-alt"></i> {{ tour.destinations.count() }} {{ _('وجهات') }}
+                                    </span>
+                                </div>
+                                <a href="{{ url_for('main.tour_plan_detail', plan_id=tour.id) }}" class="btn btn-outline-primary w-100">
+                                    {{ _('تفاصيل الرحلة') }} <i class="fas fa-arrow-left ms-2"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
-                {% endfor %}
-            {% else %}
-                <div class="col-12 text-center">
-                    <p>Regions information coming soon!</p>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12 text-center">
+                        <p>{{ _('لا توجد رحلات متاحة حالياً') }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h4 class="footer-heading">عن اكتشف مصر</h4>
+                    <p>نحن نقدم لكم أفضل التجارب السياحية في مصر، مع خدمات متميزة وأسعار تنافسية.</p>
                 </div>
-            {% endif %}
-        </div>
-    </section>
-    
-    <!-- Connect with Guides -->
-    <section class="container my-5">
-        <div class="card bg-light">
-            <div class="card-body text-center py-5">
-                <h2 class="mb-3">Connect with Professional Tour Guides</h2>
-                <p class="mb-4">Find experienced guides who speak your language and can show you the best of Egypt.</p>
-                <a href="{{ url_for('guides') }}" class="btn btn-primary">Find a Guide</a>
+                <div class="col-md-4">
+                    <h4 class="footer-heading">روابط سريعة</h4>
+                    <ul class="footer-links">
+                        <li><a href="/tours">الرحلات السياحية</a></li>
+                        <li><a href="/hotels">الفنادق</a></li>
+                        <li><a href="/transportation">المواصلات</a></li>
+                        <li><a href="/blog">المدونة</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="footer-heading">تواصل معنا</h4>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt me-2"></i>القاهرة، مصر</li>
+                        <li><i class="fas fa-phone me-2"></i>+20 123 456 789</li>
+                        <li><i class="fas fa-envelope me-2"></i>info@discovergypt.com</li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </section>
-    
-    <!-- Language Practice Section -->
-    <section class="container my-5">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <h2>Practice Languages with Locals</h2>
-                <p>Are you a language student? Connect with Egyptian students and guides to practice your language skills while exploring Egypt.</p>
-                <a href="{{ url_for('language_practice') }}" class="btn btn-outline-primary">Learn More</a>
-            </div>
-            <div class="col-md-6 text-center">
-                <i class="fas fa-comments fa-6x text-primary"></i>
+        <div class="footer-bottom">
+            <div class="container">
+                <p class="mb-0">© 2024 اكتشف مصر. جميع الحقوق محفوظة.</p>
             </div>
         </div>
-    </section>
-{% endblock %}
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Background Slider
+        function startSlider() {
+            const images = document.querySelectorAll('.slider-image');
+            let currentImage = 0;
+
+            setInterval(() => {
+                images[currentImage].classList.remove('active');
+                currentImage = (currentImage + 1) % images.length;
+                images[currentImage].classList.add('active');
+            }, 5000);
+        }
+
+        // Initialize slider
+        document.addEventListener('DOMContentLoaded', startSlider);
+
+        // Initialize map with custom style
+        var map = L.map('map', {
+            center: [26.8206, 30.8025],
+            zoom: 6,
+            zoomControl: false // Move zoom control to right
+        });
+        
+        // Add custom style tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            className: 'map-tiles'
+        }).addTo(map);
+
+        // Add custom style for map
+        var styleSheet = document.createElement("style");
+        styleSheet.textContent = `
+            .map-tiles {
+                filter: grayscale(40%) sepia(30%) hue-rotate(-20deg) saturate(150%);
+            }
+            .leaflet-popup-content-wrapper {
+                background: linear-gradient(135deg, #8B0000 0%, var(--primary-red) 100%);
+                color: white;
+                border: none;
+                border-radius: 10px;
+            }
+            .leaflet-popup-tip {
+                background: #8B0000;
+            }
+        `;
+        document.head.appendChild(styleSheet);
+
+        // Move zoom control to right
+        L.control.zoom({
+            position: 'topright'
+        }).addTo(map);
+        
+        // Add markers for key locations with custom icons
+        const locations = [
+            {lat: 30.0444, lng: 31.2357, name: '{{ _("القاهرة") }}'},
+            {lat: 29.9773, lng: 31.1325, name: '{{ _("أهرامات الجيزة") }}'},
+            {lat: 25.6872, lng: 32.6396, name: '{{ _("الأقصر") }}'},
+            {lat: 24.0889, lng: 32.8998, name: '{{ _("أسوان") }}'},
+            {lat: 27.9158, lng: 34.3300, name: '{{ _("شرم الشيخ") }}'},
+            {lat: 31.2001, lng: 29.9187, name: '{{ _("الإسكندرية") }}'}
+        ];
+        
+        const customIcon = L.divIcon({
+            className: 'custom-marker',
+            html: '<i class="fas fa-map-marker-alt" style="color: #8B0000; font-size: 24px;"></i>',
+            iconSize: [24, 24],
+            iconAnchor: [12, 24],
+            popupAnchor: [0, -24]
+        });
+        
+        locations.forEach(loc => {
+            L.marker([loc.lat, loc.lng], {icon: customIcon})
+             .addTo(map)
+             .bindPopup(`<strong>${loc.name}</strong>`);
+        });
+    </script>
+</body>
+</html>

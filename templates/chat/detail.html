@@ -64,7 +64,7 @@
             <div class="d-flex align-items-center mb-3">
                 <span class="badge bg-primary me-2">{{ chat_group.language }}</span>
                 {% if is_guide %}
-                <a href="{{ url_for('add_chat_member', chat_id=chat_group.id) }}" class="btn btn-sm btn-outline-success">{{ _('Add Member') }}</a>
+                <a href="{{ url_for('main.add_chat_member', chat_id=chat_group.id) }}" class="btn btn-sm btn-outline-success">{{ _('Add Member') }}</a>
                 {% endif %}
             </div>
         </div>

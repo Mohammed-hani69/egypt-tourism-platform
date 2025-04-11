@@ -1,8 +1,7 @@
-from flask import render_template, redirect, url_for, flash, request, jsonify, session, g, abort
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, session, g, abort
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash
-from flask_babel import get_locale
-from app import app, db, babel
+from extensions import db, babel
 from models import (User, Attraction, Region, Review, Restaurant, Activity, Guide, LanguagePractice,
                     ChatGroup, ChatGroupMember, ChatMessage, TourPlan, TourPlanDestination, 
                     TourBooking, TourProgress, TourPhoto)
@@ -12,6 +11,8 @@ from forms import (RegistrationForm, LoginForm, ReviewForm, GuideForm, LanguageP
 from datetime import datetime, date, timedelta
 import os
 
+# Create blueprint
+main = Blueprint('main', __name__)
 
 # Set up locale selector
 def get_locale():
@@ -21,36 +22,38 @@ def get_locale():
     # Default to English
     return 'en'
 
-babel.init_app(app, locale_selector=get_locale)
-
-
-@app.before_request
+@main.before_app_request
 def before_request():
     g.locale = str(get_locale())
     g.search_form = SearchForm()
 
-
-@app.route('/set_language/<language>')
+# Replace all @app decorators with @main decorators
+@main.route('/set_language/<language>')
 def set_language(language):
     session['language'] = language
-    return redirect(request.referrer or url_for('index'))
+    return redirect(request.referrer or url_for('main.index'))
 
-
-@app.route('/')
+@main.route('/')
 def index():
     # Get featured attractions
     featured_attractions = Attraction.query.filter_by(featured=True).limit(4).all()
     
     # Get all regions for the navigation
     regions = Region.query.all()
+
+    # Get active tour plans
+    tour_plans = TourPlan.query\
+        .order_by(TourPlan.created_at.desc())\
+        .limit(6)\
+        .all()
     
     return render_template('index.html', 
                            title='Home',
                            featured_attractions=featured_attractions,
-                           regions=regions)
+                           regions=regions,
+                           tour_plans=tour_plans)
 
-
-@app.route('/attractions')
+@main.route('/attractions')
 def attractions():
     # Get query parameters
     region_id = request.args.get('region', type=int)
@@ -84,8 +87,7 @@ def attractions():
                            selected_region=region_id,
                            sort_by=sort_by)
 
-
-@app.route('/attraction/<int:attraction_id>')
+@main.route('/attraction/<int:attraction_id>')
 def attraction_detail(attraction_id):
     # Get the attraction details
     attraction = Attraction.query.get_or_404(attraction_id)
@@ -113,11 +115,10 @@ def attraction_detail(attraction_id):
                            activities=activities,
                            avg_rating=avg_rating)
 
-
-@app.route('/register', methods=['GET', 'POST'])
+@main.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -160,15 +161,14 @@ def register():
             db.session.commit()
         
         flash('Your account has been created! You can now login.', 'success')
-        return redirect(url_for('login'))
+        return redirect(url_for('main.login'))
     
     return render_template('register.html', title='Register', form=form)
 
-
-@app.route('/login', methods=['GET', 'POST'])
+@main.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     form = LoginForm()
     if form.validate_on_submit():
@@ -178,20 +178,18 @@ def login():
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
             flash('Login successful!', 'success')
-            return redirect(next_page or url_for('index'))
+            return redirect(next_page or url_for('main.index'))
         else:
             flash('Login unsuccessful. Please check email and password.', 'danger')
     
     return render_template('login.html', title='Login', form=form)
 
-
-@app.route('/logout')
+@main.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('main.index'))
 
-
-@app.route('/profile')
+@main.route('/profile')
 @login_required
 def profile():
     # If user is a guide, get guide specific info
@@ -240,8 +238,7 @@ def profile():
                            reviews=reviews,
                            chat_groups=chat_groups)
 
-
-@app.route('/profile/edit', methods=['GET', 'POST'])
+@main.route('/profile/edit', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
     form = ProfileForm(original_username=current_user.username,
@@ -264,7 +261,7 @@ def edit_profile():
         
         db.session.commit()
         flash('Your profile has been updated!', 'success')
-        return redirect(url_for('profile'))
+        return redirect(url_for('main.profile'))
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.email.data = current_user.email
@@ -285,8 +282,7 @@ def edit_profile():
                           form=form,
                           is_guide_or_student=is_guide_or_student)
 
-
-@app.route('/add_review/<int:attraction_id>', methods=['GET', 'POST'])
+@main.route('/add_review/<int:attraction_id>', methods=['GET', 'POST'])
 @login_required
 def add_review(attraction_id):
     attraction = Attraction.query.get_or_404(attraction_id)
@@ -304,15 +300,14 @@ def add_review(attraction_id):
         db.session.commit()
         
         flash('Your review has been posted!', 'success')
-        return redirect(url_for('attraction_detail', attraction_id=attraction_id))
+        return redirect(url_for('main.attraction_detail', attraction_id=attraction_id))
     
     return render_template('add_review.html', 
                           title='Add Review',
                           form=form,
                           attraction=attraction)
 
-
-@app.route('/guides')
+@main.route('/guides')
 def guides():
     # Get all guides
     guides = Guide.query.join(User).filter(User.is_guide==True).all()
@@ -327,11 +322,12 @@ def guides():
                           guides=guides,
                           selected_language=language)
 
-
-@app.route('/language_practice')
+@main.route('/language_practice')
 def language_practice():
     # Get all language practice opportunities
-    opportunities = LanguagePractice.query.join(User).filter(User.is_student==True).all()
+    opportunities = LanguagePractice.query\
+        .join(User, LanguagePractice.student_id == User.id)\
+        .filter(User.is_student==True).all()
     
     # Filter by language if provided
     language = request.args.get('language')
@@ -343,8 +339,7 @@ def language_practice():
                           opportunities=opportunities,
                           selected_language=language)
 
-
-@app.route('/search', methods=['GET', 'POST'])
+@main.route('/search', methods=['GET', 'POST'])
 def search():
     if g.search_form.validate_on_submit() or request.args.get('q'):
         query = g.search_form.q.data or request.args.get('q', '')
@@ -374,16 +369,15 @@ def search():
                               restaurants=restaurants,
                               activities=activities)
     
-    return redirect(url_for('index'))
-
+    return redirect(url_for('main.index'))
 
 # Guide Dashboard Routes
-@app.route('/guide/dashboard')
+@main.route('/guide/dashboard')
 @login_required
 def guide_dashboard():
     if not current_user.is_guide:
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     # Get guide info
     guide = Guide.query.filter_by(user_id=current_user.id).first_or_404()
@@ -404,13 +398,12 @@ def guide_dashboard():
                           chat_groups=chat_groups,
                           guided_tours=guided_tours)
 
-
-@app.route('/guide/chat/create', methods=['GET', 'POST'])
+@main.route('/guide/chat/create', methods=['GET', 'POST'])
 @login_required
 def create_chat_group():
     if not current_user.is_guide:
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     form = ChatGroupForm()
     
@@ -425,14 +418,13 @@ def create_chat_group():
         db.session.commit()
         
         flash('Chat group created successfully!', 'success')
-        return redirect(url_for('guide_dashboard'))
+        return redirect(url_for('main.guide_dashboard'))
     
     return render_template('guide/create_chat_group.html',
                           title='Create Chat Group',
                           form=form)
 
-
-@app.route('/guide/chat/<int:chat_id>', methods=['GET', 'POST'])
+@main.route('/guide/chat/<int:chat_id>', methods=['GET', 'POST'])
 @login_required
 def chat_detail(chat_id):
     chat_group = ChatGroup.query.get_or_404(chat_id)
@@ -444,7 +436,7 @@ def chat_detail(chat_id):
     
     if not (is_guide or is_member):
         flash('You do not have permission to access this chat.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     # Form for sending messages
     form = ChatMessageForm()
@@ -457,7 +449,7 @@ def chat_detail(chat_id):
         )
         db.session.add(message)
         db.session.commit()
-        return redirect(url_for('chat_detail', chat_id=chat_id))
+        return redirect(url_for('main.chat_detail', chat_id=chat_id))
     
     # Get all messages for this chat
     messages = ChatMessage.query.filter_by(chat_group_id=chat_id).order_by(ChatMessage.timestamp).all()
@@ -473,8 +465,7 @@ def chat_detail(chat_id):
                           members=members,
                           is_guide=is_guide)
 
-
-@app.route('/guide/chat/<int:chat_id>/add_member', methods=['GET', 'POST'])
+@main.route('/guide/chat/<int:chat_id>/add_member', methods=['GET', 'POST'])
 @login_required
 def add_chat_member(chat_id):
     chat_group = ChatGroup.query.get_or_404(chat_id)
@@ -482,10 +473,12 @@ def add_chat_member(chat_id):
     # Only the guide can add members
     if chat_group.guide_id != current_user.id:
         flash('You do not have permission to add members to this chat.', 'danger')
-        return redirect(url_for('chat_detail', chat_id=chat_id))
+        return redirect(url_for('main.chat_detail', chat_id=chat_id))
     
     # Get students who are learning the language of this chat
-    potential_members = LanguagePractice.query.filter_by(language=chat_group.language).all()
+    potential_members = LanguagePractice.query\
+        .join(User, LanguagePractice.student_id == User.id)\
+        .filter(LanguagePractice.language == chat_group.language).all()
     
     # Filter out students who are already members
     existing_member_ids = [m.user_id for m in ChatGroupMember.query.filter_by(chat_group_id=chat_id).all()]
@@ -503,20 +496,19 @@ def add_chat_member(chat_id):
             db.session.commit()
             
             flash('Member added successfully!', 'success')
-            return redirect(url_for('chat_detail', chat_id=chat_id))
+            return redirect(url_for('main.chat_detail', chat_id=chat_id))
     
     return render_template('guide/add_chat_member.html',
                           title='Add Member to Chat',
                           chat_group=chat_group,
                           potential_members=potential_members)
 
-
-@app.route('/guide/tour/<int:tour_id>')
+@main.route('/guide/tour/<int:tour_id>')
 @login_required
 def tour_guide_detail(tour_id):
     if not current_user.is_guide:
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     # Get booking
     booking = TourBooking.query.get_or_404(tour_id)
@@ -524,7 +516,7 @@ def tour_guide_detail(tour_id):
     # Check if guide is assigned to this tour
     if booking.guide_id != current_user.id:
         flash('You are not assigned to this tour.', 'danger')
-        return redirect(url_for('guide_dashboard'))
+        return redirect(url_for('main.guide_dashboard'))
     
     # Get tour plan and destinations
     tour_plan = booking.tour_plan
@@ -544,13 +536,12 @@ def tour_guide_detail(tour_id):
                           destinations=destinations,
                           progress_by_dest=progress_by_dest)
 
-
-@app.route('/guide/tour/<int:tour_id>/progress/<int:destination_id>', methods=['GET', 'POST'])
+@main.route('/guide/tour/<int:tour_id>/progress/<int:destination_id>', methods=['GET', 'POST'])
 @login_required
 def update_tour_progress(tour_id, destination_id):
     if not current_user.is_guide:
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     # Get booking and destination
     booking = TourBooking.query.get_or_404(tour_id)
@@ -559,7 +550,7 @@ def update_tour_progress(tour_id, destination_id):
     # Check if guide is assigned to this tour
     if booking.guide_id != current_user.id:
         flash('You are not assigned to this tour.', 'danger')
-        return redirect(url_for('guide_dashboard'))
+        return redirect(url_for('main.guide_dashboard'))
     
     # Get or create progress
     progress = TourProgress.query.filter_by(
@@ -584,7 +575,7 @@ def update_tour_progress(tour_id, destination_id):
         db.session.commit()
         
         flash('Progress updated successfully!', 'success')
-        return redirect(url_for('tour_guide_detail', tour_id=tour_id))
+        return redirect(url_for('main.tour_guide_detail', tour_id=tour_id))
     
     if photo_form.validate_on_submit():
         photo = TourPhoto(
@@ -596,7 +587,7 @@ def update_tour_progress(tour_id, destination_id):
         db.session.commit()
         
         flash('Photo added successfully!', 'success')
-        return redirect(url_for('update_tour_progress', tour_id=tour_id, destination_id=destination_id))
+        return redirect(url_for('main.update_tour_progress', tour_id=tour_id, destination_id=destination_id))
     
     # Get photos
     photos = TourPhoto.query.filter_by(progress_id=progress.id).all()
@@ -613,14 +604,13 @@ def update_tour_progress(tour_id, destination_id):
                           photo_form=photo_form,
                           photos=photos)
 
-
 # Student Dashboard Routes
-@app.route('/student/dashboard')
+@main.route('/student/dashboard')
 @login_required
 def student_dashboard():
     if not current_user.is_student:
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     # Get language practice info
     language_practice = LanguagePractice.query.filter_by(student_id=current_user.id).first()
@@ -648,35 +638,33 @@ def student_dashboard():
                           guide=guide,
                           available_guides=available_guides)
 
-
-@app.route('/student/select_guide/<int:guide_id>')
+@main.route('/student/select_guide/<int:guide_id>')
 @login_required
 def select_guide(guide_id):
     if not current_user.is_student:
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     # Get language practice info
     language_practice = LanguagePractice.query.filter_by(student_id=current_user.id).first()
     
     if not language_practice:
         flash('Please set up your language practice profile first.', 'warning')
-        return redirect(url_for('student_dashboard'))
+        return redirect(url_for('main.student_dashboard'))
     
     # Set guide
     language_practice.guide_id = guide_id
     db.session.commit()
     
     flash('Guide selected successfully!', 'success')
-    return redirect(url_for('student_dashboard'))
+    return redirect(url_for('main.student_dashboard'))
 
-
-@app.route('/student/language_setup', methods=['GET', 'POST'])
+@main.route('/student/language_setup', methods=['GET', 'POST'])
 @login_required
 def language_setup():
     if not current_user.is_student:
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     form = LanguagePracticeForm()
     
@@ -703,7 +691,7 @@ def language_setup():
         
         db.session.commit()
         flash('Language practice profile updated!', 'success')
-        return redirect(url_for('student_dashboard'))
+        return redirect(url_for('main.student_dashboard'))
     
     if existing and not form.is_submitted():
         # Populate form with existing data
@@ -716,14 +704,13 @@ def language_setup():
                           title='Language Practice Setup',
                           form=form)
 
-
 # Tourist Dashboard Routes
-@app.route('/tourist/dashboard')
+@main.route('/tourist/dashboard')
 @login_required
 def tourist_dashboard():
     if not current_user.is_tourist:
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     # Get tour bookings
     bookings = TourBooking.query.filter_by(tourist_id=current_user.id).order_by(TourBooking.booking_date.desc()).all()
@@ -736,8 +723,7 @@ def tourist_dashboard():
                           bookings=bookings,
                           tour_plans=tour_plans)
 
-
-@app.route('/tourist/tour_plans')
+@main.route('/tourist/tour_plans')
 @login_required
 def tour_plans():
     # Get all tour plans
@@ -747,8 +733,7 @@ def tour_plans():
                           title='Tour Plans',
                           plans=plans)
 
-
-@app.route('/tourist/tour_plan/<int:plan_id>')
+@main.route('/tourist/tour_plan/<int:plan_id>')
 def tour_plan_detail(plan_id):
     # Get tour plan
     plan = TourPlan.query.get_or_404(plan_id)
@@ -766,13 +751,12 @@ def tour_plan_detail(plan_id):
                           plan=plan,
                           destinations_by_day=destinations_by_day)
 
-
-@app.route('/tourist/book_tour/<int:plan_id>', methods=['GET', 'POST'])
+@main.route('/tourist/book_tour/<int:plan_id>', methods=['GET', 'POST'])
 @login_required
 def book_tour(plan_id):
     if not current_user.is_tourist:
         flash('You need to register as a tourist to book tours.', 'warning')
-        return redirect(url_for('tour_plan_detail', plan_id=plan_id))
+        return redirect(url_for('main.tour_plan_detail', plan_id=plan_id))
     
     # Get tour plan
     plan = TourPlan.query.get_or_404(plan_id)
@@ -797,7 +781,7 @@ def book_tour(plan_id):
             db.session.commit()
             
             flash('Tour booked successfully! Waiting for admin confirmation.', 'success')
-            return redirect(url_for('tourist_dashboard'))
+            return redirect(url_for('main.tourist_dashboard'))
         except ValueError:
             flash('Invalid date format. Please use YYYY-MM-DD format.', 'danger')
     
@@ -806,8 +790,7 @@ def book_tour(plan_id):
                           plan=plan,
                           form=form)
 
-
-@app.route('/tourist/tour/<int:booking_id>')
+@main.route('/tourist/tour/<int:booking_id>')
 @login_required
 def tour_detail(booking_id):
     # Get booking
@@ -816,7 +799,7 @@ def tour_detail(booking_id):
     # Check if user is the tourist
     if booking.tourist_id != current_user.id:
         flash('You do not have permission to view this booking.', 'danger')
-        return redirect(url_for('tourist_dashboard'))
+        return redirect(url_for('main.tourist_dashboard'))
     
     # Get tour plan and destinations
     tour_plan = booking.tour_plan
@@ -845,14 +828,13 @@ def tour_detail(booking_id):
                           progress_by_dest=progress_by_dest,
                           photos_by_dest=photos_by_dest)
 
-
 # Admin Dashboard Routes
-@app.route('/admin/dashboard')
+@main.route('/admin/dashboard')
 @login_required
 def admin_dashboard():
     if not current_user.is_admin:
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     # Get counts for dashboard
     users_count = User.query.count()
@@ -880,13 +862,12 @@ def admin_dashboard():
                           pending_bookings=pending_bookings,
                           chat_groups_count=chat_groups_count)
 
-
-@app.route('/admin/users')
+@main.route('/admin/users')
 @login_required
 def admin_users():
     if not current_user.is_admin:
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     # Get query parameters
     role = request.args.get('role', 'all')
@@ -911,13 +892,12 @@ def admin_users():
                           users=users,
                           selected_role=role)
 
-
-@app.route('/admin/regions', methods=['GET', 'POST'])
+@main.route('/admin/regions', methods=['GET', 'POST'])
 @login_required
 def admin_regions():
     if not current_user.is_admin:
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     if request.method == 'POST':
         name = request.form.get('name')
@@ -942,13 +922,12 @@ def admin_regions():
                           title='Manage Regions',
                           regions=regions)
 
-
-@app.route('/admin/attractions', methods=['GET', 'POST'])
+@main.route('/admin/attractions', methods=['GET', 'POST'])
 @login_required
 def admin_attractions():
     if not current_user.is_admin:
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     if request.method == 'POST':
         name = request.form.get('name')
@@ -988,13 +967,12 @@ def admin_attractions():
                           attractions=attractions,
                           regions=regions)
 
-
-@app.route('/admin/tour_plans', methods=['GET', 'POST'])
+@main.route('/admin/tour_plans', methods=['GET', 'POST'])
 @login_required
 def admin_tour_plans():
     if not current_user.is_admin:
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     form = TourPlanForm()
     
@@ -1012,7 +990,7 @@ def admin_tour_plans():
         db.session.commit()
         
         flash('Tour plan created successfully!', 'success')
-        return redirect(url_for('admin_tour_plan_edit', plan_id=tour_plan.id))
+        return redirect(url_for('main.admin_tour_plan_edit', plan_id=tour_plan.id))
     
     # Get all tour plans
     plans = TourPlan.query.all()
@@ -1022,13 +1000,12 @@ def admin_tour_plans():
                           plans=plans,
                           form=form)
 
-
-@app.route('/admin/tour_plans/<int:plan_id>', methods=['GET', 'POST'])
+@main.route('/admin/tour_plans/<int:plan_id>', methods=['GET', 'POST'])
 @login_required
 def admin_tour_plan_edit(plan_id):
     if not current_user.is_admin:
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     # Get tour plan
     plan = TourPlan.query.get_or_404(plan_id)
@@ -1053,7 +1030,7 @@ def admin_tour_plan_edit(plan_id):
         
         db.session.commit()
         flash('Tour plan updated successfully!', 'success')
-        return redirect(url_for('admin_tour_plan_edit', plan_id=plan.id))
+        return redirect(url_for('main.admin_tour_plan_edit', plan_id=plan.id))
     
     if destination_form.validate_on_submit():
         destination = TourPlanDestination(
@@ -1068,7 +1045,7 @@ def admin_tour_plan_edit(plan_id):
         db.session.commit()
         
         flash('Destination added successfully!', 'success')
-        return redirect(url_for('admin_tour_plan_edit', plan_id=plan.id))
+        return redirect(url_for('main.admin_tour_plan_edit', plan_id=plan.id))
     
     # Get destinations
     destinations = plan.destinations.order_by(TourPlanDestination.day_number).all()
@@ -1090,13 +1067,12 @@ def admin_tour_plan_edit(plan_id):
                           destination_form=destination_form,
                           destinations=destinations)
 
-
-@app.route('/admin/bookings')
+@main.route('/admin/bookings')
 @login_required
 def admin_bookings():
     if not current_user.is_admin:
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     # Get query parameters
     status = request.args.get('status', 'all')
@@ -1116,13 +1092,12 @@ def admin_bookings():
                           bookings=bookings,
                           selected_status=status)
 
-
-@app.route('/admin/booking/<int:booking_id>', methods=['GET', 'POST'])
+@main.route('/admin/booking/<int:booking_id>', methods=['GET', 'POST'])
 @login_required
 def admin_booking_detail(booking_id):
     if not current_user.is_admin:
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     # Get booking
     booking = TourBooking.query.get_or_404(booking_id)
@@ -1139,14 +1114,14 @@ def admin_booking_detail(booking_id):
         db.session.commit()
         
         flash('Guide assigned and booking confirmed!', 'success')
-        return redirect(url_for('admin_bookings'))
+        return redirect(url_for('main.admin_bookings'))
     
     if request.method == 'POST' and 'status' in request.form:
         booking.status = request.form['status']
         db.session.commit()
         
         flash('Booking status updated!', 'success')
-        return redirect(url_for('admin_booking_detail', booking_id=booking.id))
+        return redirect(url_for('main.admin_booking_detail', booking_id=booking.id))
     
     # If form not submitted and guide not assigned, set form defaults
     if not form.is_submitted() and booking.guide_id:
@@ -1157,13 +1132,12 @@ def admin_booking_detail(booking_id):
                           booking=booking,
                           form=form)
 
-
-@app.route('/admin/chat_groups')
+@main.route('/admin/chat_groups')
 @login_required
 def admin_chat_groups():
     if not current_user.is_admin:
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     # Get all chat groups
     chat_groups = ChatGroup.query.all()
@@ -1172,9 +1146,8 @@ def admin_chat_groups():
                           title='Manage Chat Groups',
                           chat_groups=chat_groups)
 
-
 # API routes for JavaScript functionality
-@app.route('/api/attractions', methods=['GET'])
+@main.route('/api/attractions', methods=['GET'])
 def api_attractions():
     attractions = Attraction.query.all()
     result = []
@@ -1189,14 +1162,12 @@ def api_attractions():
     
     return jsonify(result)
 
-
 # Error handlers
-@app.errorhandler(404)
+@main.errorhandler(404)
 def not_found_error(error):
     return render_template('404.html'), 404
 
-
-@app.errorhandler(500)
+@main.errorhandler(500)
 def internal_error(error):
     db.session.rollback()
     return render_template('500.html'), 500

@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة الحجوزات | اكتشف مصر</title>
+    <title>{{ _('Manage Chat Groups') }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
             --primary-red: #e74c3c;
@@ -25,7 +25,7 @@
             overflow-x: hidden;
         }
         
-        /* Top Header */
+        /* Top Header Styles */
         .top-header {
             background: var(--primary-red);
             padding: 8px 0;
@@ -35,26 +35,19 @@
         .top-header .contact-info {
             font-size: 0.9rem;
         }
-        
+
         .top-header .social-icons a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 30px;
-            height: 30px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
             color: var(--white);
-            margin: 0 5px;
+            margin-left: 15px;
+            opacity: 0.9;
             transition: all 0.3s;
         }
-        
+
         .top-header .social-icons a:hover {
-            background-color: var(--white);
-            color: var(--primary-red);
+            opacity: 1;
             transform: translateY(-3px);
         }
-
+        
         /* Main Header */
         .main-header {
             padding: 15px 0;
@@ -62,18 +55,14 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
-        .navbar {
-            padding: 0;
-        }
-        
         .navbar-brand {
             font-weight: 700;
-            color: var(--primary-red);
+            color: var(--primary-red) !important;
             font-size: 1.8rem;
         }
         
         .nav-link {
-            color: #333;
+            color: #333 !important;
             font-weight: 600;
             margin: 0 10px;
             position: relative;
@@ -81,7 +70,7 @@
         }
         
         .nav-link:hover {
-            color: var(--primary-red);
+            color: var(--primary-red) !important;
         }
         
         .nav-link:hover::after {
@@ -96,12 +85,24 @@
             transition: transform 0.3s;
         }
         
-        .nav-item .btn {
-            padding: 8px 20px;
+        .navbar-nav .btn {
+            padding: 5px 15px;
+            margin: 5px;
             border-radius: 50px;
-            margin: 0 5px;
             font-weight: 600;
             transition: all 0.3s;
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-red);
+            border-color: var(--primary-red);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-red);
+            color: var(--white);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
         }
         
         .btn-primary {
@@ -117,113 +118,70 @@
             box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
         }
         
-        .btn-outline-primary {
-            color: var(--primary-red);
-            border-color: var(--primary-red);
-            transition: all 0.3s;
-        }
-        
-        .btn-outline-primary:hover {
-            background-color: var(--primary-red);
-            color: var(--white);
-            transform: translateY(-3px);
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
-        }
-        
-        .dropdown-menu {
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            border: none;
-            padding: 0.5rem;
-        }
-        
-        .dropdown-item {
-            padding: 10px 20px;
-            border-radius: 5px;
-            transition: all 0.2s;
-        }
-        
-        .dropdown-item:hover {
-            background-color: var(--light-red);
-            color: var(--white);
-        }
-        
-        .dropdown-item i {
-            margin-right: 10px;
-            width: 20px;
-            color: var(--primary-red);
-        }
-        
-        .dropdown-item:hover i {
-            color: var(--white);
-        }
-        
-        /* Main Content Styles */
+        /* Content Section */
         .content-section {
-            padding: 2rem 0 4rem;
-        }
-        
-        .content-header {
-            margin-bottom: 2rem;
+            padding: 3rem 0;
             position: relative;
         }
         
-        .content-header h1 {
+        .content-section::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            background-color: var(--light-red);
+            border-radius: 50%;
+            opacity: 0.1;
+            z-index: -1;
+        }
+        
+        .content-section::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            left: -50px;
+            width: 150px;
+            height: 150px;
+            background-color: var(--light-red);
+            transform: rotate(45deg);
+            opacity: 0.1;
+            z-index: -1;
+        }
+        
+        .page-title {
             font-weight: 700;
             color: var(--primary-red);
-            margin-bottom: 1rem;
+            margin-bottom: 2rem;
             position: relative;
             display: inline-block;
         }
         
-        .content-header h1::after {
+        .page-title::after {
             content: '';
             position: absolute;
-            width: 80px;
+            width: 60px;
             height: 3px;
             background-color: var(--gold);
             bottom: -10px;
             left: 0;
         }
         
+        /* Table Styles */
         .card {
             border: none;
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             transition: all 0.3s;
+            border: 2px solid rgba(231, 76, 60, 0.1);
             margin-bottom: 2rem;
-            background: var(--white);
         }
         
         .card:hover {
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
             transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.08);
-        }
-        
-        .card-body {
-            padding: 1.5rem;
-        }
-        
-        .filter-card {
-            margin-bottom: 2rem;
-        }
-        
-        .btn-group .btn {
-            border-radius: 8px;
-            margin: 0 5px;
-            padding: 8px 20px;
-            transition: all 0.3s;
-        }
-        
-        .btn-group .btn:first-child {
-            border-top-left-radius: 8px;
-            border-bottom-left-radius: 8px;
-        }
-        
-        .btn-group .btn:last-child {
-            border-top-right-radius: 8px;
-            border-bottom-right-radius: 8px;
         }
         
         .table {
@@ -231,56 +189,76 @@
         }
         
         .table thead th {
-            border-top: none;
-            border-bottom: 2px solid rgba(231, 76, 60, 0.2);
-            font-weight: 700;
-            color: var(--primary-red);
-            padding: 1rem 0.75rem;
-        }
-        
-        .table tbody tr {
-            transition: all 0.2s;
-        }
-        
-        .table tbody tr:hover {
             background-color: rgba(231, 76, 60, 0.05);
+            color: var(--secondary-red);
+            font-weight: 700;
+            border-top: none;
+            padding: 1rem 0.75rem;
         }
         
         .table td {
-            padding: 1rem 0.75rem;
             vertical-align: middle;
+            padding: 0.75rem;
+            border-color: rgba(0,0,0,0.05);
         }
         
-        .badge {
-            padding: 0.5rem 1rem;
+        .table tbody tr {
+            transition: all 0.3s;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(231, 76, 60, 0.03);
+        }
+        
+        .btn-group .btn {
             border-radius: 50px;
+            padding: 0.375rem 1rem;
             font-weight: 600;
+            margin: 0 2px;
         }
         
-        .badge.bg-success {
-            background-color: #2ecc71 !important;
+        /* Modal Styles */
+        .modal-content {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
         }
         
-        .badge.bg-warning {
-            background-color: #f39c12 !important;
+        .modal-header {
+            background-color: var(--primary-red);
+            color: var(--white);
+            border-bottom: none;
+            padding: 1.5rem;
         }
         
-        .badge.bg-danger {
-            background-color: #e74c3c !important;
+        .modal-title {
+            font-weight: 700;
         }
         
-        .badge.bg-primary {
-            background-color: #3498db !important;
+        .modal-body {
+            padding: 2rem;
         }
         
-        .btn-sm {
-            padding: 0.4rem 1rem;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 600;
+        .modal-footer {
+            border-top: none;
+            padding: 1.5rem;
         }
         
-        /* Footer Styles */
+        /* Alert Styles */
+        .alert {
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .alert-info {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--secondary-red);
+        }
+        
+        /* Footer */
         .main-footer {
             background: var(--primary-red);
             position: relative;
@@ -288,7 +266,7 @@
             color: var(--white);
             padding-top: 3rem;
         }
-        
+
         .main-footer::before {
             content: '';
             position: absolute;
@@ -305,13 +283,14 @@
             );
             opacity: 0.1;
         }
-        
+
         .footer-heading {
-            font-weight: 700;
+            color: var(--white);
             position: relative;
             margin-bottom: 1.5rem;
+            font-weight: 700;
         }
-        
+
         .footer-heading::after {
             content: '';
             position: absolute;
@@ -321,28 +300,28 @@
             height: 3px;
             background: var(--white);
         }
-        
+
         .footer-links {
             list-style: none;
             padding: 0;
         }
-        
+
         .footer-links li {
             margin-bottom: 10px;
         }
-        
+
         .footer-links a {
             color: var(--white);
             text-decoration: none;
             transition: color 0.3s;
             opacity: 0.9;
         }
-        
+
         .footer-links a:hover {
             color: var(--gold);
             opacity: 1;
         }
-        
+
         .footer-bottom {
             background: var(--secondary-red);
             padding: 20px 0;
@@ -353,18 +332,12 @@
         
         /* Responsive Styles */
         @media (max-width: 768px) {
-            .btn-group {
-                display: flex;
-                flex-wrap: wrap;
+            .table-responsive {
+                border-radius: 15px;
             }
             
-            .btn-group .btn {
-                margin-bottom: 0.5rem;
-                flex: 1 0 auto;
-            }
-            
-            .table {
-                min-width: 650px;
+            .page-title {
+                font-size: 1.8rem;
             }
         }
     </style>
@@ -428,10 +401,10 @@
                             </li>
                         {% else %}
                             <li class="nav-item">
-                                <a class="btn btn-outline-primary" href="{{ url_for('main.login') }}">{{ _('تسجيل الدخول') }}</a>
+                                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('main.login') }}">{{ _('تسجيل الدخول') }}</a>
                             </li>
                             <li class="nav-item">
-                                <a class="btn btn-primary" href="{{ url_for('main.register') }}">{{ _('التسجيل') }}</a>
+                                <a class="btn btn-primary btn-sm" href="{{ url_for('main.register') }}">{{ _('التسجيل') }}</a>
                             </li>
                         {% endif %}
                     </ul>
@@ -443,93 +416,87 @@
     <!-- Main Content -->
     <section class="content-section">
         <div class="container">
-            <div class="content-header">
-                <h1>{{ _('إدارة الحجوزات') }}</h1>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="page-title">{{ _('Manage Chat Groups') }}</h1>
+                <a href="#" class="btn btn-primary"><i class="fas fa-plus me-2"></i>{{ _('New Group') }}</a>
             </div>
-            
-            <div class="card filter-card">
-                <div class="card-body">
-                    <div class="btn-group" role="group" aria-label="Filter bookings">
-                        <a href="{{ url_for('main.admin_bookings', status='all') }}" class="btn btn-{{ 'primary' if selected_status == 'all' else 'outline-primary' }}">
-                            <i class="fas fa-list-ul me-2"></i>{{ _('جميع الحجوزات') }}
-                        </a>
-                        <a href="{{ url_for('main.admin_bookings', status='pending') }}" class="btn btn-{{ 'primary' if selected_status == 'pending' else 'outline-primary' }}">
-                            <i class="fas fa-clock me-2"></i>{{ _('قيد الانتظار') }}
-                        </a>
-                        <a href="{{ url_for('main.admin_bookings', status='confirmed') }}" class="btn btn-{{ 'primary' if selected_status == 'confirmed' else 'outline-primary' }}">
-                            <i class="fas fa-check-circle me-2"></i>{{ _('مؤكدة') }}
-                        </a>
-                        <a href="{{ url_for('main.admin_bookings', status='completed') }}" class="btn btn-{{ 'primary' if selected_status == 'completed' else 'outline-primary' }}">
-                            <i class="fas fa-flag-checkered me-2"></i>{{ _('مكتملة') }}
-                        </a>
-                        <a href="{{ url_for('main.admin_bookings', status='cancelled') }}" class="btn btn-{{ 'primary' if selected_status == 'cancelled' else 'outline-primary' }}">
-                            <i class="fas fa-times-circle me-2"></i>{{ _('ملغاة') }}
-                        </a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card">
+
+            {% if chat_groups %}
+            <div class="card fade-in">
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>{{ _('ID') }}</th>
-                                    <th>{{ _('خطة الرحلة') }}</th>
-                                    <th>{{ _('السائح') }}</th>
-                                    <th>{{ _('التواريخ') }}</th>
-                                    <th>{{ _('المرشد') }}</th>
-                                    <th>{{ _('الحالة') }}</th>
-                                    <th>{{ _('الإجراءات') }}</th>
+                                    <th>{{ _('Name') }}</th>
+                                    <th>{{ _('Language') }}</th>
+                                    <th>{{ _('Guide') }}</th>
+                                    <th>{{ _('Members') }}</th>
+                                    <th>{{ _('Created') }}</th>
+                                    <th>{{ _('Actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for booking in bookings %}
+                                {% for group in chat_groups %}
                                 <tr>
-                                    <td><strong>#{{ booking.id }}</strong></td>
-                                    <td>{{ booking.tour_plan.title }}</td>
+                                    <td class="fw-bold">{{ group.name }}</td>
+                                    <td><span class="badge bg-light text-primary">{{ group.language }}</span></td>
+                                    <td>{{ group.guide.username }}</td>
+                                    <td><span class="badge bg-secondary">{{ group.members.count() }}</span></td>
+                                    <td>{{ group.created_at.strftime('%Y-%m-%d') }}</td>
                                     <td>
-                                        <i class="fas fa-user text-primary me-2"></i>
-                                        {{ booking.tourist.username }}
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-calendar-alt text-primary me-2"></i>
-                                        {{ booking.start_date.strftime('%d/%m/%Y') }} - {{ booking.end_date.strftime('%d/%m/%Y') }}
-                                    </td>
-                                    <td>
-                                        {% if booking.guide %}
-                                        <i class="fas fa-user-tie text-primary me-2"></i>
-                                        {{ booking.guide.username }}
-                                        {% else %}
-                                        <span class="text-muted"><i class="fas fa-exclamation-circle me-2"></i>{{ _('غير معين') }}</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-{{ 'success' if booking.status == 'confirmed' else 'warning' if booking.status == 'pending' else 'danger' if booking.status == 'cancelled' else 'primary' }}">
-                                            {% if booking.status == 'confirmed' %}
-                                                <i class="fas fa-check-circle me-1"></i>{{ _('مؤكدة') }}
-                                            {% elif booking.status == 'pending' %}
-                                                <i class="fas fa-clock me-1"></i>{{ _('قيد الانتظار') }}
-                                            {% elif booking.status == 'cancelled' %}
-                                                <i class="fas fa-times-circle me-1"></i>{{ _('ملغاة') }}
-                                            {% else %}
-                                                <i class="fas fa-flag-checkered me-1"></i>{{ _('مكتملة') }}
-                                            {% endif %}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a href="{{ url_for('main.admin_booking_detail', booking_id=booking.id) }}" class="btn btn-sm btn-primary">
-                                            <i class="fas fa-edit me-1"></i>{{ _('إدارة') }}
-                                        </a>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('main.chat_detail', chat_id=group.id) }}" class="btn btn-sm btn-outline-primary">{{ _('View') }}</a>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ group.id }}">
+                                                {{ _('Delete') }}
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
+
+                                <!-- Delete Modal -->
+                                <div class="modal fade" id="deleteModal{{ group.id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">{{ _('Delete Chat Group') }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="text-center mb-4">
+                                                    <i class="fas fa-exclamation-triangle text-danger fa-3x mb-3"></i>
+                                                    <h4>{{ _('Are you sure?') }}</h4>
+                                                </div>
+                                                <p>{{ _('Are you sure you want to delete the chat group') }} <strong>"{{ group.name }}"</strong>?</p>
+                                                <p class="text-danger">{{ _('This action cannot be undone.') }}</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                                                <form method="POST" action="{{ url_for('main.chat_detail', chat_id=group.id) }}" class="d-inline">
+                                                    <input type="hidden" name="_method" value="DELETE">
+                                                    <button type="submit" class="btn btn-danger">{{ _('Delete') }}</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+            {% else %}
+            <div class="alert alert-info slide-up">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-info-circle fa-2x me-3"></i>
+                    <div>
+                        <h4 class="fw-bold mb-1">{{ _('No Groups Found') }}</h4>
+                        <p class="mb-0">{{ _('No chat groups found. Create a new group to get started.') }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </section>
 
@@ -544,10 +511,10 @@
                 <div class="col-md-4">
                     <h4 class="footer-heading">روابط سريعة</h4>
                     <ul class="footer-links">
-                        <li><a href="/tours"><i class="fas fa-plane me-2"></i>الرحلات السياحية</a></li>
-                        <li><a href="/hotels"><i class="fas fa-hotel me-2"></i>الفنادق</a></li>
-                        <li><a href="/transportation"><i class="fas fa-bus me-2"></i>المواصلات</a></li>
-                        <li><a href="/blog"><i class="fas fa-blog me-2"></i>المدونة</a></li>
+                        <li><a href="/tours">الرحلات السياحية</a></li>
+                        <li><a href="/hotels">الفنادق</a></li>
+                        <li><a href="/transportation">المواصلات</a></li>
+                        <li><a href="/blog">المدونة</a></li>
                     </ul>
                 </div>
                 <div class="col-md-4">
@@ -567,6 +534,7 @@
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

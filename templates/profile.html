@@ -1,78 +1,568 @@
-{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ current_user.username }} - الملف الشخصي</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* General Styling with Red and White Theme */
+body {
+    font-family: 'Cairo', sans-serif;
+    background-color: #f8f8f8;
+    color: #333;
+    direction: rtl;
+}
 
-{% block content %}
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-body text-center">
-                        <img src="{{ current_user.profile_pic or 'https://via.placeholder.com/150' }}" class="rounded-circle mb-3" width="150" height="150" alt="{{ _('Profile Picture') }}">
-                        <h4>{{ current_user.username }}</h4>
-                        <p class="text-muted">{{ current_user.email }}</p>
-                        
-                        {% if current_user.is_guide %}
-                            <span class="badge bg-primary mb-2">{{ _('Tour Guide') }}</span>
-                        {% endif %}
-                        
-                        {% if current_user.is_student %}
-                            <span class="badge bg-info mb-2">{{ _('Language Student') }}</span>
-                        {% endif %}
-                        
-                        {% if current_user.is_tourist %}
-                            <span class="badge bg-warning mb-2">{{ _('Tourist') }}</span>
-                        {% endif %}
-                        
-                        {% if current_user.is_admin %}
-                            <span class="badge bg-danger mb-2">{{ _('Admin') }}</span>
-                        {% endif %}
-                        
-                        <p class="mt-2">{{ _('Member since') }}: {{ current_user.date_joined.strftime('%B %d, %Y') }}</p>
-                        
-                        {% if current_user.bio %}
-                            <div class="mt-3">
-                                <h6>{{ _('Bio') }}</h6>
-                                <p>{{ current_user.bio }}</p>
-                            </div>
-                        {% endif %}
-                        
-                        {% if current_user.languages %}
-                            <div class="mt-3">
-                                <h6>{{ _('Languages') }}</h6>
-                                <p>{{ current_user.languages }}</p>
-                            </div>
-                        {% endif %}
-                        
-                        <a href="{{ url_for('edit_profile') }}" class="btn btn-outline-primary mt-3">{{ _('Edit Profile') }}</a>
-                        
-                        <!-- Dashboard Links -->
-                        <div class="mt-3">
-                            {% if current_user.is_admin %}
-                                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary d-block mb-2">{{ _('Admin Dashboard') }}</a>
-                            {% endif %}
-                            
-                            {% if current_user.is_guide %}
-                                <a href="{{ url_for('guide_dashboard') }}" class="btn btn-success d-block mb-2">{{ _('Guide Dashboard') }}</a>
-                            {% endif %}
-                            
-                            {% if current_user.is_student %}
-                                <a href="{{ url_for('student_dashboard') }}" class="btn btn-info d-block mb-2">{{ _('Student Dashboard') }}</a>
-                            {% endif %}
-                            
-                            {% if current_user.is_tourist %}
-                                <a href="{{ url_for('tourist_dashboard') }}" class="btn btn-warning d-block mb-2">{{ _('Tourist Dashboard') }}</a>
-                            {% endif %}
-                        </div>
+/* Headers and Text */
+h1, h2, h3, h4, h5, h6, .section-heading, .footer-heading {
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+    color: #d01f1f; /* Red color for headings */
+}
+
+/* Top Header */
+.top-header {
+    background-color: #d01f1f;
+    color: white;
+    padding: 10px 0;
+}
+
+.top-header .contact-info span {
+    color: white;
+}
+
+.social-icons a {
+    color: white;
+    margin-left: 10px;
+    transition: all 0.3s ease;
+}
+
+.social-icons a:hover {
+    color: #f8d7d7;
+}
+
+/* Main Header */
+.main-header {
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-brand, .logo {
+    font-size: 24px;
+    font-weight: 900;
+    color: #d01f1f !important;
+}
+
+.nav-link {
+    font-family: 'Cairo', sans-serif;
+    font-weight: 600;
+    color: #333;
+    margin: 0 5px;
+    position: relative;
+    transition: color 0.3s;
+}
+
+.nav-link:hover {
+    color: #d01f1f;
+}
+
+.nav-link:after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    background-color: #d01f1f;
+    bottom: 0;
+    left: 0;
+    transition: width 0.3s;
+}
+
+.nav-link:hover:after {
+    width: 100%;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #d01f1f;
+    border-color: #d01f1f;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #b01a1a;
+    border-color: #b01a1a;
+    transform: translateY(-2px);
+}
+
+.btn-outline-primary {
+    color: #d01f1f;
+    border-color: #d01f1f;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 600;
+}
+
+.btn-outline-primary:hover {
+    background-color: #d01f1f;
+    color: white;
+}
+
+/* Hero Section */
+.attractions-hero {
+    background: linear-gradient(135deg, #d01f1f 0%, #ff5757 100%);
+    position: relative;
+    overflow: hidden;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    margin-bottom: 40px;
+}
+
+.attractions-hero-content {
+    text-align: center;
+    z-index: 10;
+}
+
+.attractions-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 15px;
+    color: white;
+}
+
+.attractions-hero p {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Floating shapes */
+.floating-shape {
+    position: absolute;
+    opacity: 0.1;
+    background-color: white;
+}
+
+.circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    top: -50px;
+    left: 10%;
+    animation: float 15s infinite linear;
+}
+
+.triangle {
+    width: 0;
+    height: 0;
+    border-left: 100px solid transparent;
+    border-right: 100px solid transparent;
+    border-bottom: 173px solid white;
+    right: 10%;
+    bottom: -80px;
+    animation: float 20s infinite linear reverse;
+}
+
+.square {
+    width: 100px;
+    height: 100px;
+    transform: rotate(45deg);
+    left: 50%;
+    top: 20%;
+    animation: float 18s infinite linear;
+}
+
+@keyframes float {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(10px, 15px) rotate(5deg); }
+    50% { transform: translate(0, 25px) rotate(0deg); }
+    75% { transform: translate(-10px, 15px) rotate(-5deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+/* Profile Section */
+.practice-card, .benefits-card, .filter-section {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    margin-bottom: 25px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid rgba(208, 31, 31, 0.1);
+}
+
+.practice-card:hover, .benefits-card:hover, .filter-section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(208, 31, 31, 0.1);
+}
+
+.section-heading {
+    background-color: #d01f1f;
+    color: white;
+    padding: 15px;
+    margin: 0;
+    font-weight: 700;
+    border-radius: 15px 15px 0 0;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* Profile Picture */
+.student-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #d01f1f;
+    box-shadow: 0 5px 15px rgba(208, 31, 31, 0.2);
+}
+
+/* Badges */
+.badge {
+    background-color: #d01f1f;
+    color: white;
+    font-family: 'Cairo', sans-serif;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+/* Rating Stars */
+.rating-display {
+    position: relative;
+    display: inline-block;
+    unicode-bidi: bidi-override;
+    color: #e0e0e0;
+    font-size: 18px;
+}
+
+.rating-stars {
+    position: absolute;
+    left: 0;
+    top: 0;
+    overflow: hidden;
+    color: #d01f1f;
+}
+
+/* List Group */
+.list-group-item {
+    border-left: 4px solid #d01f1f;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+.list-group-item:hover {
+    background-color: #fff9f9;
+    transform: translateX(-5px);
+}
+
+/* Footer */
+.main-footer {
+    background-color: #d01f1f;
+    color: white;
+    padding: 50px 0 0;
+    margin-top: 50px;
+}
+
+.footer-heading {
+    color: white;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 10px;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.footer-links a:hover {
+    color: white;
+    text-decoration: none;
+    padding-right: 5px;
+}
+
+.footer-bottom {
+    background-color: #b01a1a;
+    padding: 15px 0;
+    margin-top: 30px;
+    text-align: center;
+}
+
+/* Scroll to top button */
+.scroll-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #d01f1f;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 99;
+    border: none;
+    box-shadow: 0 2px 10px rgba(208, 31, 31, 0.3);
+}
+
+.scroll-top.active {
+    opacity: 1;
+    bottom: 30px;
+}
+
+.scroll-top:hover {
+    background-color: #b01a1a;
+    transform: translateY(-5px);
+}
+
+/* Dashboard links */
+.btn-success, .btn-info, .btn-warning {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.btn-success:before, .btn-info:before, .btn-warning:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    z-index: -1;
+}
+
+.btn-success:hover:before, .btn-info:hover:before, .btn-warning:hover:before {
+    left: 0;
+}
+
+/* Fade-in animation */
+.fade-in {
+    animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* RTL Specific Adjustments */
+.dropdown-menu-end {
+    left: 0;
+    right: auto;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767px) {
+    .attractions-hero h1 {
+        font-size: 1.8rem;
+    }
+    
+    .top-header .contact-info, .top-header .social-icons {
+        text-align: center !important;
+    }
+    
+    .top-header .social-icons {
+        margin-top: 10px;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="top-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="contact-info">
+                        <span class="me-3"><i class="fas fa-phone me-2"></i>+20 123 456 789</span>
+                        <span><i class="fas fa-envelope me-2"></i>info@discovergypt.com</span>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
             </div>
-            
+        </div>
+    </div>
+    
+    <!-- Main Header -->
+    <header class="main-header">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg">
+                <a class="navbar-brand logo" href="{{ url_for('main.index') }}">
+                    <i class="fas fa-pyramid"></i> {{ _('اكتشف مصر') }}
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.index') }}">{{ _('الرئيسية') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.attractions') }}">{{ _('المعالم السياحية') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.guides') }}">{{ _('المرشدين السياحيين') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.language_practice') }}">{{ _('تعلم اللغات') }}</a>
+                        </li>
+                        {% if current_user.is_authenticated %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user-circle"></i> {{ _('حسابي') }}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="{{ url_for('main.profile') }}"><i class="fas fa-user"></i> {{ _('الملف الشخصي') }}</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt"></i> {{ _('تسجيل الخروج') }}</a></li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="btn btn-outline-primary btn-sm ms-2" href="{{ url_for('main.login') }}">{{ _('تسجيل الدخول') }}</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-primary btn-sm ms-2" href="{{ url_for('main.register') }}">{{ _('التسجيل') }}</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </header>
+    
+
+    <div class="attractions-hero text-center">
+        <div class="container">
+            <h1 class="text-white mb-3">الملف الشخصي</h1>
+            <p class="text-white-50">{{ current_user.username }}</p>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <div class="profile-card p-4 mb-4">
+            <div class="text-center">
+                <img src="{{ current_user.profile_pic or 'https://via.placeholder.com/150' }}" 
+                     class="profile-image" alt="الصورة الشخصية">
+                <h3 class="mt-3">{{ current_user.username }}</h3>
+                <p class="text-muted">{{ current_user.email }}</p>
+                
+                <div class="badges my-3">
+                    {% if current_user.is_guide %}
+                        <span class="badge bg-primary">مرشد سياحي</span>
+                    {% endif %}
+                    {% if current_user.is_student %}
+                        <span class="badge bg-info mb-2">{{ _('Language Student') }}</span>
+                    {% endif %}
+                    
+                    {% if current_user.is_tourist %}
+                        <span class="badge bg-warning mb-2">{{ _('Tourist') }}</span>
+                    {% endif %}
+                    
+                    {% if current_user.is_admin %}
+                        <span class="badge bg-danger mb-2">{{ _('Admin') }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="section-card">
+                    <h5 class="section-title">معلومات شخصية</h5>
+                    <p class="mt-2">{{ _('Member since') }}: {{ current_user.date_joined.strftime('%B %d, %Y') }}</p>
+                        
+                    {% if current_user.bio %}
+                        <div class="mt-3">
+                            <h6 class="footer-heading">{{ _('Bio') }}</h6>
+                            <p>{{ current_user.bio }}</p>
+                        </div>
+                    {% endif %}
+                    
+                    {% if current_user.languages %}
+                        <div class="mt-3">
+                            <h6>{{ _('Languages') }}</h6>
+                            <p>{{ current_user.languages }}</p>
+                        </div>
+                    {% endif %}
+                    
+                    <a href="{{ url_for('main.edit_profile') }}" class="btn btn-primary mt-3">
+                        <i class="fas fa-edit"></i> {{ _('Edit Profile') }}
+                    </a>
+                </div>
+
+                <div class="section-card">
+                    <h5 class="section-title">لوحات التحكم</h5>
+                    {% if current_user.is_admin %}
+                        <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-primary d-block mb-2">
+                            <i class="fas fa-users-cog"></i> {{ _('Admin Dashboard') }}
+                        </a>
+                    {% endif %}
+                    
+                    {% if current_user.is_guide %}
+                        <a href="{{ url_for('main.guide_dashboard') }}" class="btn btn-success d-block mb-2">
+                            <i class="fas fa-map-signs"></i> {{ _('Guide Dashboard') }}
+                        </a>
+                    {% endif %}
+                    
+                    {% if current_user.is_student %}
+                        <a href="{{ url_for('main.student_dashboard') }}" class="btn btn-info d-block mb-2">
+                            <i class="fas fa-book"></i> {{ _('Student Dashboard') }}
+                        </a>
+                    {% endif %}
+                    
+                    {% if current_user.is_tourist %}
+                        <a href="{{ url_for('main.tourist_dashboard') }}" class="btn btn-warning d-block mb-2">
+                            <i class="fas fa-plane"></i> {{ _('Tourist Dashboard') }}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
             <div class="col-md-8">
                 <!-- Guide Information -->
                 {% if current_user.is_guide %}
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h5>{{ _('Guide Information') }}</h5>
-                        </div>
+                    <div class="filter-section mb-4">
+                        <h5 class="section-heading">{{ _('Guide Information') }}</h5>
                         <div class="card-body">
                             {% if guide_info %}
                                 <div class="row">
@@ -102,10 +592,8 @@
                 
                 <!-- Language Practice Information -->
                 {% if current_user.is_student %}
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h5>{{ _('Language Practice Information') }}</h5>
-                        </div>
+                    <div class="filter-section mb-4">
+                        <h5 class="section-heading">{{ _('Language Practice Information') }}</h5>
                         <div class="card-body">
                             {% if language_practice %}
                                 <div class="row">
@@ -118,20 +606,18 @@
                                         <p><strong>{{ _('Interests') }}:</strong> {{ language_practice.interests }}</p>
                                     </div>
                                 </div>
-                                <a href="{{ url_for('language_setup') }}" class="btn btn-sm btn-outline-primary mt-2">{{ _('Update Language Information') }}</a>
+                                <a href="{{ url_for('main.language_setup') }}" class="btn btn-sm btn-outline-primary mt-2">{{ _('Update Language Information') }}</a>
                             {% else %}
                                 <p>{{ _('You have not completed your language practice profile yet.') }}</p>
-                                <a href="{{ url_for('language_setup') }}" class="btn btn-primary">{{ _('Complete Language Practice Profile') }}</a>
+                                <a href="{{ url_for('main.language_setup') }}" class="btn btn-primary">{{ _('Complete Language Practice Profile') }}</a>
                             {% endif %}
                         </div>
                     </div>
                 {% endif %}
                 
                 <!-- My Reviews -->
-                <div class="card">
-                    <div class="card-header">
-                        <h5>{{ _('My Reviews') }}</h5>
-                    </div>
+                <div class="filter-section">
+                    <h5 class="section-heading">{{ _('My Reviews') }}</h5>
                     <div class="card-body">
                         {% if reviews %}
                             <div class="list-group">
@@ -144,7 +630,7 @@
                                         <p class="mb-1">{{ review.content[:100] }}{% if review.content|length > 100 %}...{% endif %}</p>
                                         <div class="d-flex justify-content-between align-items-center">
                                             <small class="text-muted">
-                                                <a href="{{ url_for('attraction_detail', attraction_id=review.attraction_id) }}">
+                                                <a href="{{ url_for('main.attraction_detail', attraction_id=review.attraction_id) }}">
                                                     {{ review.attraction.name }}
                                                 </a>
                                             </small>
@@ -158,11 +644,64 @@
                             </div>
                         {% else %}
                             <p>{{ _('You haven\'t written any reviews yet.') }}</p>
-                            <a href="{{ url_for('attractions') }}" class="btn btn-outline-primary">{{ _('Browse Attractions') }}</a>
+                            <a href="{{ url_for('main.attractions') }}" class="btn btn-outline-primary">{{ _('Browse Attractions') }}</a>
                         {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
-{% endblock %}
+
+    <button class="scroll-top" id="scrollTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Scroll to top functionality
+        const scrollTop = document.getElementById('scrollTop');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 200) {
+                scrollTop.classList.add('active');
+            } else {
+                scrollTop.classList.remove('active');
+            }
+        });
+        scrollTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+    <footer class="main-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h4 class="footer-heading">عن اكتشف مصر</h4>
+                    <p>نحن نقدم لكم أفضل التجارب السياحية في مصر، مع خدمات متميزة وأسعار تنافسية.</p>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="footer-heading">روابط سريعة</h4>
+                    <ul class="footer-links">
+                        <li><a href="/tours">الرحلات السياحية</a></li>
+                        <li><a href="/hotels">الفنادق</a></li>
+                        <li><a href="/transportation">المواصلات</a></li>
+                        <li><a href="/blog">المدونة</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="footer-heading">تواصل معنا</h4>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt me-2"></i>القاهرة، مصر</li>
+                        <li><i class="fas fa-phone me-2"></i>+20 123 456 789</li>
+                        <li><i class="fas fa-envelope me-2"></i>info@discovergypt.com</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p class="mb-0">© 2024 اكتشف مصر. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -49,7 +49,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{{ url_for('tour_detail', booking_id=booking.id) }}" class="btn btn-sm btn-outline-primary">{{ _('View Details') }}</a>
+                                        <a href="{{ url_for('main.tour_detail', booking_id=booking.id) }}" class="btn btn-sm btn-outline-primary">{{ _('View Details') }}</a>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -71,7 +71,7 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ _('Explore Egypt') }}</h5>
                     <p>{{ _('Discover our carefully curated tour plans for exploring Egypt.') }}</p>
-                    <a href="{{ url_for('tour_plans') }}" class="btn btn-outline-success">{{ _('Browse All Tour Plans') }}</a>
+                    <a href="{{ url_for('main.tour_plans') }}" class="btn btn-outline-success">{{ _('Browse All Tour Plans') }}</a>
                     
                     {% if tour_plans %}
                     <hr>
@@ -88,8 +88,8 @@
                                         <small>{{ _('Duration') }}: {{ plan.duration }} {{ _('days') }}</small><br>
                                         <small>{{ _('Price') }}: {{ plan.price }} {{ _('EGP') }}</small>
                                     </p>
-                                    <a href="{{ url_for('tour_plan_detail', plan_id=plan.id) }}" class="btn btn-sm btn-primary">{{ _('Details') }}</a>
-                                    <a href="{{ url_for('book_tour', plan_id=plan.id) }}" class="btn btn-sm btn-success">{{ _('Book') }}</a>
+                                    <a href="{{ url_for('main.tour_plan_detail', plan_id=plan.id) }}" class="btn btn-sm btn-primary">{{ _('Details') }}</a>
+                                    <a href="{{ url_for('main.book_tour', plan_id=plan.id) }}" class="btn btn-sm btn-success">{{ _('Book') }}</a>
                                 </div>
                             </div>
                         </div>

@@ -17,7 +17,8 @@
                         <strong>{{ _('Experience') }}:</strong> {{ guide.years_experience }} {{ _('years') }}<br>
                         <strong>{{ _('Specialization') }}:</strong> {{ guide.specialization }}
                     </p>
-                    <a href="{{ url_for('profile') }}" class="btn btn-sm btn-outline-primary">{{ _('Edit Profile') }}</a>
+                    <a href="{{ url_for('main.profile') }}" class="btn btn-sm btn-outline-primary">{{ _('Edit Profile') }}</a>
+                    <a href="{{ url_for('main.logout') }}" class="btn btn-sm btn-outline-danger ms-2">{{ _('Logout') }}</a>
                 </div>
             </div>
         </div>
@@ -30,13 +31,13 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ chat_groups|length }} {{ _('Chat Groups') }}</h5>
                     <p>{{ _('Manage your language learning groups') }}</p>
-                    <a href="{{ url_for('create_chat_group') }}" class="btn btn-sm btn-outline-success">{{ _('Create New Group') }}</a>
+                    <a href="{{ url_for('main.create_chat_group') }}" class="btn btn-sm btn-outline-success">{{ _('Create New Group') }}</a>
                     
                     {% if chat_groups %}
                     <hr>
                     <div class="list-group mt-2">
                         {% for group in chat_groups %}
-                        <a href="{{ url_for('chat_detail', chat_id=group.id) }}" class="list-group-item list-group-item-action">
+                        <a href="{{ url_for('main.chat_detail', chat_id=group.id) }}" class="list-group-item list-group-item-action">
                             {{ group.name }} ({{ group.language }})
                         </a>
                         {% endfor %}
@@ -112,7 +113,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{{ url_for('tour_guide_detail', tour_id=tour.id) }}" class="btn btn-sm btn-outline-primary">{{ _('View Details') }}</a>
+                                        <a href="{{ url_for('main.tour_guide_detail', tour_id=tour.id) }}" class="btn btn-sm btn-outline-primary">{{ _('View Details') }}</a>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -127,4 +128,10 @@
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock content %}
+
+{% block scripts %}
+<script>
+    // Add any page-specific scripts here
+</script>
+{% endblock scripts %}

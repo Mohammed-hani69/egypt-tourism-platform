@@ -1,69 +1,652 @@
-{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="{{ lang_code|default('ar') }}" dir="{{ 'rtl' if lang_code == 'ar' else 'ltr' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المعالم السياحية - اكتشف مصر</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-red: #e74c3c;
+            --secondary-red: #c0392b;
+            --light-red: #ff6b6b;
+            --white: #ffffff;
+            --off-white: #fff5f5;
+            --light-gray: #f8d7da;
+            --gold: #ffd700;
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, var(--off-white) 0%, var(--white) 100%);
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        /* Header Styles */
+        .top-header {
+            background: var(--primary-red);
+            padding: 8px 0;
+            color: var(--white);
+        }
 
-{% block content %}
-    <div class="container mt-5">
-        <h1 class="text-center mb-4">Explore Egyptian Attractions</h1>
+        .top-header .contact-info {
+            font-size: 0.9rem;
+        }
         
-        <!-- Filters -->
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <label for="region-filter" class="form-label">Filter by Region:</label>
-                <select id="region-filter" class="form-select">
-                    <option value="">All Regions</option>
-                    {% for region in regions %}
-                        <option value="{{ region.id }}" {% if selected_region == region.id %}selected{% endif %}>
-                            {{ region.name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-6">
-                <label for="sort-filter" class="form-label">Sort by:</label>
-                <select id="sort-filter" class="form-select">
-                    <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Name (A-Z)</option>
-                    <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Rating (High to Low)</option>
-                </select>
-            </div>
-        </div>
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            color: var(--white);
+            margin: 0 5px;
+            transition: all 0.3s;
+        }
         
-        <!-- Attractions Map -->
-        <div class="mb-4">
-            <h3 class="mb-3">Map View</h3>
-            <div id="attractions-map" style="height: 400px; width: 100%; border-radius: 10px;"></div>
-        </div>
+        .social-icons a:hover {
+            background-color: var(--white);
+            color: var(--primary-red);
+            transform: translateY(-3px);
+        }
+
+        .main-header {
+            padding: 15px 0;
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
         
-        <!-- Attractions List -->
-        <div class="row mt-4">
-            {% if attractions %}
-                {% for attraction in attractions %}
-                    <div class="col-md-4 mb-4">
-                        <div class="card attraction-card h-100">
-                            <img src="{{ attraction.image_url or 'https://source.unsplash.com/500x300/?egypt,' + attraction.name }}" class="card-img-top" alt="{{ attraction.name }}">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ attraction.name }}</h5>
-                                <p class="card-text small">{{ attraction.region.name }}</p>
-                                <p class="card-text">{{ attraction.description[:100] }}{% if attraction.description|length > 100 %}...{% endif %}</p>
-                                {% if attraction.ticket_price %}
-                                    <p class="card-text"><strong>Ticket:</strong> {{ attraction.ticket_price }}</p>
-                                {% endif %}
-                            </div>
-                            <div class="card-footer">
-                                <a href="{{ url_for('attraction_detail', attraction_id=attraction.id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
-                            </div>
-                        </div>
+        .navbar {
+            background-color: transparent;
+            padding: 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-red);
+            font-size: 1.8rem;
+        }
+        
+        .nav-link {
+            color: #333;
+            font-weight: 600;
+            margin: 0 10px;
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-red);
+        }
+        
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-red);
+            bottom: -5px;
+            left: 0;
+            transform: scaleX(1);
+            transition: transform 0.3s;
+        }
+        
+        .nav-item .btn {
+            padding: 5px 15px;
+            margin: 5px;
+            border-radius: 20px;
+        }
+        
+        .dropdown-menu {
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .dropdown-item {
+            padding: 8px 20px;
+        }
+        
+        .dropdown-item i {
+            margin-right: 8px;
+            width: 20px;
+        }
+
+        .navbar-nav {
+            align-items: center;
+        }
+        
+        /* Hero Section */
+        .attractions-hero {
+            height: 50vh;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.9) 0%, rgba(192, 57, 43, 0.8) 100%);
+            margin-bottom: 3rem;
+        }
+
+        .floating-shape {
+            position: absolute;
+            opacity: 0.1;
+            z-index: 1;
+        }
+        
+        .floating-shape.circle {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background-color: var(--light-red);
+            top: -150px;
+            right: -150px;
+            animation: float 15s infinite linear;
+        }
+        
+        .floating-shape.triangle {
+            width: 0;
+            height: 0;
+            border-left: 200px solid transparent;
+            border-right: 200px solid transparent;
+            border-bottom: 350px solid var(--light-red);
+            bottom: -200px;
+            left: -200px;
+            animation: float 20s infinite linear reverse;
+        }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(30px, 20px) rotate(180deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+
+        .attractions-hero-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: var(--white);
+            position: relative;
+            z-index: 2;
+            padding: 0 2rem;
+        }
+        
+        .attractions-hero-content h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 1rem;
+        }
+        
+        .attractions-hero-content p {
+            font-size: 1.4rem;
+            max-width: 800px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        /* Filters Section */
+        .filter-section {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 3rem;
+            border: 2px solid var(--light-red);
+            transition: all 0.3s;
+        }
+        
+        .filter-section:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transform: translateY(-5px);
+        }
+
+        .section-heading {
+            position: relative;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--primary-red);
+            font-weight: 700;
+        }
+
+        .section-heading::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: var(--gold);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--primary-red);
+        }
+        
+        .form-select {
+            border: 2px solid var(--light-red);
+            border-radius: 10px;
+            padding: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .form-select:focus {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
+        }
+        
+        /* Map Section */
+        #attractions-map {
+            height: 500px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(139, 0, 0, 0.3);
+            margin: 2rem 0;
+            border: 3px solid var(--light-red);
+        }
+
+        /* Attractions Grid */
+        .attraction-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+        }
+
+        .attraction-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            border-color: var(--light-red);
+        }
+
+        .attraction-card img {
+            height: 200px;
+            object-fit: cover;
+            transition: all 0.5s;
+        }
+        
+        .attraction-card:hover img {
+            transform: scale(1.05);
+        }
+        
+        .card-title {
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+        
+        .card-text {
+            color: #555;
+        }
+        
+        .card-footer {
+            background-color: transparent;
+            border-top: none;
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-red);
+            border-color: var(--primary-red);
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s;
+            padding: 8px 20px;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-red);
+            color: var(--white);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        /* Animation Classes */
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 1s ease-in forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Footer */
+        .main-footer {
+            background: var(--primary-red);
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+            padding-top: 3rem;
+        }
+
+        .main-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                var(--primary-red),
+                var(--primary-red) 10px,
+                var(--secondary-red) 10px,
+                var(--secondary-red) 20px
+            );
+            opacity: 0.1;
+        }
+        
+        .footer-heading {
+            color: var(--white);
+            position: relative;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        
+        .footer-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--white);
+        }
+        
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: var(--white);
+            text-decoration: none;
+            transition: color 0.3s;
+            opacity: 0.9;
+        }
+        
+        .footer-links a:hover {
+            color: var(--gold);
+            opacity: 1;
+        }
+        
+        .footer-bottom {
+            background: var(--secondary-red);
+            padding: 20px 0;
+            margin-top: 3rem;
+            text-align: center;
+            position: relative;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .attractions-hero-content h1 {
+                font-size: 2.2rem;
+            }
+            
+            .attractions-hero-content p {
+                font-size: 1.1rem;
+            }
+            
+            .floating-shape {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="contact-info">
+                        <span class="me-3"><i class="fas fa-phone me-2"></i>+20 123 456 789</span>
+                        <span><i class="fas fa-envelope me-2"></i>info@discovergypt.com</span>
                     </div>
-                {% endfor %}
-            {% else %}
-                <div class="col-12 text-center">
-                    <p>No attractions found with the selected filters. Please try different filters.</p>
                 </div>
-            {% endif %}
+                <div class="col-md-6 text-end">
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-{% endblock %}
 
-{% block scripts %}
-    <!-- Google Maps JavaScript API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initAttractionsMap" async defer></script>
-    <script src="{{ url_for('static', filename='js/maps.js') }}"></script>
-{% endblock %}
+    <!-- Main Header -->
+    <header class="main-header">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg">
+                <a class="navbar-brand logo" href="{{ url_for('main.index') }}">
+                    <i class="fas fa-pyramid"></i> {{ _('اكتشف مصر') }}
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.index') }}">{{ _('الرئيسية') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.attractions') }}">{{ _('المعالم السياحية') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.guides') }}">{{ _('المرشدين السياحيين') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.language_practice') }}">{{ _('تعلم اللغات') }}</a>
+                        </li>
+                        {% if current_user.is_authenticated %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user-circle"></i> {{ _('حسابي') }}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="{{ url_for('main.profile') }}"><i class="fas fa-user"></i> {{ _('الملف الشخصي') }}</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt"></i> {{ _('تسجيل الخروج') }}</a></li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="btn btn-outline-primary btn-sm ms-2" href="{{ url_for('main.login') }}">{{ _('تسجيل الدخول') }}</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-primary btn-sm ms-2" href="{{ url_for('main.register') }}">{{ _('التسجيل') }}</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="attractions-hero">
+        <div class="floating-shape circle"></div>
+        <div class="floating-shape triangle"></div>
+        <div class="attractions-hero-content">
+            <h1 class="display-4 mb-3">{{ _('اكتشف المعالم السياحية في مصر') }}</h1>
+            <p class="lead">{{ _('تعرف على أجمل المعالم السياحية في مختلف أنحاء مصر') }}</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Filters Section -->
+        <div class="filter-section">
+            <h2 class="text-center section-heading">{{ _('تصفية المعالم السياحية') }}</h2>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label" for="region-filter">{{ _('المنطقة:') }}</label>
+                    <select id="region-filter" class="form-select">
+                        <option value="">{{ _('جميع المناطق') }}</option>
+                        {% for region in regions %}
+                            <option value="{{ region.id }}" {% if selected_region == region.id %}selected{% endif %}>
+                                {{ region.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label" for="sort-filter">{{ _('الترتيب:') }}</label>
+                    <select id="sort-filter" class="form-select">
+                        <option value="name">{{ _('الاسم (أ-ي)') }}</option>
+                        <option value="rating">{{ _('التقييم (الأعلى للأدنى)') }}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Section -->
+        <section id="map-section">
+            <h2 class="text-center section-heading">{{ _('خريطة المعالم السياحية') }}</h2>
+            <div id="attractions-map"></div>
+        </section>
+
+        <!-- Attractions Grid -->
+        <section class="attractions-grid">
+            <h2 class="text-center section-heading">{{ _('المعالم السياحية') }}</h2>
+            {% if attractions %}
+                <div class="row">
+                    {% for attraction in attractions %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card attraction-card fade-in" style="animation-delay: {{ loop.index0 * 0.1 }}s">
+                                <img src="{{ attraction.image_url or 'https://source.unsplash.com/500x300/?egypt,' + attraction.name }}" 
+                                     class="card-img-top" alt="{{ attraction.name }}">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ attraction.name }}</h5>
+                                    <p class="card-text text-muted"><i class="fas fa-map-marker-alt"></i> {{ attraction.region.name }}</p>
+                                    <p class="card-text">{{ attraction.description[:100] }}{% if attraction.description|length > 100 %}...{% endif %}</p>
+                                    {% if attraction.ticket_price %}
+                                        <p class="card-text">
+                                            <i class="fas fa-ticket-alt"></i>
+                                            <strong>{{ _('سعر التذكرة:') }}</strong> {{ attraction.ticket_price }}
+                                        </p>
+                                    {% endif %}
+                                </div>
+                                <div class="card-footer bg-transparent border-0">
+                                    <a href="{{ url_for('main.attraction_detail', attraction_id=attraction.id) }}" 
+                                       class="btn btn-outline-primary w-100">
+                                        {{ _('عرض التفاصيل') }} <i class="fas fa-arrow-left"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="col-12 text-center">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        {{ _('لم يتم العثور على معالم سياحية. الرجاء تجربة معايير تصفية مختلفة.') }}
+                    </div>
+                </div>
+            {% endif %}
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h4 class="footer-heading">عن اكتشف مصر</h4>
+                    <p>نحن نقدم لكم أفضل التجارب السياحية في مصر، مع خدمات متميزة وأسعار تنافسية.</p>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="footer-heading">روابط سريعة</h4>
+                    <ul class="footer-links">
+                        <li><a href="/tours">الرحلات السياحية</a></li>
+                        <li><a href="/hotels">الفنادق</a></li>
+                        <li><a href="/transportation">المواصلات</a></li>
+                        <li><a href="/blog">المدونة</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="footer-heading">تواصل معنا</h4>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt me-2"></i>القاهرة، مصر</li>
+                        <li><i class="fas fa-phone me-2"></i>+20 123 456 789</li>
+                        <li><i class="fas fa-envelope me-2"></i>info@discovergypt.com</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p class="mb-0">© 2024 اكتشف مصر. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Map initialization
+        function initMap() {
+            const map = L.map('attractions-map').setView([26.8206, 30.8025], 6);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            const customIcon = L.divIcon({
+                className: 'custom-marker',
+                html: '<i class="fas fa-map-marker-alt" style="color: var(--primary-red); font-size: 24px;"></i>',
+                iconSize: [24, 24],
+                iconAnchor: [12, 24],
+                popupAnchor: [0, -24]
+            });
+
+            {% for attraction in attractions %}
+                {% if attraction.latitude and attraction.longitude %}
+                    L.marker([{{ attraction.latitude }}, {{ attraction.longitude }}], {icon: customIcon})
+                        .bindPopup(`
+                            <div style="text-align: center;">
+                                <h6 style="margin: 0; color: var(--primary-red);">{{ attraction.name }}</h6>
+                                <small>{{ attraction.region.name }}</small>
+                            </div>
+                        `)
+                        .addTo(map);
+                {% endif %}
+            {% endfor %}
+        }
+
+        // Initialize map when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initMap);
+
+        // Filter and sort functionality
+        const regionFilter = document.getElementById('region-filter');
+        const sortFilter = document.getElementById('sort-filter');
+
+        function updateResults() {
+            const region = regionFilter.value;
+            const sort = sortFilter.value;
+            window.location.href = `?region=${region}&sort=${sort}`;
+        }
+
+        regionFilter.addEventListener('change', updateResults);
+        sortFilter.addEventListener('change', updateResults);
+    </script>
+</body>
+</html>

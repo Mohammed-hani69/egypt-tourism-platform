@@ -1,75 +1,634 @@
-{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ _('إدارة المستخدمين') }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #e74c3c;
+            --secondary-red: #c0392b;
+            --light-red: #ff6b6b;
+            --white: #ffffff;
+            --off-white: #fff5f5;
+            --light-gray: #f8d7da;
+            --gold: #ffd700;
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, var(--off-white) 0%, var(--white) 100%);
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        /* Header Styles */
+        .top-header {
+            background: var(--primary-red);
+            padding: 8px 0;
+            color: var(--white);
+        }
 
-{% block content %}
-<div class="container mt-4">
-    <h1>{{ _('Manage Users') }}</h1>
-    
-    <div class="row mb-4">
-        <div class="col">
-            <div class="card">
-                <div class="card-body">
-                    <div class="btn-group" role="group" aria-label="Filter users">
-                        <a href="{{ url_for('admin_users', role='all') }}" class="btn btn-{{ 'primary' if selected_role == 'all' else 'outline-primary' }}">{{ _('All Users') }}</a>
-                        <a href="{{ url_for('admin_users', role='guide') }}" class="btn btn-{{ 'primary' if selected_role == 'guide' else 'outline-primary' }}">{{ _('Guides') }}</a>
-                        <a href="{{ url_for('admin_users', role='student') }}" class="btn btn-{{ 'primary' if selected_role == 'student' else 'outline-primary' }}">{{ _('Students') }}</a>
-                        <a href="{{ url_for('admin_users', role='tourist') }}" class="btn btn-{{ 'primary' if selected_role == 'tourist' else 'outline-primary' }}">{{ _('Tourists') }}</a>
-                        <a href="{{ url_for('admin_users', role='admin') }}" class="btn btn-{{ 'primary' if selected_role == 'admin' else 'outline-primary' }}">{{ _('Admins') }}</a>
+        .top-header .contact-info {
+            font-size: 0.9rem;
+        }
+
+        .top-header .social-icons a {
+            color: var(--white);
+            margin-left: 10px;
+            transition: all 0.3s;
+        }
+
+        .top-header .social-icons a:hover {
+            color: var(--gold);
+            transform: translateY(-3px);
+        }
+
+        .main-header {
+            padding: 15px 0;
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-red);
+            font-size: 1.8rem;
+        }
+        
+        .nav-link {
+            color: #333;
+            font-weight: 600;
+            margin: 0 10px;
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-red);
+        }
+        
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-red);
+            bottom: -5px;
+            left: 0;
+            transform: scaleX(1);
+            transition: transform 0.3s;
+        }
+        
+        .navbar-nav {
+            align-items: center;
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            background-color: var(--primary-red);
+            border-color: var(--primary-red);
+            padding: 12px 30px;
+            font-weight: 600;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-red);
+            border-color: var(--primary-red);
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-red);
+            color: var(--white);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        .btn-sm {
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        /* Filter Button Group */
+        .filter-section {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-right: 4px solid var(--primary-red);
+            margin-bottom: 2rem;
+            transition: transform 0.3s;
+        }
+
+        .filter-section:hover {
+            transform: translateY(-5px);
+        }
+
+        .filter-section .btn-group {
+            width: 100%;
+            overflow-x: auto;
+            display: flex;
+            padding-bottom: 5px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        /* Table Styles */
+        .admin-table-card {
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: none;
+            transition: transform 0.3s;
+        }
+
+        .admin-table-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        .admin-table-card .card-header {
+            background-color: var(--primary-red);
+            color: var(--white);
+            font-weight: bold;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            padding: 1rem 1.5rem;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: #333;
+            font-weight: 700;
+            border-top: none;
+            border-bottom: 2px solid var(--primary-red);
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+
+        tbody tr {
+            transition: all 0.3s;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(231, 76, 60, 0.05);
+            transform: scale(1.01);
+        }
+
+        .badge {
+            padding: 8px 12px;
+            border-radius: 15px;
+            font-weight: 600;
+            margin-right: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .badge.bg-danger {
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--secondary-red) 100%) !important;
+        }
+
+        .badge.bg-primary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+        }
+
+        .badge.bg-info {
+            background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%) !important;
+        }
+
+        .badge.bg-warning {
+            background: linear-gradient(135deg, #f39c12 0%, #d35400 100%) !important;
+            color: white !important;
+        }
+
+        /* Footer Styles */
+        .main-footer {
+            background: var(--primary-red);
+            position: relative;
+            overflow: hidden;
+            color: var(--white);
+            margin-top: 3rem;
+            padding-top: 3rem;
+        }
+
+        .main-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                var(--primary-red),
+                var(--primary-red) 10px,
+                var(--secondary-red) 10px,
+                var(--secondary-red) 20px
+            );
+            opacity: 0.1;
+        }
+
+        .footer-heading {
+            color: var(--white);
+            position: relative;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--white);
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: var(--white);
+            text-decoration: none;
+            transition: color 0.3s;
+            opacity: 0.9;
+        }
+
+        .footer-links a:hover {
+            color: var(--gold);
+            opacity: 1;
+        }
+
+        .footer-bottom {
+            background: var(--secondary-red);
+            padding: 20px 0;
+            margin-top: 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .filter-section .btn-group {
+                flex-wrap: nowrap;
+            }
+            
+            .badge {
+                display: inline-block;
+                margin-bottom: 3px;
+            }
+            
+            .table-responsive {
+                border-radius: 15px;
+            }
+        }
+
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+        
+        .slide-up {
+            animation: slideUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Accents and decorative elements */
+        .page-title {
+            position: relative;
+            color: var(--primary-red);
+            font-weight: 800;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+        }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 4px;
+            background-color: var(--gold);
+            bottom: 0;
+            right: 0;
+        }
+
+        .page-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .accent-shape {
+            position: absolute;
+            z-index: -1;
+            opacity: 0.05;
+        }
+
+        .accent-shape.circle {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background-color: var(--primary-red);
+            top: -150px;
+            left: -150px;
+        }
+
+        .accent-shape.square {
+            width: 200px;
+            height: 200px;
+            transform: rotate(45deg);
+            background-color: var(--primary-red);
+            bottom: -100px;
+            right: -100px;
+        }
+
+        /* Action buttons */
+        .action-btn {
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-left: 5px;
+        }
+
+        .action-btn-edit {
+            color: #3498db;
+            border-color: #3498db;
+        }
+
+        .action-btn-edit:hover {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .action-btn-disable {
+            color: var(--primary-red);
+            border-color: var(--primary-red);
+        }
+
+        .action-btn-disable:hover {
+            background-color: var(--primary-red);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="contact-info">
+                        <span class="me-3"><i class="fas fa-phone me-2"></i>+20 123 456 789</span>
+                        <span><i class="fas fa-envelope me-2"></i>info@discovergypt.com</span>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <div class="card">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>{{ _('ID') }}</th>
-                            <th>{{ _('Username') }}</th>
-                            <th>{{ _('Email') }}</th>
-                            <th>{{ _('Roles') }}</th>
-                            <th>{{ _('Joined') }}</th>
-                            <th>{{ _('Actions') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in users %}
-                        <tr>
-                            <td>{{ user.id }}</td>
-                            <td>{{ user.username }}</td>
-                            <td>{{ user.email }}</td>
-                            <td>
-                                {% if user.is_admin %}
-                                <span class="badge bg-danger me-1">{{ _('Admin') }}</span>
-                                {% endif %}
-                                
-                                {% if user.is_guide %}
-                                <span class="badge bg-primary me-1">{{ _('Guide') }}</span>
-                                {% endif %}
-                                
-                                {% if user.is_student %}
-                                <span class="badge bg-info me-1">{{ _('Student') }}</span>
-                                {% endif %}
-                                
-                                {% if user.is_tourist %}
-                                <span class="badge bg-warning me-1">{{ _('Tourist') }}</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ user.date_joined.strftime('%d/%m/%Y') }}</td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-sm btn-outline-primary">{{ _('Edit') }}</button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger">{{ _('Disable') }}</button>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+
+    <!-- Main Header -->
+    <header class="main-header">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg">
+                <a class="navbar-brand logo" href="{{ url_for('main.index') }}">
+                    <i class="fas fa-pyramid"></i> {{ _('اكتشف مصر') }}
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.index') }}">{{ _('الرئيسية') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.attractions') }}">{{ _('المعالم السياحية') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.guides') }}">{{ _('المرشدين السياحيين') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.language_practice') }}">{{ _('تعلم اللغات') }}</a>
+                        </li>
+                        {% if current_user.is_authenticated %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user-circle"></i> {{ _('حسابي') }}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="{{ url_for('main.profile') }}"><i class="fas fa-user"></i> {{ _('الملف الشخصي') }}</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt"></i> {{ _('تسجيل الخروج') }}</a></li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="btn btn-outline-primary btn-sm ms-2" href="{{ url_for('main.login') }}">{{ _('تسجيل الدخول') }}</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-primary btn-sm ms-2" href="{{ url_for('main.register') }}">{{ _('التسجيل') }}</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mt-5 page-container">
+        <!-- Decorative elements -->
+        <div class="accent-shape circle"></div>
+        <div class="accent-shape square"></div>
+        
+        <!-- Page title -->
+        <div class="row mb-4 fade-in">
+            <div class="col-12">
+                <h1 class="page-title">{{ _('إدارة المستخدمين') }}</h1>
+            </div>
+        </div>
+        
+        <!-- Filter section -->
+        <div class="row mb-4 slide-up">
+            <div class="col-12">
+                <div class="filter-section">
+                    <div class="btn-group" role="group" aria-label="Filter users">
+                        <a href="{{ url_for('main.admin_users', role='all') }}" class="btn btn-{{ 'primary' if selected_role == 'all' else 'outline-primary' }}">{{ _('جميع المستخدمين') }}</a>
+                        <a href="{{ url_for('main.admin_users', role='guide') }}" class="btn btn-{{ 'primary' if selected_role == 'guide' else 'outline-primary' }}">{{ _('المرشدين') }}</a>
+                        <a href="{{ url_for('main.admin_users', role='student') }}" class="btn btn-{{ 'primary' if selected_role == 'student' else 'outline-primary' }}">{{ _('الطلاب') }}</a>
+                        <a href="{{ url_for('main.admin_users', role='tourist') }}" class="btn btn-{{ 'primary' if selected_role == 'tourist' else 'outline-primary' }}">{{ _('السياح') }}</a>
+                        <a href="{{ url_for('main.admin_users', role='admin') }}" class="btn btn-{{ 'primary' if selected_role == 'admin' else 'outline-primary' }}">{{ _('المشرفين') }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Users table -->
+        <div class="row slide-up" style="animation-delay: 0.2s;">
+            <div class="col-12">
+                <div class="card admin-table-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0"><i class="fas fa-users me-2"></i> {{ _('قائمة المستخدمين') }}</h4>
+                        <span class="badge bg-light text-dark">{{ users|length }} {{ _('مستخدم') }}</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>{{ _('ID') }}</th>
+                                        <th>{{ _('اسم المستخدم') }}</th>
+                                        <th>{{ _('البريد الإلكتروني') }}</th>
+                                        <th>{{ _('الأدوار') }}</th>
+                                        <th>{{ _('تاريخ التسجيل') }}</th>
+                                        <th>{{ _('الإجراءات') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user in users %}
+                                    <tr>
+                                        <td>{{ user.id }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle me-2" style="background-color: var(--primary-red); color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                                                    {{ user.username[0].upper() }}
+                                                </div>
+                                                <span>{{ user.username }}</span>
+                                            </div>
+                                        </td>
+                                        <td>{{ user.email }}</td>
+                                        <td>
+                                            {% if user.is_admin %}
+                                            <span class="badge bg-danger me-1">{{ _('مشرف') }}</span>
+                                            {% endif %}
+                                            
+                                            {% if user.is_guide %}
+                                            <span class="badge bg-primary me-1">{{ _('مرشد') }}</span>
+                                            {% endif %}
+                                            
+                                            {% if user.is_student %}
+                                            <span class="badge bg-info me-1">{{ _('طالب') }}</span>
+                                            {% endif %}
+                                            
+                                            {% if user.is_tourist %}
+                                            <span class="badge bg-warning me-1">{{ _('سائح') }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ user.date_joined.strftime('%d/%m/%Y') }}</td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-sm action-btn action-btn-edit">
+                                                    <i class="fas fa-edit me-1"></i> {{ _('تعديل') }}
+                                                </button>
+                                                <button type="button" class="btn btn-sm action-btn action-btn-disable">
+                                                    <i class="fas fa-ban me-1"></i> {{ _('تعطيل') }}
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+
+    <!-- Footer -->
+    <footer class="main-footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h4 class="footer-heading">عن اكتشف مصر</h4>
+                    <p>نحن نقدم لكم أفضل التجارب السياحية في مصر، مع خدمات متميزة وأسعار تنافسية.</p>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="footer-heading">روابط سريعة</h4>
+                    <ul class="footer-links">
+                        <li><a href="/tours">الرحلات السياحية</a></li>
+                        <li><a href="/hotels">الفنادق</a></li>
+                        <li><a href="/transportation">المواصلات</a></li>
+                        <li><a href="/blog">المدونة</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="footer-heading">تواصل معنا</h4>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt me-2"></i>القاهرة، مصر</li>
+                        <li><i class="fas fa-phone me-2"></i>+20 123 456 789</li>
+                        <li><i class="fas fa-envelope me-2"></i>info@discovergypt.com</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p class="mb-0">© 2024 اكتشف مصر. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,122 +1,644 @@
-{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ _('Manage Attractions') }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #e74c3c;
+            --secondary-red: #c0392b;
+            --light-red: #ff6b6b;
+            --white: #ffffff;
+            --off-white: #fff5f5;
+            --light-gray: #f8d7da;
+            --gold: #ffd700;
+            --dark-gray: #333333;
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, var(--off-white) 0%, var(--white) 100%);
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        /* Header Styles */
+        .top-header {
+            background: var(--primary-red);
+            padding: 8px 0;
+            color: var(--white);
+        }
 
-{% block content %}
-<div class="container mt-4">
-    <h1>{{ _('Manage Attractions') }}</h1>
-    
-    <div class="row mt-4">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h5>{{ _('Attractions List') }}</h5>
+        .top-header .contact-info {
+            font-size: 0.9rem;
+        }
+        
+        .top-header .social-icons a {
+            color: var(--white);
+            margin-left: 15px;
+            transition: all 0.3s;
+        }
+        
+        .top-header .social-icons a:hover {
+            color: var(--gold);
+            transform: translateY(-3px);
+        }
+
+        .main-header {
+            padding: 15px 0;
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .main-header .navbar-brand {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+        
+        .main-header .navbar-brand i {
+            color: var(--gold);
+            margin-right: 5px;
+        }
+        
+        .nav-link {
+            color: #333;
+            font-weight: 600;
+            margin: 0 10px;
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-red);
+        }
+        
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-red);
+            bottom: -5px;
+            left: 0;
+            transform: scaleX(1);
+            transition: transform 0.3s;
+        }
+        
+        .navbar-nav .btn {
+            padding: 5px 15px;
+            margin: 5px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-red);
+            border-color: var(--primary-red);
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-red);
+            border-color: var(--secondary-red);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-red);
+            border-color: var(--primary-red);
+            font-weight: 600;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-red);
+            color: var(--white);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        /* Admin Panel Navbar */
+        .admin-navbar {
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--secondary-red) 100%);
+            padding: 15px 0;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            margin-bottom: 2rem;
+        }
+        
+        .admin-navbar .navbar-brand {
+            color: var(--white);
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        /* Main Content */
+        .page-title {
+            color: var(--primary-red);
+            font-weight: 800;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .page-title::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 3px;
+            background-color: var(--gold);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        /* Card Styles */
+        .card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--primary-red);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            background-color: var(--white);
+            border-bottom: 1px solid rgba(231, 76, 60, 0.2);
+            padding: 1.5rem;
+        }
+        
+        .card-header h5 {
+            margin-bottom: 0;
+            color: var(--primary-red);
+            font-weight: 700;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        /* Table Styles */
+        .table {
+            margin-bottom: 0;
+        }
+        
+        .table th {
+            font-weight: 700;
+            color: var(--primary-red);
+            border-top: none;
+            border-bottom: 2px solid var(--light-red);
+        }
+        
+        .table td {
+            vertical-align: middle;
+        }
+        
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: var(--off-white);
+        }
+        
+        .badge {
+            padding: 5px 10px;
+            font-weight: 600;
+            border-radius: 50px;
+        }
+        
+        .btn-group .btn {
+            border-radius: 50px;
+            padding: 5px 15px;
+            font-weight: 600;
+        }
+        
+        /* Form Styles */
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 10px 15px;
+            border: 1px solid rgba(231, 76, 60, 0.2);
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 0.25rem rgba(231, 76, 60, 0.25);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-red);
+            border-color: var(--primary-red);
+        }
+        
+        /* Footer Styles */
+        .main-footer {
+            background: var(--primary-red);
+            padding: 3rem 0 0;
+            color: var(--white);
+            margin-top: 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                var(--primary-red),
+                var(--primary-red) 10px,
+                var(--secondary-red) 10px,
+                var(--secondary-red) 20px
+            );
+            opacity: 0.1;
+        }
+
+        .footer-heading {
+            color: var(--white);
+            font-weight: 700;
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--white);
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: var(--white);
+            text-decoration: none;
+            transition: color 0.3s;
+            opacity: 0.9;
+        }
+
+        .footer-links a:hover {
+            color: var(--gold);
+            opacity: 1;
+        }
+
+        .footer-bottom {
+            background: var(--secondary-red);
+            padding: 20px 0;
+            margin-top: 3rem;
+            text-align: center;
+        }
+        
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+        
+        .slide-up {
+            animation: slideUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .card {
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="contact-info">
+                        <span class="me-3"><i class="fas fa-phone me-2"></i>+20 123 456 789</span>
+                        <span><i class="fas fa-envelope me-2"></i>info@discovergypt.com</span>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>{{ _('ID') }}</th>
-                                    <th>{{ _('Name') }}</th>
-                                    <th>{{ _('Region') }}</th>
-                                    <th>{{ _('Featured') }}</th>
-                                    <th>{{ _('Reviews') }}</th>
-                                    <th>{{ _('Actions') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for attraction in attractions %}
-                                <tr>
-                                    <td>{{ attraction.id }}</td>
-                                    <td>{{ attraction.name }}</td>
-                                    <td>{{ attraction.region.name }}</td>
-                                    <td>
-                                        {% if attraction.featured %}
-                                        <span class="badge bg-success">{{ _('Yes') }}</span>
-                                        {% else %}
-                                        <span class="badge bg-secondary">{{ _('No') }}</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ attraction.reviews.count() }}</td>
-                                    <td>
-                                        <div class="btn-group" role="group">
-                                            <a href="{{ url_for('attraction_detail', attraction_id=attraction.id) }}" class="btn btn-sm btn-outline-primary">{{ _('View') }}</a>
-                                            <button type="button" class="btn btn-sm btn-outline-danger">{{ _('Delete') }}</button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                <div class="col-md-6 text-end">
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5>{{ _('Add New Attraction') }}</h5>
+    </div>
+
+    <!-- Main Header -->
+    <header class="main-header">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg">
+                <a class="navbar-brand logo" href="{{ url_for('main.index') }}">
+                    <i class="fas fa-pyramid"></i> {{ _('اكتشف مصر') }}
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.index') }}">{{ _('الرئيسية') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.attractions') }}">{{ _('المعالم السياحية') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.guides') }}">{{ _('المرشدين السياحيين') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.language_practice') }}">{{ _('تعلم اللغات') }}</a>
+                        </li>
+                        {% if current_user.is_authenticated %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user-circle"></i> {{ _('حسابي') }}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="{{ url_for('main.profile') }}"><i class="fas fa-user"></i> {{ _('الملف الشخصي') }}</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt"></i> {{ _('تسجيل الخروج') }}</a></li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="btn btn-outline-primary btn-sm ms-2" href="{{ url_for('main.login') }}">{{ _('تسجيل الدخول') }}</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-primary btn-sm ms-2" href="{{ url_for('main.register') }}">{{ _('التسجيل') }}</a>
+                            </li>
+                        {% endif %}
+                    </ul>
                 </div>
-                <div class="card-body">
-                    <form method="POST" action="">
-                        <div class="mb-3">
-                            <label for="name" class="form-label">{{ _('Attraction Name') }}</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Admin Panel Navbar -->
+    <nav class="navbar admin-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-cogs me-2"></i>{{ _('Admin Panel') }}
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4 fade-in">
+        <div class="text-center mb-4">
+            <h1 class="page-title">{{ _('Manage Attractions') }}</h1>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-lg-8 slide-up">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-landmark me-2"></i>{{ _('Attractions List') }}</h5>
+                        <div class="form-group mb-0">
+                            <input type="text" class="form-control form-control-sm" placeholder="{{ _('Search attractions...') }}">
                         </div>
-                        
-                        <div class="mb-3">
-                            <label for="name_ar" class="form-label">{{ _('Attraction Name (Arabic)') }}</label>
-                            <input type="text" class="form-control" id="name_ar" name="name_ar">
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>{{ _('ID') }}</th>
+                                        <th>{{ _('Name') }}</th>
+                                        <th>{{ _('Region') }}</th>
+                                        <th>{{ _('Featured') }}</th>
+                                        <th>{{ _('Reviews') }}</th>
+                                        <th>{{ _('Actions') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for attraction in attractions %}
+                                    <tr>
+                                        <td>{{ attraction.id }}</td>
+                                        <td>{{ attraction.name }}</td>
+                                        <td>{{ attraction.region.name }}</td>
+                                        <td>
+                                            {% if attraction.featured %}
+                                            <span class="badge bg-success">{{ _('Yes') }}</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">{{ _('No') }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info text-dark">{{ attraction.reviews.count() }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ url_for('main.attraction_detail', attraction_id=attraction.id) }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye me-1"></i>{{ _('View') }}
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger delete-btn">
+                                                    <i class="fas fa-trash-alt me-1"></i>{{ _('Delete') }}
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
-                        
-                        <div class="mb-3">
-                            <label for="description" class="form-label">{{ _('Description') }}</label>
-                            <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="description_ar" class="form-label">{{ _('Description (Arabic)') }}</label>
-                            <textarea class="form-control" id="description_ar" name="description_ar" rows="3"></textarea>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="region_id" class="form-label">{{ _('Region') }}</label>
-                            <select class="form-select" id="region_id" name="region_id" required>
-                                <option value="" selected disabled>{{ _('Select a region') }}</option>
-                                {% for region in regions %}
-                                <option value="{{ region.id }}">{{ region.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="image_url" class="form-label">{{ _('Image URL') }}</label>
-                            <input type="url" class="form-control" id="image_url" name="image_url">
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="latitude" class="form-label">{{ _('Latitude') }}</label>
-                                <input type="number" class="form-control" id="latitude" name="latitude" step="0.000001">
+                    </div>
+                    <div class="card-footer text-center">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center mb-0">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">{{ _('Previous') }}</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">{{ _('Next') }}</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 slide-up">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-plus-circle me-2"></i>{{ _('Add New Attraction') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">{{ _('Attraction Name') }}</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
                             </div>
-                            <div class="col-md-6">
-                                <label for="longitude" class="form-label">{{ _('Longitude') }}</label>
-                                <input type="number" class="form-control" id="longitude" name="longitude" step="0.000001">
+                            
+                            <div class="mb-3">
+                                <label for="name_ar" class="form-label">{{ _('Attraction Name (Arabic)') }}</label>
+                                <input type="text" class="form-control" id="name_ar" name="name_ar">
                             </div>
-                        </div>
-                        
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="featured" name="featured">
-                            <label class="form-check-label" for="featured">{{ _('Featured Attraction') }}</label>
-                        </div>
-                        
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">{{ _('Add Attraction') }}</button>
-                        </div>
-                    </form>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">{{ _('Description') }}</label>
+                                <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description_ar" class="form-label">{{ _('Description (Arabic)') }}</label>
+                                <textarea class="form-control" id="description_ar" name="description_ar" rows="3"></textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="region_id" class="form-label">{{ _('Region') }}</label>
+                                <select class="form-select" id="region_id" name="region_id" required>
+                                    <option value="" selected disabled>{{ _('Select a region') }}</option>
+                                    {% for region in regions %}
+                                    <option value="{{ region.id }}">{{ region.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="image_url" class="form-label">{{ _('Image URL') }}</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-image"></i></span>
+                                    <input type="url" class="form-control" id="image_url" name="image_url">
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="latitude" class="form-label">{{ _('Latitude') }}</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                        <input type="number" class="form-control" id="latitude" name="latitude" step="0.000001">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="longitude" class="form-label">{{ _('Longitude') }}</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                        <input type="number" class="form-control" id="longitude" name="longitude" step="0.000001">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="featured" name="featured">
+                                <label class="form-check-label" for="featured">{{ _('Featured Attraction') }}</label>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>{{ _('Add Attraction') }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h4 class="footer-heading">عن اكتشف مصر</h4>
+                    <p>نحن نقدم لكم أفضل التجارب السياحية في مصر، مع خدمات متميزة وأسعار تنافسية.</p>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="footer-heading">روابط سريعة</h4>
+                    <ul class="footer-links">
+                        <li><a href="/tours">الرحلات السياحية</a></li>
+                        <li><a href="/hotels">الفنادق</a></li>
+                        <li><a href="/transportation">المواصلات</a></li>
+                        <li><a href="/blog">المدونة</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="footer-heading">تواصل معنا</h4>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt me-2"></i>القاهرة، مصر</li>
+                        <li><i class="fas fa-phone me-2"></i>+20 123 456 789</li>
+                        <li><i class="fas fa-envelope me-2"></i>info@discovergypt.com</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p class="mb-0">© 2024 اكتشف مصر. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add animation classes on load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add smooth scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+            
+            // Add delete confirmation
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (confirm("{{ _('Are you sure you want to delete this attraction?') }}")) {
+                        // Add delete functionality here
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

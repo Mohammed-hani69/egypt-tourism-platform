@@ -7,7 +7,7 @@
                 <div class="card form-container">
                     <div class="card-body">
                         <h2 class="text-center mb-4">Login</h2>
-                        <form method="POST" action="{{ url_for('login') }}">
+                        <form method="POST" action="{{ url_for('main.login') }}">
                             {{ form.hidden_tag() }}
                             
                             <div class="mb-3">
@@ -49,7 +49,7 @@
                             
                             <div class="text-center mt-3">
                                 <small class="text-muted">
-                                    Don't have an account? <a href="{{ url_for('register') }}">Register</a>
+                                    Don't have an account? <a href="{{ url_for('main.register') }}">Register</a>
                                 </small>
                             </div>
                         </form>

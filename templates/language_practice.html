@@ -1,28 +1,939 @@
-{% extends "layout.html" %}
-
-{% block content %}
-    <div class="container mt-5">
-        <h1 class="text-center mb-4">Language Practice</h1>
-        <p class="text-center mb-4">Connect with language students and practice your language skills while exploring Egypt.</p>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Practice - Egypt Explorer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #e74c3c;
+            --secondary-red: #c0392b;
+            --light-red: #ff6b6b;
+            --deep-red: #8b0000;
+            --white: #ffffff;
+            --off-white: #fff5f5;
+            --light-gray: #f8d7da;
+            --gold: #ffd700;
+            --dark-gold: #d4af37;
+        }
         
-        <!-- Language Filter -->
-        <div class="row mb-4">
-            <div class="col-md-6 mx-auto">
-                <label for="language-filter" class="form-label">Filter by Language:</label>
-                <select id="language-filter" class="form-select" onchange="window.location.href='{{ url_for('language_practice') }}?language=' + this.value">
-                    <option value="">All Languages</option>
-                    <option value="English" {% if selected_language == 'English' %}selected{% endif %}>English</option>
-                    <option value="Arabic" {% if selected_language == 'Arabic' %}selected{% endif %}>Arabic</option>
-                    <option value="French" {% if selected_language == 'French' %}selected{% endif %}>French</option>
-                    <option value="German" {% if selected_language == 'German' %}selected{% endif %}>German</option>
-                    <option value="Spanish" {% if selected_language == 'Spanish' %}selected{% endif %}>Spanish</option>
-                    <option value="Italian" {% if selected_language == 'Italian' %}selected{% endif %}>Italian</option>
-                    <option value="Russian" {% if selected_language == 'Russian' %}selected{% endif %}>Russian</option>
-                    <option value="Chinese" {% if selected_language == 'Chinese' %}selected{% endif %}>Chinese</option>
-                </select>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #fcf7f7;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e74c3c' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        /* Header Styles */
+        .top-header {
+            background: linear-gradient(120deg, var(--primary-red), var(--deep-red));
+            padding: 10px 0;
+            color: var(--white);
+            border-bottom: 3px solid var(--gold);
+        }
+
+        .top-header .contact-info {
+            font-size: 0.9rem;
+        }
+        
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            color: var(--white);
+            margin: 0 5px;
+            transition: all 0.3s;
+        }
+        
+        .social-icons a:hover {
+            background-color: var(--gold);
+            color: var(--primary-red);
+            transform: translateY(-3px) rotate(10deg);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .main-header {
+            padding: 15px 0;
+            background: var(--white);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .navbar {
+            background-color: transparent;
+            padding: 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-red);
+            font-size: 1.8rem;
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .navbar-brand:hover {
+            color: var(--deep-red);
+            transform: scale(1.05);
+        }
+        
+        .navbar-brand i {
+            color: var(--gold);
+            margin-right: 5px;
+        }
+        
+        .nav-link {
+            color: #333;
+            font-weight: 600;
+            margin: 0 10px;
+            position: relative;
+            transition: all 0.3s;
+            padding: 10px 5px;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-red);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-red);
+            bottom: 0;
+            left: 0;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .nav-item .btn {
+            padding: 8px 20px;
+            margin: 5px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-item .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        
+        .dropdown-menu {
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border: none;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        
+        .dropdown-item {
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--light-gray);
+            color: var(--primary-red);
+        }
+        
+        .dropdown-item i {
+            margin-right: 8px;
+            width: 20px;
+            color: var(--primary-red);
+        }
+
+        .navbar-nav {
+            align-items: center;
+        }
+        
+        /* Hero Section */
+        .attractions-hero {
+            height: 60vh;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.9) 0%, rgba(139, 0, 0, 0.8) 100%);
+            margin-bottom: 4rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-bottom: 5px solid var(--gold);
+            animation: heroGradient 10s infinite alternate;
+        }
+        
+        @keyframes heroGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .floating-shape {
+            position: absolute;
+            opacity: 0.1;
+            z-index: 1;
+        }
+        
+        .floating-shape.circle {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background-color: var(--white);
+            top: -150px;
+            right: -150px;
+            animation: float 15s infinite linear;
+        }
+        
+        .floating-shape.triangle {
+            width: 0;
+            height: 0;
+            border-left: 200px solid transparent;
+            border-right: 200px solid transparent;
+            border-bottom: 350px solid var(--white);
+            bottom: -200px;
+            left: -200px;
+            animation: float 20s infinite linear reverse;
+        }
+        
+        .floating-shape.square {
+            width: 200px;
+            height: 200px;
+            background-color: var(--white);
+            bottom: -100px;
+            right: 20%;
+            transform: rotate(45deg);
+            animation: float 18s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(20px, 10px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+
+        .attractions-hero-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: var(--white);
+            position: relative;
+            z-index: 2;
+            padding: 0 2rem;
+        }
+        
+        .attractions-hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            text-shadow: 3px 3px 5px rgba(0,0,0,0.3);
+            margin-bottom: 1.5rem;
+            animation: fadeInDown 1.2s ease-out;
+        }
+        
+        .attractions-hero-content p {
+            font-size: 1.5rem;
+            font-weight: 400;
+            max-width: 800px;
+            text-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+            animation: fadeInUp 1.2s ease-out;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Filters Section */
+        .filter-section {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(231, 76, 60, 0.1);
+            margin-bottom: 4rem;
+            border: none;
+            position: relative;
+            transition: all 0.5s;
+        }
+        
+        .filter-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 20px;
+            padding: 4px;
+            background: linear-gradient(45deg, var(--primary-red), var(--gold), var(--deep-red));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+        
+        .filter-section:hover {
+            box-shadow: 0 20px 40px rgba(231, 76, 60, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .section-heading {
+            position: relative;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2.5rem;
+            text-align: center;
+            color: var(--primary-red);
+            font-weight: 800;
+            font-size: 2.5rem;
+        }
+
+        .section-heading::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary-red), var(--gold));
+            border-radius: 4px;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--primary-red);
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .form-select {
+            border: 2px solid var(--light-red);
+            border-radius: 15px;
+            padding: 0.8rem;
+            font-size: 1rem;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            cursor: pointer;
+        }
+        
+        .form-select:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 0.25rem rgba(231, 76, 60, 0.25);
+        }
+        
+        /* Attractions Grid */
+        .attraction-card {
+            border: none;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        .attraction-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(231, 76, 60, 0.2);
+        }
+
+        .attraction-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary-red), var(--gold));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+        
+        .attraction-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .attraction-card img {
+            height: 200px;
+            object-fit: cover;
+            transition: all 0.7s;
+        }
+        
+        .attraction-card:hover img {
+            transform: scale(1.1);
+        }
+        
+        .card-title {
+            font-weight: 700;
+            color: var(--primary-red);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card-text {
+            color: #555;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        
+        .card-footer {
+            background-color: transparent;
+            border-top: none;
+            padding: 1.5rem;
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-red);
+            border-color: var(--primary-red);
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s;
+            padding: 10px 25px;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-red);
+            color: var(--white);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3);
+        }
+        
+        /* Practice Card Styles */
+        .practice-card {
+            border: none;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            background: var(--white);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .practice-card::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 70px;
+            height: 70px;
+            background: var(--gold);
+            opacity: 0.2;
+            border-radius: 50%;
+            z-index: -1;
+            transition: all 0.4s ease;
+        }
+
+        .practice-card:hover::before {
+            transform: scale(2);
+            opacity: 0.1;
+        }
+
+        .practice-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 20px 40px rgba(231, 76, 60, 0.15);
+        }
+
+        .student-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--light-red);
+            padding: 3px;
+            margin: 0 auto;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .practice-card:hover .student-avatar {
+            transform: scale(1.05) rotate(5deg);
+            border-color: var(--gold);
+            box-shadow: 0 15px 30px rgba(231, 76, 60, 0.2);
+        }
+
+        .practice-card .card-body {
+            padding: 2.5rem;
+        }
+
+        .practice-card .badge {
+            font-size: 0.9rem;
+            padding: 8px 20px;
+            border-radius: 50px;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary-red), var(--deep-red)) !important;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .practice-card .btn {
+            border-radius: 50px;
+            padding: 10px 30px;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, var(--primary-red), var(--deep-red));
+            border: none;
+            box-shadow: 0 8px 15px rgba(231, 76, 60, 0.2);
+        }
+
+        .practice-card .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(231, 76, 60, 0.3);
+        }
+
+        .practice-card h5 {
+            margin-top: 1rem;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+
+        .practice-card p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .practice-card p strong {
+            color: #333;
+        }
+
+        /* Benefits Section Styles */
+        .benefits-card {
+            border: none;
+            border-radius: 20px;
+            transition: all 0.4s ease;
+            background: linear-gradient(135deg, var(--white) 0%, var(--off-white) 100%);
+            height: 100%;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .benefits-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary-red), var(--gold));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+        
+        .benefits-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .benefits-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(231, 76, 60, 0.12);
+        }
+
+        .benefits-card i {
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+            transition: all 0.4s ease;
+            background: linear-gradient(135deg, var(--primary-red), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .benefits-card:hover i {
+            transform: scale(1.2);
+        }
+
+        .benefits-card h5 {
+            color: var(--primary-red);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        /* Join Section Styles */
+        .filter-section .card {
+            border-radius: 20px;
+            border: none;
+            background: linear-gradient(135deg, var(--white) 0%, var(--off-white) 100%);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .filter-section .card h3 {
+            color: var(--primary-red);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .filter-section .card .btn {
+            border-radius: 50px;
+            padding: 12px 35px;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary-red), var(--deep-red));
+            border: none;
+            color: var(--white);
+            box-shadow: 0 10px 20px rgba(231, 76, 60, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .filter-section .card .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(231, 76, 60, 0.3);
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 1.2s ease-in forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Footer */
+        .main-footer {
+            background: linear-gradient(135deg, var(--primary-red), var(--deep-red));
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+            padding-top: 4rem;
+            border-top: 5px solid var(--gold);
+            margin-top: 5rem;
+        }
+
+        .main-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.1;
+        }
+        
+        .footer-heading {
+            color: var(--white);
+            position: relative;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            font-size: 1.4rem;
+        }
+        
+        .footer-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: var(--gold);
+            border-radius: 3px;
+        }
+        
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        
+        .footer-links li:hover {
+            transform: translateX(5px);
+        }
+        
+        .footer-links a {
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s;
+            opacity: 0.9;
+            display: inline-block;
+        }
+        
+        .footer-links a:hover {
+            color: var(--gold);
+            opacity: 1;
+        }
+
+        .footer-links i {
+            margin-right: 10px;
+            color: var(--gold);
+        }
+        
+        .footer-bottom {
+            background: var(--secondary-red);
+            padding: 20px 0;
+            margin-top: 4rem;
+            text-align: center;
+            position: relative;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Scroll to top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-red), var(--deep-red));
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .scroll-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 991px) {
+            .navbar-collapse {
+                background: var(--white);
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                margin-top: 10px;
+            }
+            
+            .attractions-hero-content h1 {
+                font-size: 2.5rem;
+            }
+            
+            .attractions-hero-content p {
+                font-size: 1.2rem;
+            }
+            
+            .section-heading {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .attractions-hero {
+                height: 50vh;
+            }
+            
+            .attractions-hero-content h1 {
+                font-size: 2rem;
+            }
+            
+            .attractions-hero-content p {
+                font-size: 1.1rem;
+            }
+            
+            .floating-shape {
+                display: none;
+            }
+            
+            .practice-card {
+                margin-bottom: 2rem;
+            }
+
+            .student-avatar {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .section-heading {
+                font-size: 1.8rem;
+            }
+            
+            .filter-section {
+                padding: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .attractions-hero {
+                height: 40vh;
+            }
+            
+            .top-header .contact-info {
+                display: none;
+            }
+            
+            .social-icons {
+                text-align: center !important;
+            }
+            
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+            
+            .section-heading {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Top Header -->
+<div class="top-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="contact-info">
+                    <span class="me-3"><i class="fas fa-phone me-2"></i>+20 123 456 789</span>
+                    <span><i class="fas fa-envelope me-2"></i>info@discovergypt.com</span>
+                </div>
+            </div>
+            <div class="col-md-6 text-end">
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
             </div>
         </div>
-        
+    </div>
+</div>
+
+<!-- Main Header -->
+<header class="main-header">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg">
+            <a class="navbar-brand logo" href="{{ url_for('main.index') }}">
+                <i class="fas fa-pyramid"></i> {{ _('اكتشف مصر') }}
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.index') }}">{{ _('الرئيسية') }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.attractions') }}">{{ _('المعالم السياحية') }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.guides') }}">{{ _('المرشدين السياحيين') }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.language_practice') }}">{{ _('تعلم اللغات') }}</a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle"></i> {{ _('حسابي') }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{{ url_for('main.profile') }}"><i class="fas fa-user"></i> {{ _('الملف الشخصي') }}</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt"></i> {{ _('تسجيل الخروج') }}</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="btn btn-outline-primary btn-sm ms-2" href="{{ url_for('main.login') }}">{{ _('تسجيل الدخول') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-primary btn-sm ms-2" href="{{ url_for('main.register') }}">{{ _('التسجيل') }}</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+    </div>
+</header>
+
+
+    <!-- Hero Section -->
+    <div class="attractions-hero">
+        <div class="floating-shape circle"></div>
+        <div class="floating-shape triangle"></div>
+        <div class="attractions-hero-content">
+            <h1>Language Practice</h1>
+            <p>Connect with language students and practice your language skills while exploring Egypt</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Language Filter Section -->
+        <div class="filter-section fade-in">
+            <h2 class="section-heading">Choose Your Language</h2>
+            <div class="row">
+                <div class="col-md-6 mx-auto">
+                    <label for="language-filter" class="form-label">Filter by Language:</label>
+                    <select id="language-filter" class="form-select" onchange="window.location.href='{{ url_for('main.language_practice') }}?language=' + this.value">
+                        <option value="">All Languages</option>
+                        <option value="English" {% if selected_language == 'English' %}selected{% endif %}>English</option>
+                        <option value="Arabic" {% if selected_language == 'Arabic' %}selected{% endif %}>Arabic</option>
+                        <option value="French" {% if selected_language == 'French' %}selected{% endif %}>French</option>
+                        <option value="German" {% if selected_language == 'German' %}selected{% endif %}>German</option>
+                        <option value="Spanish" {% if selected_language == 'Spanish' %}selected{% endif %}>Spanish</option>
+                        <option value="Italian" {% if selected_language == 'Italian' %}selected{% endif %}>Italian</option>
+                        <option value="Russian" {% if selected_language == 'Russian' %}selected{% endif %}>Russian</option>
+                        <option value="Chinese" {% if selected_language == 'Chinese' %}selected{% endif %}>Chinese</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
         <!-- Language Practice Opportunities -->
         <div class="row">
             {% if opportunities %}
@@ -55,31 +966,33 @@
                 </div>
             {% endif %}
         </div>
-        
+
         <!-- Join as Language Student Section -->
-        <div class="card bg-light mt-5">
-            <div class="card-body text-center p-5">
-                <h3>Are You a Language Student?</h3>
-                <p class="mb-4">Join our platform to practice your language skills with locals and tourists in Egypt.</p>
-                {% if current_user.is_authenticated %}
-                    {% if current_user.is_student %}
-                        <p class="text-success"><i class="fas fa-check-circle me-2"></i>You are registered as a language student!</p>
+        <div class="filter-section mt-5 fade-in">
+            <div class="card bg-light">
+                <div class="card-body text-center p-5">
+                    <h3>Are You a Language Student?</h3>
+                    <p class="mb-4">Join our platform to practice your language skills with locals and tourists in Egypt.</p>
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.is_student %}
+                            <p class="text-success"><i class="fas fa-check-circle me-2"></i>You are registered as a language student!</p>
+                        {% else %}
+                            <a href="{{ url_for('main.profile') }}" class="btn btn-primary">Register as Language Student</a>
+                        {% endif %}
                     {% else %}
-                        <a href="{{ url_for('profile') }}" class="btn btn-primary">Register as Language Student</a>
+                        <a href="{{ url_for('main.register') }}" class="btn btn-primary">Register Now</a>
                     {% endif %}
-                {% else %}
-                    <a href="{{ url_for('register') }}" class="btn btn-primary">Register Now</a>
-                {% endif %}
+                </div>
             </div>
         </div>
-        
+
         <!-- Benefits Section -->
-        <div class="row mt-5">
+        <div class="row mt-5 fade-in">
             <div class="col-12">
                 <h3 class="text-center mb-4">Benefits of Language Practice</h3>
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <div class="card h-100">
+                        <div class="card h-100 benefits-card">
                             <div class="card-body text-center">
                                 <i class="fas fa-graduation-cap fa-3x mb-3 text-primary"></i>
                                 <h5>Improve Your Skills</h5>
@@ -88,7 +1001,7 @@
                         </div>
                     </div>
                     <div class="col-md-4 mb-3">
-                        <div class="card h-100">
+                        <div class="card h-100 benefits-card">
                             <div class="card-body text-center">
                                 <i class="fas fa-users fa-3x mb-3 text-primary"></i>
                                 <h5>Cultural Exchange</h5>
@@ -97,7 +1010,7 @@
                         </div>
                     </div>
                     <div class="col-md-4 mb-3">
-                        <div class="card h-100">
+                        <div class="card h-100 benefits-card">
                             <div class="card-body text-center">
                                 <i class="fas fa-map-marked-alt fa-3x mb-3 text-primary"></i>
                                 <h5>Explore Egypt</h5>
@@ -109,4 +1022,41 @@
             </div>
         </div>
     </div>
-{% endblock %}
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h4 class="footer-heading">عن اكتشف مصر</h4>
+                    <p>نحن نقدم لكم أفضل التجارب السياحية في مصر، مع خدمات متميزة وأسعار تنافسية.</p>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="footer-heading">روابط سريعة</h4>
+                    <ul class="footer-links">
+                        <li><a href="/tours">الرحلات السياحية</a></li>
+                        <li><a href="/hotels">الفنادق</a></li>
+                        <li><a href="/transportation">المواصلات</a></li>
+                        <li><a href="/blog">المدونة</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="footer-heading">تواصل معنا</h4>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt me-2"></i>القاهرة، مصر</li>
+                        <li><i class="fas fa-phone me-2"></i>+20 123 456 789</li>
+                        <li><i class="fas fa-envelope me-2"></i>info@discovergypt.com</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p class="mb-0">© 2024 اكتشف مصر. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

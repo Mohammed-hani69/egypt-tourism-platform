@@ -1,16 +1,417 @@
-{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Review - {{ attraction.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #e74c3c;
+            --secondary-red: #c0392b;
+            --light-red: #ff6b6b;
+            --white: #ffffff;
+            --off-white: #fff5f5;
+            --light-gray: #f8d7da;
+            --gold: #ffd700;
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, var(--off-white) 0%, var(--white) 100%);
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        /* Top Header */
+        .top-header {
+            background: var(--primary-red);
+            padding: 8px 0;
+            color: var(--white);
+        }
 
-{% block content %}
+        .top-header .contact-info {
+            font-size: 0.9rem;
+        }
+        
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            color: var(--white);
+            margin: 0 5px;
+            transition: all 0.3s;
+        }
+        
+        .social-icons a:hover {
+            background-color: var(--white);
+            color: var(--primary-red);
+            transform: translateY(-3px);
+        }
+        
+        /* Main Header */
+        .main-header {
+            padding: 15px 0;
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .main-header .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            text-decoration: none;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+        }
+        
+        .navbar-nav {
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: #333;
+            font-weight: 600;
+            margin: 0 10px;
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-red);
+        }
+        
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-red);
+            bottom: -5px;
+            left: 0;
+            transform: scaleX(1);
+            transition: transform 0.3s;
+        }
+        
+        .nav-item .btn {
+            padding: 5px 15px;
+            margin: 5px;
+            border-radius: 20px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-red);
+            border-color: var(--primary-red);
+            padding: 8px 18px;
+            font-weight: 600;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-red);
+            border-color: var(--secondary-red);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-red);
+            border-color: var(--primary-red);
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-red);
+            color: var(--white);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        .btn-outline-secondary {
+            color: #666;
+            border-color: #ccc;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: #f1f1f1;
+            color: #333;
+            transform: translateY(-3px);
+            border-color: #ccc;
+        }
+        
+        .dropdown-menu {
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: none;
+            padding: 0.5rem;
+        }
+        
+        .dropdown-item {
+            padding: 8px 20px;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--light-red);
+            color: var(--white);
+        }
+        
+        .dropdown-item i {
+            margin-left: 8px;
+            width: 20px;
+        }
+        
+        /* Review Form Container */
+        .card.form-container {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            margin-bottom: 3rem;
+            border-top: 4px solid var(--primary-red);
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        .card h2 {
+            color: var(--primary-red);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .card h2:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background-color: var(--gold);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e0e0e0;
+            box-shadow: none;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--light-red);
+            box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
+        }
+        
+        .invalid-feedback {
+            font-size: 0.85rem;
+            color: var(--primary-red);
+        }
+        
+        .is-invalid {
+            border-color: var(--primary-red);
+        }
+        
+        /* Footer Styles */
+        .main-footer {
+            background: var(--primary-red);
+            position: relative;
+            overflow: hidden;
+            padding: 3rem 0 0;
+            color: var(--white);
+        }
+
+        .main-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                var(--primary-red),
+                var(--primary-red) 10px,
+                var(--secondary-red) 10px,
+                var(--secondary-red) 20px
+            );
+            opacity: 0.1;
+        }
+        
+        .footer-heading {
+            color: var(--white);
+            position: relative;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .footer-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--white);
+        }
+        
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a, .footer-links li {
+            color: var(--white);
+            text-decoration: none;
+            transition: color 0.3s;
+            opacity: 0.9;
+            display: block;
+        }
+
+        .footer-links a:hover {
+            color: var(--gold);
+            opacity: 1;
+            padding-right: 5px;
+        }
+        
+        .footer-links i {
+            margin-left: 10px;
+            width: 16px;
+            text-align: center;
+        }
+        
+        .footer-bottom {
+            background: var(--secondary-red);
+            padding: 20px 0;
+            margin-top: 3rem;
+            text-align: center;
+            position: relative;
+        }
+        
+        @media (max-width: 768px) {
+            .main-header .logo {
+                font-size: 1.5rem;
+            }
+            
+            .card-body {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="contact-info">
+                        <span class="me-3"><i class="fas fa-phone me-2"></i>+20 123 456 789</span>
+                        <span><i class="fas fa-envelope me-2"></i>info@discovergypt.com</span>
+                    </div>
+                </div>
+                <div class="col-md-6 text-start">
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <header class="main-header">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg">
+                <a class="navbar-brand logo" href="{{ url_for('main.index') }}">
+                    <i class="fas fa-pyramid"></i> {{ _('اكتشف مصر') }}
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.index') }}">{{ _('الرئيسية') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.attractions') }}">{{ _('المعالم السياحية') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.guides') }}">{{ _('المرشدين السياحيين') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.language_practice') }}">{{ _('تعلم اللغات') }}</a>
+                        </li>
+                        {% if current_user.is_authenticated %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user-circle"></i> {{ _('حسابي') }}
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{{ url_for('main.profile') }}"><i class="fas fa-user"></i> {{ _('الملف الشخصي') }}</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt"></i> {{ _('تسجيل الخروج') }}</a></li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="btn btn-outline-primary btn-sm ms-2" href="{{ url_for('main.login') }}">{{ _('تسجيل الدخول') }}</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-primary btn-sm ms-2" href="{{ url_for('main.register') }}">{{ _('التسجيل') }}</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
     <div class="container mt-5">
         <div class="row">
             <div class="col-md-8 mx-auto">
                 <div class="card form-container">
                     <div class="card-body">
-                        <h2 class="mb-4">Review: {{ attraction.name }}</h2>
-                        <form method="POST" action="{{ url_for('add_review', attraction_id=attraction.id) }}">
+                        <h2 class="mb-4">مراجعة: {{ attraction.name }}</h2>
+                        <form method="POST" action="{{ url_for('main.add_review', attraction_id=attraction.id) }}">
                             {{ form.hidden_tag() }}
                             
-                            <div class="mb-3">
+                            <div class="mb-4">
                                 {{ form.title.label(class="form-label") }}
                                 {% if form.title.errors %}
                                     {{ form.title(class="form-control is-invalid") }}
@@ -24,7 +425,7 @@
                                 {% endif %}
                             </div>
                             
-                            <div class="mb-3">
+                            <div class="mb-4">
                                 {{ form.content.label(class="form-label") }}
                                 {% if form.content.errors %}
                                     {{ form.content(class="form-control is-invalid", rows=5) }}
@@ -38,7 +439,7 @@
                                 {% endif %}
                             </div>
                             
-                            <div class="mb-3">
+                            <div class="mb-4">
                                 {{ form.rating.label(class="form-label") }}
                                 {% if form.rating.errors %}
                                     {{ form.rating(class="form-select is-invalid") }}
@@ -52,8 +453,8 @@
                                 {% endif %}
                             </div>
                             
-                            <div class="d-flex justify-content-between">
-                                <a href="{{ url_for('attraction_detail', attraction_id=attraction.id) }}" class="btn btn-outline-secondary">Cancel</a>
+                            <div class="d-flex justify-content-between mt-4">
+                                <a href="{{ url_for('main.attraction_detail', attraction_id=attraction.id) }}" class="btn btn-outline-secondary">إلغاء</a>
                                 {{ form.submit(class="btn btn-primary") }}
                             </div>
                         </form>
@@ -62,4 +463,41 @@
             </div>
         </div>
     </div>
-{% endblock %}
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h4 class="footer-heading">عن اكتشف مصر</h4>
+                    <p>نحن نقدم لكم أفضل التجارب السياحية في مصر، مع خدمات متميزة وأسعار تنافسية.</p>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="footer-heading">روابط سريعة</h4>
+                    <ul class="footer-links">
+                        <li><a href="/tours"><i class="fas fa-chevron-left"></i>الرحلات السياحية</a></li>
+                        <li><a href="/hotels"><i class="fas fa-chevron-left"></i>الفنادق</a></li>
+                        <li><a href="/transportation"><i class="fas fa-chevron-left"></i>المواصلات</a></li>
+                        <li><a href="/blog"><i class="fas fa-chevron-left"></i>المدونة</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="footer-heading">تواصل معنا</h4>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i>القاهرة، مصر</li>
+                        <li><i class="fas fa-phone"></i>+20 123 456 789</li>
+                        <li><i class="fas fa-envelope"></i>info@discovergypt.com</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p class="mb-0">© 2024 اكتشف مصر. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

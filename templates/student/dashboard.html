@@ -18,10 +18,10 @@
                         <strong>{{ _('Availability') }}:</strong> {{ language_practice.availability }}<br>
                         <strong>{{ _('Interests') }}:</strong> {{ language_practice.interests }}
                     </p>
-                    <a href="{{ url_for('language_setup') }}" class="btn btn-sm btn-outline-primary">{{ _('Edit Settings') }}</a>
+                    <a href="{{ url_for('main.language_setup') }}" class="btn btn-sm btn-outline-primary">{{ _('Edit Settings') }}</a>
                     {% else %}
                     <p class="text-muted">{{ _('You have not set up your language practice profile yet.') }}</p>
-                    <a href="{{ url_for('language_setup') }}" class="btn btn-primary">{{ _('Set Up Now') }}</a>
+                    <a href="{{ url_for('main.language_setup') }}" class="btn btn-primary">{{ _('Set Up Now') }}</a>
                     {% endif %}
                 </div>
             </div>
@@ -55,7 +55,7 @@
                                     <strong>{{ guide.user.username }}</strong><br>
                                     {{ _('Experience') }}: {{ guide.years_experience }} {{ _('years') }}
                                 </div>
-                                <a href="{{ url_for('select_guide', guide_id=guide.user_id) }}" class="btn btn-sm btn-primary">{{ _('Select') }}</a>
+                                <a href="{{ url_for('main.select_guide', guide_id=guide.user_id) }}" class="btn btn-sm btn-primary">{{ _('Select') }}</a>
                             </div>
                         </div>
                         {% endfor %}
@@ -82,7 +82,7 @@
                     {% if chat_groups %}
                     <div class="list-group mt-2">
                         {% for group in chat_groups %}
-                        <a href="{{ url_for('chat_detail', chat_id=group.id) }}" class="list-group-item list-group-item-action">
+                        <a href="{{ url_for('main.chat_detail', chat_id=group.id) }}" class="list-group-item list-group-item-action">
                             {{ group.name }} ({{ group.language }})
                             <small class="text-muted d-block">{{ _('Guide') }}: {{ group.guide.username }}</small>
                         </a>

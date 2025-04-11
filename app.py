@@ -1,59 +1,61 @@
 import os
 import logging
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase
-from flask_login import LoginManager
-from flask_babel import Babel
-
+from extensions import db, login_manager, babel, migrate
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
-# Create base class for SQLAlchemy models
-class Base(DeclarativeBase):
-    pass
-
-
-# Initialize SQLAlchemy
-db = SQLAlchemy(model_class=Base)
-
-# Create Flask app
-app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET", "dev_secret_key")
-
-# Configure database
-# Use DATABASE_URL environment variable which points to PostgreSQL
-# Provide a fallback SQLite URI in case DATABASE_URL is not set
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///egypt_tourism.db")
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_recycle": 300,
-    "pool_pre_ping": True,
-}
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-# Configure babel for internationalization
-app.config['BABEL_DEFAULT_LOCALE'] = 'en'
-app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
-babel = Babel()
-
-# Initialize the app with the extension
-db.init_app(app)
-
-# Initialize login manager
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
-
-# Import models after db is defined to avoid circular imports
-with app.app_context():
-    # Import models to create tables
-    import models
-    db.create_all()
+def create_app():
+    app = Flask(__name__)
     
-    # Import the user loader function
-    from models import User
+    # Configure app
+    app.secret_key = os.environ.get("SESSION_SECRET", "dev_secret_key")
+    
+    # Database configuration
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+        "DATABASE_URL",
+        "mysql://root:@localhost:3306/egypt_tourism"
+    )
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "pool_recycle": 300,
+        "pool_pre_ping": True,
+    }
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    
+    # Babel configuration
+    app.config['BABEL_DEFAULT_LOCALE'] = 'en'
+    app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
+    
+    # Initialize extensions with app
+    db.init_app(app)
+    login_manager.init_app(app)
+    migrate.init_app(app, db)
+    
+    # Configure login
+    login_manager.login_view = 'main.login'
+    
+    with app.app_context():
+        # Import models here to avoid circular imports
+        from models import User
+        
+        @login_manager.user_loader
+        def load_user(user_id):
+            return User.query.get(int(user_id))
+        
+        # Import and register blueprints
+        from routes import main, get_locale
+        app.register_blueprint(main)
+        
+        # Initialize babel after registering blueprints
+        babel.init_app(app, locale_selector=get_locale)
+        
+        # Create database tables
+        db.create_all()
+    
+    return app
 
-    @login_manager.user_loader
-    def load_user(user_id):
-        return User.query.get(int(user_id))
+app = create_app()
+
+if __name__ == '__main__':
+    app.run(debug=True)

@@ -23,7 +23,7 @@
                                 <p class="card-text">{{ attraction.description[:100] }}{% if attraction.description|length > 100 %}...{% endif %}</p>
                             </div>
                             <div class="card-footer">
-                                <a href="{{ url_for('attraction_detail', attraction_id=attraction.id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                <a href="{{ url_for('main.attraction_detail', attraction_id=attraction.id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
                             </div>
                         </div>
                     </div>
@@ -44,7 +44,7 @@
                                     <span class="badge bg-info">{{ restaurant.cuisine_type }}</span>
                                 {% endif %}
                                 <p class="card-text mt-2">{{ restaurant.description[:100] if restaurant.description else 'No description available.' }}{% if restaurant.description and restaurant.description|length > 100 %}...{% endif %}</p>
-                                <a href="{{ url_for('attraction_detail', attraction_id=restaurant.attraction_id) }}" class="btn btn-sm btn-outline-primary">View Attraction</a>
+                                <a href="{{ url_for('main.attraction_detail', attraction_id=restaurant.attraction_id) }}" class="btn btn-sm btn-outline-primary">View Attraction</a>
                             </div>
                         </div>
                     </div>
@@ -65,7 +65,7 @@
                                 {% if activity.price %}
                                     <p><strong>Price:</strong> {{ activity.price }}</p>
                                 {% endif %}
-                                <a href="{{ url_for('attraction_detail', attraction_id=activity.attraction_id) }}" class="btn btn-sm btn-outline-primary">View Attraction</a>
+                                <a href="{{ url_for('main.attraction_detail', attraction_id=activity.attraction_id) }}" class="btn btn-sm btn-outline-primary">View Attraction</a>
                             </div>
                         </div>
                     </div>
@@ -77,11 +77,11 @@
         <div class="mt-5">
             <h3>You might also be interested in:</h3>
             <div class="d-flex flex-wrap gap-2 mt-3">
-                <a href="{{ url_for('search', q='pyramids') }}" class="btn btn-outline-secondary">Pyramids</a>
-                <a href="{{ url_for('search', q='nile') }}" class="btn btn-outline-secondary">Nile River</a>
-                <a href="{{ url_for('search', q='museum') }}" class="btn btn-outline-secondary">Museums</a>
-                <a href="{{ url_for('search', q='temple') }}" class="btn btn-outline-secondary">Temples</a>
-                <a href="{{ url_for('search', q='beach') }}" class="btn btn-outline-secondary">Beaches</a>
+                <a href="{{ url_for('main.search', q='pyramids') }}" class="btn btn-outline-secondary">Pyramids</a>
+                <a href="{{ url_for('main.search', q='nile') }}" class="btn btn-outline-secondary">Nile River</a>
+                <a href="{{ url_for('main.search', q='museum') }}" class="btn btn-outline-secondary">Museums</a>
+                <a href="{{ url_for('main.search', q='temple') }}" class="btn btn-outline-secondary">Temples</a>
+                <a href="{{ url_for('main.search', q='beach') }}" class="btn btn-outline-secondary">Beaches</a>
             </div>
         </div>
     </div>
