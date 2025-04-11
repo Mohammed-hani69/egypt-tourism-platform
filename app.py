@@ -12,6 +12,12 @@ def create_app():
     # Configure app
     app.secret_key = os.environ.get("SESSION_SECRET", "dev_secret_key")
     
+    # التأكد من وجود مجلد instance
+    instance_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance')
+    if not os.path.exists(instance_path):
+        os.makedirs(instance_path, exist_ok=True)
+        print(f"تم إنشاء مجلد instance: {instance_path}")
+    
     # Database configuration
     app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
         "DATABASE_URL",
