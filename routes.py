@@ -790,6 +790,8 @@ def book_tour(plan_id):
                 tour_plan_id=plan_id,
                 start_date=start_date,
                 end_date=end_date,
+                number_of_people=form.number_of_people.data,
+                notes=form.notes.data,
                 status='pending'
             )
             db.session.add(booking)

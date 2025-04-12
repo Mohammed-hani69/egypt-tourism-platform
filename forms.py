@@ -175,6 +175,8 @@ class TourPlanDestinationForm(FlaskForm):
 
 class TourBookingForm(FlaskForm):
     start_date = StringField('Start Date', validators=[DataRequired()])
+    number_of_people = IntegerField('Number of People', validators=[DataRequired(), NumberRange(min=1)])
+    notes = TextAreaField('Additional Notes')
     submit = SubmitField('Book Tour')
 
 
