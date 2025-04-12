@@ -129,7 +129,7 @@
             <div class="content-section">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h3 class="mb-0">{{ _('تقييمات الزوار') }}</h3>
-                    <a href="{{ url_for('main.add_review', type='attraction', id=attraction.id) }}" class="btn btn-primary">{{ _('إضافة تقييم') }}</a>
+                    <a href="{{ url_for('main.add_review', attraction_id=attraction.id) }}" class="btn btn-primary">{{ _('إضافة تقييم') }}</a>
                 </div>
 
                 {% if attraction.reviews %}
