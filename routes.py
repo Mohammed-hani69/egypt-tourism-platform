@@ -775,10 +775,32 @@ def tourist_dashboard():
     # Get available tour plans
     tour_plans = TourPlan.query.all()
     
+    # Get upcoming tours
+    upcoming_tours = TourBooking.query.filter_by(
+        tourist_id=current_user.id,
+        status=('pending', 'confirmed', 'in_progress')
+    ).order_by(TourBooking.start_date).all()
+    
+    # Count active tours
+    active_tour_count = TourBooking.query.filter_by(
+        tourist_id=current_user.id,
+        status='in_progress'
+    ).count()
+    
+    # Count reviews
+    review_count = Review.query.filter_by(user_id=current_user.id).count()
+    
+    # Get recommended guides (optional)
+    recommended_guides = Guide.query.join(User).filter(User.is_guide==True).limit(3).all()
+    
     return render_template('tourist/dashboard.html',
                           title='Tourist Dashboard',
                           bookings=bookings,
-                          tour_plans=tour_plans)
+                          tour_plans=tour_plans,
+                          upcoming_tours=upcoming_tours,
+                          active_tour_count=active_tour_count,
+                          review_count=review_count,
+                          recommended_guides=recommended_guides)
 
 @main.route('/tourist/tour_plans')
 @login_required
