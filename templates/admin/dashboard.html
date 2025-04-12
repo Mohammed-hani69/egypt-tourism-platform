@@ -1,574 +1,228 @@
-<!DOCTYPE html>
-<html lang="en" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ _('Admin Dashboard') }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --primary-red: #e74c3c;
-            --secondary-red: #c0392b;
-            --light-red: #ff6b6b;
-            --white: #ffffff;
-            --off-white: #fff5f5;
-            --light-gray: #f8d7da;
-            --gold: #ffd700;
-            --primary: #e74c3c;
-            --success: #2ecc71;
-            --info: #3498db;
-            --warning: #f39c12;
-            --dark: #2c3e50;
-        }
-        
-        body {
-            font-family: 'Cairo', sans-serif;
-            background: linear-gradient(135deg, var(--off-white) 0%, var(--white) 100%);
-            color: #333;
-            overflow-x: hidden;
-        }
-        
-        /* Top Header Styles */
-        .top-header {
-            background: var(--primary-red);
-            padding: 8px 0;
-            color: var(--white);
-        }
+{% extends "base.html" %}
 
-        .top-header .contact-info {
-            font-size: 0.9rem;
-        }
-        
-        .social-icons a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 30px;
-            height: 30px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            color: var(--white);
-            margin: 0 5px;
-            transition: all 0.3s;
-        }
-        
-        .social-icons a:hover {
-            background-color: var(--white);
-            color: var(--primary-red);
-            transform: translateY(-3px);
-        }
-        
-        /* Main Header Styles */
-        .main-header {
-            padding: 15px 0;
-            background: var(--white);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .navbar-brand {
-            font-weight: 700;
-            color: var(--primary-red);
-            font-size: 1.8rem;
-        }
-        
-        .nav-link {
-            color: #333;
-            font-weight: 600;
-            margin: 0 10px;
-            position: relative;
-            transition: color 0.3s;
-        }
-        
-        .nav-link:hover {
-            color: var(--primary-red);
-        }
-        
-        .nav-link:hover::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            background-color: var(--primary-red);
-            bottom: -5px;
-            left: 0;
-            transform: scaleX(1);
-            transition: transform 0.3s;
-        }
-        
-        .nav-item .btn {
-            padding: 5px 15px;
-            margin: 5px;
-            border-radius: 20px;
-        }
-        
-        .dropdown-menu {
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .dropdown-item {
-            padding: 8px 20px;
-        }
-        
-        .dropdown-item i {
-            margin-right: 8px;
-            width: 20px;
-        }
-        
-        /* Dashboard Styles */
-        .dashboard-heading {
-            position: relative;
-            margin-bottom: 30px;
-            color: var(--dark);
-            font-weight: 700;
-        }
-        
-        .dashboard-heading::after {
-            content: '';
-            position: absolute;
-            width: 100px;
-            height: 3px;
-            background-color: var(--gold);
-            bottom: -10px;
-            right: 0;
-        }
-        
-        .card {
-            border: none;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: all 0.3s;
-            margin-bottom: 1.5rem;
-            border-right: 4px solid transparent;
-        }
-        
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-        }
-        
-        .card-header {
-            border-bottom: none;
-            padding: 20px;
-            font-weight: 600;
-        }
-        
-        .card-body {
-            padding: 20px;
-        }
-        
-        .card-title {
-            font-weight: 700;
-            margin-bottom: 15px;
-            font-size: 1.4rem;
-        }
-        
-        .card-primary {
-            border-right-color: var(--primary);
-        }
-        
-        .card-success {
-            border-right-color: var(--success);
-        }
-        
-        .card-info {
-            border-right-color: var(--info);
-        }
-        
-        .card-warning {
-            border-right-color: var(--warning);
-        }
-        
-        .bg-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary-red) 100%) !important;
-        }
-        
-        .bg-success {
-            background: linear-gradient(135deg, var(--success) 0%, #27ae60 100%) !important;
-        }
-        
-        .bg-info {
-            background: linear-gradient(135deg, var(--info) 0%, #2980b9 100%) !important;
-        }
-        
-        .bg-warning {
-            background: linear-gradient(135deg, var(--warning) 0%, #e67e22 100%) !important;
-        }
-        
-        .btn {
-            border-radius: 50px;
-            padding: 8px 20px;
-            font-weight: 600;
-            transition: all 0.3s;
-            margin-right: 5px;
-        }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        
-        .btn-sm {
-            padding: 5px 15px;
-            font-size: 0.85rem;
-        }
-        
-        .btn-outline-primary {
-            color: var(--primary);
-            border-color: var(--primary);
-        }
-        
-        .btn-outline-primary:hover {
-            background-color: var(--primary);
-            border-color: var(--primary);
-        }
-        
-        .btn-outline-success {
-            color: var(--success);
-            border-color: var(--success);
-        }
-        
-        .btn-outline-success:hover {
-            background-color: var(--success);
-            border-color: var(--success);
-        }
-        
-        .btn-outline-info {
-            color: var(--info);
-            border-color: var(--info);
-        }
-        
-        .btn-outline-info:hover {
-            background-color: var(--info);
-            border-color: var(--info);
-        }
-        
-        .btn-outline-warning {
-            color: var(--warning);
-            border-color: var(--warning);
-        }
-        
-        .btn-outline-warning:hover {
-            background-color: var(--warning);
-            border-color: var(--warning);
-        }
-        
-        /* Stats Icon */
+{% block title %}{{ _('لوحة تحكم المشرف') }}{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header text-center">
+        <div class="container">
+            <h1 class="display-4">{{ _('لوحة تحكم المشرف') }}</h1>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="stats-icon bg-primary mx-auto mb-3">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h5 class="card-title">{{ _('المستخدمين') }}</h5>
+                        <h3 class="card-text">{{ user_count }}</h3>
+                        <a href="{{ url_for('admin.users') }}" class="btn btn-sm btn-outline-primary mt-3">{{ _('عرض المستخدمين') }}</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="stats-icon bg-success mx-auto mb-3">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h5 class="card-title">{{ _('المعالم السياحية') }}</h5>
+                        <h3 class="card-text">{{ attraction_count }}</h3>
+                        <a href="{{ url_for('admin.attractions') }}" class="btn btn-sm btn-outline-success mt-3">{{ _('إدارة المعالم') }}</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="stats-icon bg-info mx-auto mb-3">
+                            <i class="fas fa-route"></i>
+                        </div>
+                        <h5 class="card-title">{{ _('خطط الرحلات') }}</h5>
+                        <h3 class="card-text">{{ tour_plan_count }}</h3>
+                        <a href="{{ url_for('admin.tour_plans') }}" class="btn btn-sm btn-outline-info mt-3">{{ _('إدارة الخطط') }}</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="stats-icon bg-warning mx-auto mb-3">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <h5 class="card-title">{{ _('الحجوزات') }}</h5>
+                        <h3 class="card-text">{{ booking_count }}</h3>
+                        <a href="{{ url_for('admin.bookings') }}" class="btn btn-sm btn-outline-warning mt-3">{{ _('عرض الحجوزات') }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">{{ _('آخر الحجوزات') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>{{ _('المرجع') }}</th>
+                                        <th>{{ _('السائح') }}</th>
+                                        <th>{{ _('المرشد') }}</th>
+                                        <th>{{ _('التاريخ') }}</th>
+                                        <th>{{ _('الحالة') }}</th>
+                                        <th>{{ _('الإجراءات') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for booking in recent_bookings %}
+                                    <tr>
+                                        <td>{{ booking.reference }}</td>
+                                        <td>{{ booking.tourist.username }}</td>
+                                        <td>{{ booking.tour_plan.guide.username }}</td>
+                                        <td>{{ booking.created_at.strftime('%Y-%m-%d') }}</td>
+                                        <td>
+                                            {% if booking.status == 'pending' %}
+                                            <span class="badge bg-warning">{{ _('قيد الانتظار') }}</span>
+                                            {% elif booking.status == 'confirmed' %}
+                                            <span class="badge bg-success">{{ _('تم التأكيد') }}</span>
+                                            {% elif booking.status == 'cancelled' %}
+                                            <span class="badge bg-danger">{{ _('ملغي') }}</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">{{ booking.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{{ url_for('admin.booking_detail', booking_id=booking.id) }}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white text-center">
+                        <a href="{{ url_for('admin.bookings') }}" class="btn btn-link">{{ _('عرض جميع الحجوزات') }}</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">{{ _('إحصائيات سريعة') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h6>{{ _('المرشدين السياحيين') }}</h6>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: {{ (guide_count / user_count) * 100 if user_count > 0 else 0 }}%"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <small>{{ guide_count }} {{ _('مرشد') }}</small>
+                                <small>{{ ((guide_count / user_count) * 100) if user_count > 0 else 0 }}%</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h6>{{ _('السياح') }}</h6>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ (tourist_count / user_count) * 100 if user_count > 0 else 0 }}%"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <small>{{ tourist_count }} {{ _('سائح') }}</small>
+                                <small>{{ ((tourist_count / user_count) * 100) if user_count > 0 else 0 }}%</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h6>{{ _('طلاب اللغة') }}</h6>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: {{ (student_count / user_count) * 100 if user_count > 0 else 0 }}%"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <small>{{ student_count }} {{ _('طالب') }}</small>
+                                <small>{{ ((student_count / user_count) * 100) if user_count > 0 else 0 }}%</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">{{ _('إضافة سريعة') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('admin.add_attraction') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-plus-circle me-2"></i>{{ _('إضافة معلم سياحي') }}
+                            </a>
+                            <a href="{{ url_for('admin.add_region') }}" class="btn btn-outline-success">
+                                <i class="fas fa-plus-circle me-2"></i>{{ _('إضافة منطقة') }}
+                            </a>
+                            <a href="{{ url_for('admin.add_user') }}" class="btn btn-outline-info">
+                                <i class="fas fa-plus-circle me-2"></i>{{ _('إضافة مستخدم') }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
         .stats-icon {
             width: 60px;
             height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: var(--primary-red); /*This line was added to resolve conflict.*/
             border-radius: 50%;
             margin-bottom: 20px;
             font-size: 1.5rem;
             color: var(--white);
         }
-        
-        /* Footer Styles */
-        .main-footer {
-            background: var(--primary-red);
-            position: relative;
-            overflow: hidden;
-            margin-top: 4rem;
-            color: var(--white);
+
+        .stats-icon.bg-primary {
+            background-color: var(--primary-red);
         }
-        
-        .main-footer::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: repeating-linear-gradient(
-                45deg,
-                var(--primary-red),
-                var(--primary-red) 10px,
-                var(--secondary-red) 10px,
-                var(--secondary-red) 20px
-            );
-            opacity: 0.1;
+
+        .stats-icon.bg-success {
+            background-color: #28a745;
         }
-        
-        .footer-heading {
-            color: var(--white);
-            position: relative;
-            font-weight: 700;
-            margin-bottom: 25px;
+
+        .stats-icon.bg-info {
+            background-color: #17a2b8;
         }
-        
-        .footer-heading::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            right: 0;
-            width: 50px;
-            height: 3px;
-            background: var(--white);
+
+        .stats-icon.bg-warning {
+            background-color: #ffc107;
+            color: #212529;
         }
-        
-        .footer-links {
-            list-style: none;
-            padding: 0;
+
+        .progress-bar.bg-primary {
+            background-color: var(--primary-red) !important;
         }
-        
-        .footer-links li {
-            margin-bottom: 10px;
+
+        .progress-bar.bg-success {
+            background-color: #28a745 !important;
         }
-        
-        .footer-links a {
-            color: var(--white);
-            text-decoration: none;
-            transition: color 0.3s;
-            opacity: 0.9;
-        }
-        
-        .footer-links a:hover {
-            color: var(--gold);
-            opacity: 1;
-        }
-        
-        .footer-bottom {
-            background: var(--secondary-red);
-            padding: 20px 0;
-            margin-top: 3rem;
-            text-align: center;
-            position: relative;
-            color: var(--white);
-        }
-        
-        /* Animation classes */
-        .fade-in {
-            animation: fadeIn 1s ease-in;
-        }
-        
-        .slide-up {
-            animation: slideUp 0.8s ease-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        /* Responsive styles */
-        @media (max-width: 768px) {
-            .dashboard-heading {
-                font-size: 1.8rem;
-            }
-            
-            .card-title {
-                font-size: 1.2rem;
-            }
+
+        .progress-bar.bg-info {
+            background-color: #17a2b8 !important;
         }
     </style>
-</head>
-<body>
-    <!-- Top Header -->
-    <div class="top-header">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <div class="contact-info">
-                        <span class="me-3"><i class="fas fa-phone me-2"></i>+20 123 456 789</span>
-                        <span><i class="fas fa-envelope me-2"></i>info@discovergypt.com</span>
-                    </div>
-                </div>
-                <div class="col-md-6 text-end">
-                    <div class="social-icons">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Header -->
-    <header class="main-header">
-        <div class="container">
-            <nav class="navbar navbar-expand-lg">
-                <a class="navbar-brand logo" href="{{ url_for('main.index') }}">
-                    <i class="fas fa-pyramid"></i> {{ _('اكتشف مصر') }}
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.index') }}">{{ _('الرئيسية') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.attractions') }}">{{ _('المعالم السياحية') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.guides') }}">{{ _('المرشدين السياحيين') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.language_practice') }}">{{ _('تعلم اللغات') }}</a>
-                        </li>
-                        {% if current_user.is_authenticated %}
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-user-circle"></i> {{ _('حسابي') }}
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="{{ url_for('main.profile') }}"><i class="fas fa-user"></i> {{ _('الملف الشخصي') }}</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt"></i> {{ _('تسجيل الخروج') }}</a></li>
-                                </ul>
-                            </li>
-                        {% else %}
-                            <li class="nav-item">
-                                <a class="btn btn-outline-primary btn-sm ms-2" href="{{ url_for('main.login') }}">{{ _('تسجيل الدخول') }}</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="btn btn-primary btn-sm ms-2" href="{{ url_for('main.register') }}">{{ _('التسجيل') }}</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </nav>
-        </div>
-    </header>
-
-    <!-- Dashboard Content -->
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-12">
-                <h1 class="dashboard-heading fade-in">{{ _('Admin Dashboard') }}</h1>
-            </div>
-        </div>
-        
-        <div class="row mt-4">
-            <div class="col-md-6 col-lg-3">
-                <div class="card card-primary fade-in">
-                    <div class="card-header bg-primary text-white">
-                        <div class="stats-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <h3 class="card-title mb-0">{{ _('Users') }}</h3>
-                    </div>
-                    <div class="card-body">
-                        <h2 class="fs-3 mb-3">{{ users_count }}</h2>
-                        <p class="mb-3">
-                            <span class="d-block mb-2"><i class="fas fa-user-tie me-2"></i>{{ _('Guides') }}: {{ guides_count }}</span>
-                            <span class="d-block mb-2"><i class="fas fa-user-graduate me-2"></i>{{ _('Students') }}: {{ students_count }}</span>
-                            <span class="d-block"><i class="fas fa-suitcase me-2"></i>{{ _('Tourists') }}: {{ tourists_count }}</span>
-                        </p>
-                        <a href="{{ url_for('main.admin_users') }}" class="btn btn-outline-primary w-100">{{ _('Manage Users') }}</a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-6 col-lg-3">
-                <div class="card card-success slide-up">
-                    <div class="card-header bg-success text-white">
-                        <div class="stats-icon">
-                            <i class="fas fa-landmark"></i>
-                        </div>
-                        <h3 class="card-title mb-0">{{ _('Attractions') }}</h3>
-                    </div>
-                    <div class="card-body">
-                        <h2 class="fs-3 mb-3">{{ attractions_count }}</h2>
-                        <p class="mb-3">
-                            <span class="d-block mb-2"><i class="fas fa-map-marker-alt me-2"></i>{{ _('Regions') }}: {{ regions_count }}</span>
-                        </p>
-                        <div class="d-flex flex-column">
-                            <a href="{{ url_for('main.admin_regions') }}" class="btn btn-outline-success mb-2">{{ _('Manage Regions') }}</a>
-                            <a href="{{ url_for('main.admin_attractions') }}" class="btn btn-outline-success">{{ _('Manage Attractions') }}</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-6 col-lg-3">
-                <div class="card card-info fade-in">
-                    <div class="card-header bg-info text-white">
-                        <div class="stats-icon">
-                            <i class="fas fa-route"></i>
-                        </div>
-                        <h3 class="card-title mb-0">{{ _('Tour Plans') }}</h3>
-                    </div>
-                    <div class="card-body">
-                        <h2 class="fs-3 mb-3">{{ bookings_count }}</h2>
-                        <p class="mb-3">
-                            <span class="d-block mb-2"><i class="fas fa-clock me-2"></i>{{ _('Pending') }}: {{ pending_bookings }}</span>
-                        </p>
-                        <div class="d-flex flex-column">
-                            <a href="{{ url_for('main.admin_tour_plans') }}" class="btn btn-outline-info mb-2">{{ _('Manage Tour Plans') }}</a>
-                            <a href="{{ url_for('main.admin_bookings') }}" class="btn btn-outline-info">{{ _('Manage Bookings') }}</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-6 col-lg-3">
-                <div class="card card-warning slide-up">
-                    <div class="card-header bg-warning">
-                        <div class="stats-icon">
-                            <i class="fas fa-comments"></i>
-                        </div>
-                        <h3 class="card-title mb-0 text-dark">{{ _('Chat Groups') }}</h3>
-                    </div>
-                    <div class="card-body">
-                        <h2 class="fs-3 mb-3">{{ chat_groups_count }}</h2>
-                        <p class="mb-3">{{ _('Manage language learning chat groups') }}</p>
-                        <a href="{{ url_for('main.admin_chat_groups') }}" class="btn btn-outline-warning w-100">{{ _('Manage Chat Groups') }}</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="main-footer mt-5">
-        <div class="container">
-            <div class="row py-4">
-                <div class="col-md-4">
-                    <h4 class="footer-heading">عن اكتشف مصر</h4>
-                    <p>نحن نقدم لكم أفضل التجارب السياحية في مصر، مع خدمات متميزة وأسعار تنافسية.</p>
-                </div>
-                <div class="col-md-4">
-                    <h4 class="footer-heading">روابط سريعة</h4>
-                    <ul class="footer-links">
-                        <li><a href="/tours">الرحلات السياحية</a></li>
-                        <li><a href="/hotels">الفنادق</a></li>
-                        <li><a href="/transportation">المواصلات</a></li>
-                        <li><a href="/blog">المدونة</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h4 class="footer-heading">تواصل معنا</h4>
-                    <ul class="footer-links">
-                        <li><i class="fas fa-map-marker-alt me-2"></i>القاهرة، مصر</li>
-                        <li><i class="fas fa-phone me-2"></i>+20 123 456 789</li>
-                        <li><i class="fas fa-envelope me-2"></i>info@discovergypt.com</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <div class="container">
-                <p class="mb-0">© 2024 اكتشف مصر. جميع الحقوق محفوظة.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}
