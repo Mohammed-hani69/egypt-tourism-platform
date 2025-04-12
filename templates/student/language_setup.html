@@ -1,87 +1,180 @@
-{% extends "layout.html" %}
+
+{% extends "base.html" %}
+
+{% block title %}{{ _('إعداد ممارسة اللغة') }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>{{ _('Language Practice Setup') }}</h1>
-    
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <form method="POST" action="">
-                        {{ form.hidden_tag() }}
-                        
-                        <div class="mb-3">
-                            {{ form.language.label(class="form-label") }}
-                            {{ form.language(class="form-select") }}
-                            {% if form.language.errors %}
-                                {% for error in form.language.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                        
-                        <div class="mb-3">
-                            {{ form.proficiency_level.label(class="form-label") }}
-                            {{ form.proficiency_level(class="form-select") }}
-                            {% if form.proficiency_level.errors %}
-                                {% for error in form.proficiency_level.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                        
-                        <div class="mb-3">
-                            {{ form.availability.label(class="form-label") }}
-                            {{ form.availability(class="form-control", placeholder=_("e.g. Weekdays after 6 PM, Weekends in the morning")) }}
-                            {% if form.availability.errors %}
-                                {% for error in form.availability.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                        
-                        <div class="mb-3">
-                            {{ form.interests.label(class="form-label") }}
-                            {{ form.interests(class="form-control", placeholder=_("e.g. Travel, Food, Movies, Sports")) }}
-                            {% if form.interests.errors %}
-                                {% for error in form.interests.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                        
-                        <div class="d-grid">
-                            {{ form.submit(class="btn btn-primary") }}
-                        </div>
-                    </form>
-                </div>
-            </div>
+    <!-- Page Header -->
+    <div class="page-header text-center">
+        <div class="container">
+            <h1 class="display-4">{{ _('إعداد ممارسة اللغة') }}</h1>
         </div>
-        
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5>{{ _('Language Learning Tips') }}</h5>
+    </div>
+    
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0">{{ _('أخبرنا عن أهدافك اللغوية') }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('main.language_setup') }}">
+                            {{ form.hidden_tag() }}
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <div class="form-group">
+                                        <label class="form-label">{{ _('اللغة التي ترغب في تعلمها') }}</label>
+                                        {{ form.language(class="form-control form-control-lg") }}
+                                        {% if form.language.errors %}
+                                            {% for error in form.language.errors %}
+                                                <div class="text-danger">{{ error }}</div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">{{ _('مستوى إتقانك الحالي') }}</label>
+                                        {{ form.proficiency_level(class="form-control form-control-lg") }}
+                                        {% if form.proficiency_level.errors %}
+                                            {% for error in form.proficiency_level.errors %}
+                                                <div class="text-danger">{{ error }}</div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group mb-4">
+                                <label class="form-label">{{ _('اهتماماتك (اختر مواضيع ترغب في مناقشتها)') }}</label>
+                                {{ form.interests(class="form-control", rows=3) }}
+                                {% if form.interests.errors %}
+                                    {% for error in form.interests.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                {% endif %}
+                                <small class="text-muted">{{ _('مثال: السفر، الطهي، الموسيقى، الرياضة، التكنولوجيا') }}</small>
+                            </div>
+                            
+                            <div class="form-group mb-4">
+                                <label class="form-label">{{ _('هدف التعلم') }}</label>
+                                {{ form.learning_goal(class="form-control", rows=3) }}
+                                {% if form.learning_goal.errors %}
+                                    {% for error in form.learning_goal.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                {% endif %}
+                                <small class="text-muted">{{ _('مثال: السفر إلى بلد ناطق باللغة، إجراء محادثات أساسية، قراءة كتب') }}</small>
+                            </div>
+                            
+                            <div class="form-group mb-4">
+                                <label class="form-label">{{ _('أوقات التوفر لممارسة اللغة') }}</label>
+                                {{ form.availability(class="form-control", rows=2) }}
+                                {% if form.availability.errors %}
+                                    {% for error in form.availability.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                {% endif %}
+                                <small class="text-muted">{{ _('مثال: مساءً من الاثنين إلى الجمعة، صباح يوم السبت') }}</small>
+                            </div>
+                            
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg px-5">
+                                    {% if language_practice %}
+                                        {{ _('تحديث المعلومات') }}
+                                    {% else %}
+                                        {{ _('حفظ المعلومات') }}
+                                    {% endif %}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <p>{{ _('Setting up your language practice profile will help us match you with the right guide and practice opportunities.') }}</p>
-                    
-                    <h6>{{ _('Tips for effective language learning:') }}</h6>
-                    <ul>
-                        <li>{{ _('Practice consistently, even if it\'s just for a few minutes each day') }}</li>
-                        <li>{{ _('Don\'t be afraid to make mistakes - they\'re an essential part of learning') }}</li>
-                        <li>{{ _('Immerse yourself in the language through music, TV shows, and movies') }}</li>
-                        <li>{{ _('Join language exchange groups to practice with native speakers') }}</li>
-                        <li>{{ _('Use language learning apps to supplement your formal learning') }}</li>
-                    </ul>
-                    
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> {{ _('Your availability and interests help guides plan sessions that are convenient and engaging for you.') }}
+                
+                <div class="card border-0 shadow mt-4">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0">{{ _('نصائح لممارسة اللغة') }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="d-flex">
+                                    <div class="stats-icon bg-primary me-3" style="width: 40px; height: 40px; font-size: 1rem;">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </div>
+                                    <div>
+                                        <h5>{{ _('ممارسة منتظمة') }}</h5>
+                                        <p class="text-muted">{{ _('حاول ممارسة اللغة يومياً حتى لو لفترة قصيرة.') }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="d-flex">
+                                    <div class="stats-icon bg-success me-3" style="width: 40px; height: 40px; font-size: 1rem;">
+                                        <i class="fas fa-headphones"></i>
+                                    </div>
+                                    <div>
+                                        <h5>{{ _('استمع كثيراً') }}</h5>
+                                        <p class="text-muted">{{ _('استمع إلى محتوى باللغة التي تتعلمها بشكل يومي.') }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="d-flex">
+                                    <div class="stats-icon bg-info me-3" style="width: 40px; height: 40px; font-size: 1rem;">
+                                        <i class="fas fa-comment"></i>
+                                    </div>
+                                    <div>
+                                        <h5>{{ _('لا تخف من الأخطاء') }}</h5>
+                                        <p class="text-muted">{{ _('الأخطاء جزء طبيعي من عملية التعلم، استفد منها.') }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="d-flex">
+                                    <div class="stats-icon bg-warning me-3" style="width: 40px; height: 40px; font-size: 1rem; color: #212529;">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div>
+                                        <h5>{{ _('تعلم الثقافة') }}</h5>
+                                        <p class="text-muted">{{ _('فهم ثقافة المتحدثين الأصليين يساعد في فهم اللغة.') }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+    
+    <style>
+        .stats-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary-red);
+            border-radius: 50%;
+            color: var(--white);
+        }
+        
+        .stats-icon.bg-primary {
+            background-color: var(--primary-red);
+        }
+        
+        .stats-icon.bg-success {
+            background-color: #28a745;
+        }
+        
+        .stats-icon.bg-info {
+            background-color: #17a2b8;
+        }
+        
+        .stats-icon.bg-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+    </style>
 {% endblock %}

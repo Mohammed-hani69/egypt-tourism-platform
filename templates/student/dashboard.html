@@ -1,100 +1,215 @@
-{% extends "layout.html" %}
+
+{% extends "base.html" %}
+
+{% block title %}{{ _('لوحة تحكم طالب اللغة') }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>{{ _('Student Dashboard') }}</h1>
+    <!-- Page Header -->
+    <div class="page-header text-center">
+        <div class="container">
+            <h1 class="display-4">{{ _('لوحة تحكم طالب اللغة') }}</h1>
+        </div>
+    </div>
     
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    {{ _('My Language Practice') }}
-                </div>
-                <div class="card-body">
-                    {% if language_practice %}
-                    <h5 class="card-title">{{ language_practice.language }}</h5>
-                    <p>
-                        <strong>{{ _('Level') }}:</strong> {{ language_practice.proficiency_level }}<br>
-                        <strong>{{ _('Availability') }}:</strong> {{ language_practice.availability }}<br>
-                        <strong>{{ _('Interests') }}:</strong> {{ language_practice.interests }}
-                    </p>
-                    <a href="{{ url_for('main.language_setup') }}" class="btn btn-sm btn-outline-primary">{{ _('Edit Settings') }}</a>
-                    {% else %}
-                    <p class="text-muted">{{ _('You have not set up your language practice profile yet.') }}</p>
-                    <a href="{{ url_for('main.language_setup') }}" class="btn btn-primary">{{ _('Set Up Now') }}</a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-header bg-success text-white">
-                    {{ _('My Guide') }}
-                </div>
-                <div class="card-body">
-                    {% if guide %}
-                    <h5 class="card-title">{{ guide.user.username }}</h5>
-                    <p>
-                        <strong>{{ _('Languages') }}:</strong> {{ guide.user.languages }}<br>
-                        <strong>{{ _('Experience') }}:</strong> {{ guide.years_experience }} {{ _('years') }}<br>
-                        <strong>{{ _('Specialization') }}:</strong> {{ guide.specialization }}
-                    </p>
-                    <a href="#" class="btn btn-sm btn-outline-success">{{ _('Contact Guide') }}</a>
-                    {% else %}
-                    <p class="text-muted">{{ _('You have not selected a guide yet.') }}</p>
-                    
-                    {% if language_practice %}
-                    <h6>{{ _('Available Guides for') }} {{ language_practice.language }}:</h6>
-                    {% if available_guides %}
-                    <div class="list-group mt-2">
-                        {% for guide in available_guides %}
-                        <div class="list-group-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <strong>{{ guide.user.username }}</strong><br>
-                                    {{ _('Experience') }}: {{ guide.years_experience }} {{ _('years') }}
-                                </div>
-                                <a href="{{ url_for('main.select_guide', guide_id=guide.user_id) }}" class="btn btn-sm btn-primary">{{ _('Select') }}</a>
-                            </div>
+    <div class="container mt-5">
+        <div class="row mb-4">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="stats-icon bg-primary mx-auto mb-3">
+                            <i class="fas fa-language"></i>
                         </div>
-                        {% endfor %}
+                        <h5 class="card-title">{{ _('ممارسة اللغة') }}</h5>
+                        <h3 class="card-text">{{ language_practice.language if language_practice else _('غير مفعل') }}</h3>
+                        <a href="{{ url_for('main.language_setup') }}" class="btn btn-sm btn-outline-primary mt-3">{{ _('إعدادات اللغة') }}</a>
                     </div>
-                    {% else %}
-                    <p class="text-muted">{{ _('No guides available for') }} {{ language_practice.language }}.</p>
-                    {% endif %}
-                    {% else %}
-                    <p class="text-muted">{{ _('Set up your language practice profile first.') }}</p>
-                    {% endif %}
-                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="stats-icon bg-success mx-auto mb-3">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <h5 class="card-title">{{ _('المرشد الخاص') }}</h5>
+                        <h3 class="card-text">{{ guide.user.username if guide else _('لا يوجد') }}</h3>
+                        {% if guide %}
+                        <a href="#" class="btn btn-sm btn-outline-success mt-3">{{ _('التواصل مع المرشد') }}</a>
+                        {% else %}
+                        <a href="#" class="btn btn-sm btn-outline-success mt-3">{{ _('البحث عن مرشد') }}</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="stats-icon bg-info mx-auto mb-3">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h5 class="card-title">{{ _('مجموعات المحادثة') }}</h5>
+                        <h3 class="card-text">{{ chat_groups|length }}</h3>
+                        <a href="#" class="btn btn-sm btn-outline-info mt-3">{{ _('استعراض المجموعات') }}</a>
+                    </div>
                 </div>
             </div>
         </div>
         
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-header bg-info text-white">
-                    {{ _('Chat Groups') }}
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ chat_groups|length }} {{ _('Chat Groups') }}</h5>
-                    
-                    {% if chat_groups %}
-                    <div class="list-group mt-2">
-                        {% for group in chat_groups %}
-                        <a href="{{ url_for('main.chat_detail', chat_id=group.id) }}" class="list-group-item list-group-item-action">
-                            {{ group.name }} ({{ group.language }})
-                            <small class="text-muted d-block">{{ _('Guide') }}: {{ group.guide.username }}</small>
-                        </a>
-                        {% endfor %}
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">{{ _('مجموعات المحادثة المتاحة') }}</h5>
                     </div>
-                    {% else %}
-                    <p class="text-muted">{{ _('You are not a member of any chat groups yet.') }}</p>
-                    <p>{{ _('Your guide can add you to chat groups for language practice.') }}</p>
-                    {% endif %}
+                    <div class="card-body">
+                        {% if chat_groups %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>{{ _('اسم المجموعة') }}</th>
+                                            <th>{{ _('اللغة') }}</th>
+                                            <th>{{ _('المرشد') }}</th>
+                                            <th>{{ _('عدد الأعضاء') }}</th>
+                                            <th>{{ _('الإجراءات') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for group in chat_groups %}
+                                        <tr>
+                                            <td>{{ group.name }}</td>
+                                            <td>{{ group.language }}</td>
+                                            <td>{{ group.guide.username }}</td>
+                                            <td>{{ group.members|length }}</td>
+                                            <td>
+                                                <a href="{{ url_for('main.chat_detail', chat_id=group.id) }}" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
+                                <p>{{ _('لا توجد مجموعات محادثة متاحة حالياً') }}</p>
+                                <p>{{ _('يمكن للمرشد الخاص بك إضافتك إلى مجموعات المحادثة لممارسة اللغة') }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">{{ _('مستوى اللغة') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if language_practice %}
+                            <div class="mb-4">
+                                <h6>{{ _('المستوى الحالي') }}</h6>
+                                <div class="progress" style="height: 10px;">
+                                    {% set level_percentage = {
+                                        'مبتدئ': 20,
+                                        'متوسط': 50,
+                                        'متقدم': 80,
+                                        'beginner': 20,
+                                        'intermediate': 50,
+                                        'advanced': 80
+                                    } %}
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: {{ level_percentage.get(language_practice.proficiency_level, 0) }}%"></div>
+                                </div>
+                                <div class="d-flex justify-content-between mt-2">
+                                    <small>{{ language_practice.proficiency_level }}</small>
+                                    <small>{{ level_percentage.get(language_practice.proficiency_level, 0) }}%</small>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6>{{ _('الأهداف اللغوية') }}</h6>
+                                <div class="d-flex align-items-center mt-3">
+                                    <div class="me-3">
+                                        <div class="badge bg-primary text-white p-2">
+                                            <i class="fas fa-comments me-1"></i> {{ _('محادثة') }}
+                                        </div>
+                                    </div>
+                                    <div class="me-3">
+                                        <div class="badge bg-info text-white p-2">
+                                            <i class="fas fa-book-reader me-1"></i> {{ _('قراءة') }}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="badge bg-success text-white p-2">
+                                            <i class="fas fa-pen me-1"></i> {{ _('كتابة') }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <p class="text-center text-muted">{{ _('لم تقم بإعداد ملف ممارسة اللغة بعد.') }}</p>
+                            <div class="d-grid">
+                                <a href="{{ url_for('main.language_setup') }}" class="btn btn-primary">{{ _('إعداد الآن') }}</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">{{ _('إجراءات سريعة') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('main.language_setup') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-cog me-2"></i>{{ _('إعدادات اللغة') }}
+                            </a>
+                            <a href="{{ url_for('main.guides') }}" class="btn btn-outline-success">
+                                <i class="fas fa-search me-2"></i>{{ _('البحث عن مرشد') }}
+                            </a>
+                            <a href="{{ url_for('main.edit_profile') }}" class="btn btn-outline-info">
+                                <i class="fas fa-user-edit me-2"></i>{{ _('تعديل الملف الشخصي') }}
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+    
+    <style>
+        .stats-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary-red);
+            border-radius: 50%;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: var(--white);
+        }
+        
+        .stats-icon.bg-primary {
+            background-color: var(--primary-red);
+        }
+        
+        .stats-icon.bg-success {
+            background-color: #28a745;
+        }
+        
+        .stats-icon.bg-info {
+            background-color: #17a2b8;
+        }
+        
+        .progress-bar.bg-success {
+            background-color: #28a745 !important;
+        }
+    </style>
 {% endblock %}

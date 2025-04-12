@@ -1,104 +1,235 @@
-{% extends "layout.html" %}
+
+{% extends "base.html" %}
+
+{% block title %}{{ _('تفاصيل الرحلة') }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>{{ tour_plan.title }}</h1>
-        
-        <div>
-            <span class="badge bg-{{ 'success' if booking.status == 'confirmed' else 'warning' if booking.status == 'pending' else 'danger' if booking.status == 'cancelled' else 'primary' }}">
-                {{ _('Confirmed') if booking.status == 'confirmed' else _('Pending') if booking.status == 'pending' else _('Cancelled') if booking.status == 'cancelled' else _('Completed') }}
-            </span>
+    <!-- Page Header -->
+    <div class="page-header text-center">
+        <div class="container">
+            <h1 class="display-4">{{ _('تفاصيل الرحلة') }}</h1>
         </div>
     </div>
     
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5>{{ _('Tour Details') }}</h5>
-                </div>
-                <div class="card-body">
-                    <p><strong>{{ _('Tourist') }}:</strong> {{ booking.tourist.username }}</p>
-                    <p><strong>{{ _('Start Date') }}:</strong> {{ booking.start_date.strftime('%d %B, %Y') }}</p>
-                    <p><strong>{{ _('End Date') }}:</strong> {{ booking.end_date.strftime('%d %B, %Y') }}</p>
-                    <p><strong>{{ _('Duration') }}:</strong> {{ tour_plan.duration }} {{ _('days') }}</p>
-                    <p><strong>{{ _('Price') }}:</strong> {{ tour_plan.price }} {{ _('EGP') }}</p>
-                    
-                    <div class="alert alert-info">
-                        {{ _('You are the assigned guide for this tour.') }}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">{{ _('معلومات الحجز') }}</h4>
+                        <span class="badge {% if booking.status == 'pending' %}bg-warning{% elif booking.status == 'confirmed' %}bg-success{% elif booking.status == 'cancelled' %}bg-danger{% elif booking.status == 'in_progress' %}bg-info{% elif booking.status == 'completed' %}bg-primary{% else %}bg-secondary{% endif %} px-3 py-2">
+                            {% if booking.status == 'pending' %}
+                                {{ _('قيد الانتظار') }}
+                            {% elif booking.status == 'confirmed' %}
+                                {{ _('تم التأكيد') }}
+                            {% elif booking.status == 'cancelled' %}
+                                {{ _('ملغي') }}
+                            {% elif booking.status == 'in_progress' %}
+                                {{ _('قيد التنفيذ') }}
+                            {% elif booking.status == 'completed' %}
+                                {{ _('مكتمل') }}
+                            {% else %}
+                                {{ booking.status }}
+                            {% endif %}
+                        </span>
                     </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5>{{ _('Tour Progress') }}</h5>
-                </div>
-                <div class="card-body">
-                    {% set completed_count = progress_by_dest.values()|selectattr('completed')|list|length %}
-                    {% set total_count = destinations|length %}
-                    
-                    <div class="progress mb-3">
-                        <div class="progress-bar bg-success" role="progressbar" 
-                             style="width: {{ (completed_count / total_count) * 100 if total_count > 0 else 0 }}%" 
-                             aria-valuenow="{{ completed_count }}" aria-valuemin="0" aria-valuemax="{{ total_count }}">
-                            {{ completed_count }}/{{ total_count }}
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5 class="text-muted mb-3">{{ _('معلومات أساسية') }}</h5>
+                                <p><strong>{{ _('رقم المرجع') }}:</strong> {{ booking.reference }}</p>
+                                <p><strong>{{ _('خطة الرحلة') }}:</strong> {{ booking.tour_plan.title }}</p>
+                                <p><strong>{{ _('المدة') }}:</strong> {{ booking.tour_plan.duration }} {{ _('أيام') }}</p>
+                                <p><strong>{{ _('تاريخ البداية') }}:</strong> {{ booking.start_date.strftime('%Y-%m-%d') }}</p>
+                                <p><strong>{{ _('تاريخ الانتهاء') }}:</strong> {{ booking.end_date.strftime('%Y-%m-%d') }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="text-muted mb-3">{{ _('معلومات السائح') }}</h5>
+                                <p><strong>{{ _('اسم السائح') }}:</strong> {{ booking.tourist.username }}</p>
+                                <p><strong>{{ _('البريد الإلكتروني') }}:</strong> {{ booking.tourist.email }}</p>
+                                {% if booking.tourist.phone %}
+                                <p><strong>{{ _('رقم الهاتف') }}:</strong> {{ booking.tourist.phone }}</p>
+                                {% endif %}
+                                {% if booking.tourist.country %}
+                                <p><strong>{{ _('البلد') }}:</strong> {{ booking.tourist.country }}</p>
+                                {% endif %}
+                                <p><strong>{{ _('تاريخ التسجيل') }}:</strong> {{ booking.tourist.date_joined.strftime('%Y-%m-%d') }}</p>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <p>{{ _('Completed Destinations') }}: {{ completed_count }}/{{ total_count }}</p>
-                    
-                    {% if completed_count == total_count %}
-                        <div class="alert alert-success">
-                            {{ _('Tour completed successfully!') }}
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="card">
-        <div class="card-header">
-            <h5>{{ _('Itinerary Progress') }}</h5>
-        </div>
-        <div class="card-body">
-            <div class="timeline">
-                {% for destination in destinations %}
-                <div class="row mb-4">
-                    <div class="col-md-10">
-                        <div class="card mb-3 {{ 'border-success' if progress_by_dest[destination.id] and progress_by_dest[destination.id].completed else '' }}">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h5>{{ _('Day') }} {{ destination.day_number }}: {{ destination.attraction.name }}</h5>
-                                    {% if progress_by_dest[destination.id] and progress_by_dest[destination.id].completed %}
-                                        <span class="badge bg-success">{{ _('Completed') }}</span>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="text-muted mb-3">{{ _('ملاحظات إضافية') }}</h5>
+                                <div class="p-3 bg-light rounded">
+                                    {% if booking.notes %}
+                                        {{ booking.notes }}
                                     {% else %}
-                                        <span class="badge bg-secondary">{{ _('Pending') }}</span>
-                                    {% endif %}
-                                </div>
-                                
-                                <p>{{ destination.description or destination.attraction.description }}</p>
-                                
-                                <div class="mt-3 d-flex justify-content-between align-items-center">
-                                    <a href="{{ url_for('attraction_detail', attraction_id=destination.attraction.id) }}" class="btn btn-sm btn-outline-primary">{{ _('View Attraction') }}</a>
-                                    
-                                    {% if not (progress_by_dest[destination.id] and progress_by_dest[destination.id].completed) %}
-                                        <a href="{{ url_for('update_tour_progress', tour_id=booking.id, destination_id=destination.id) }}" class="btn btn-sm btn-success">{{ _('Update Progress') }}</a>
-                                    {% else %}
-                                        <a href="{{ url_for('update_tour_progress', tour_id=booking.id, destination_id=destination.id) }}" class="btn btn-sm btn-outline-success">{{ _('View/Edit') }}</a>
+                                        <p class="text-muted mb-0">{{ _('لا توجد ملاحظات إضافية') }}</p>
                                     {% endif %}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
+                
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0">{{ _('تقدم الرحلة') }}</h4>
+                    </div>
+                    <div class="card-body">
+                        {% if booking.status in ['in_progress', 'completed'] %}
+                            {% if tour_progress %}
+                                <div class="progress mb-4" style="height: 25px; border-radius: 10px;">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                        style="width: {{ tour_progress.progress_percentage }}%;" 
+                                        aria-valuenow="{{ tour_progress.progress_percentage }}" 
+                                        aria-valuemin="0" 
+                                        aria-valuemax="100">
+                                        {{ tour_progress.progress_percentage }}%
+                                    </div>
+                                </div>
+                                
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>{{ _('التاريخ') }}</th>
+                                                <th>{{ _('الموقع الحالي') }}</th>
+                                                <th>{{ _('المعالم المزارة') }}</th>
+                                                <th>{{ _('ملاحظات') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for update in progress_updates %}
+                                            <tr>
+                                                <td>{{ update.update_date.strftime('%Y-%m-%d') }}</td>
+                                                <td>{{ update.current_location }}</td>
+                                                <td>{{ update.visited_attractions }}</td>
+                                                <td>{{ update.notes }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <div class="mt-4">
+                                    <a href="{{ url_for('guide.update_progress', booking_id=booking.id) }}" class="btn btn-primary">
+                                        <i class="fas fa-plus-circle me-2"></i>{{ _('إضافة تحديث جديد') }}
+                                    </a>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                                    <p>{{ _('لم يتم إضافة تحديثات للتقدم بعد') }}</p>
+                                    <a href="{{ url_for('guide.update_progress', booking_id=booking.id) }}" class="btn btn-primary">
+                                        <i class="fas fa-plus-circle me-2"></i>{{ _('إضافة تحديث جديد') }}
+                                    </a>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="alert alert-info">
+                                {{ _('سيتم عرض تقدم الرحلة هنا بمجرد بدء الرحلة.') }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0">{{ _('التفاصيل المالية') }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ _('سعر الخطة') }}
+                                <span>{{ booking.tour_plan.price }} {{ _('جنيه مصري') }}</span>
+                            </li>
+                            {% if booking.additional_services %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ _('خدمات إضافية') }}
+                                <span>{{ booking.additional_services_cost }} {{ _('جنيه مصري') }}</span>
+                            </li>
+                            {% endif %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ _('المجموع') }}
+                                <span class="fw-bold">{{ booking.total_cost }} {{ _('جنيه مصري') }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ _('حالة الدفع') }}
+                                <span class="badge {% if booking.payment_status == 'paid' %}bg-success{% elif booking.payment_status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {% if booking.payment_status == 'paid' %}
+                                        {{ _('تم الدفع') }}
+                                    {% elif booking.payment_status == 'pending' %}
+                                        {{ _('قيد الانتظار') }}
+                                    {% else %}
+                                        {{ _('غير مدفوع') }}
+                                    {% endif %}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0">{{ _('إجراءات') }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            {% if booking.status == 'pending' %}
+                                <a href="{{ url_for('guide.confirm_booking', booking_id=booking.id) }}" class="btn btn-success">
+                                    <i class="fas fa-check-circle me-2"></i>{{ _('تأكيد الحجز') }}
+                                </a>
+                                <a href="{{ url_for('guide.reject_booking', booking_id=booking.id) }}" class="btn btn-danger">
+                                    <i class="fas fa-times-circle me-2"></i>{{ _('رفض الحجز') }}
+                                </a>
+                            {% elif booking.status == 'confirmed' %}
+                                <a href="{{ url_for('guide.start_tour', booking_id=booking.id) }}" class="btn btn-primary">
+                                    <i class="fas fa-play-circle me-2"></i>{{ _('بدء الرحلة') }}
+                                </a>
+                                <a href="{{ url_for('guide.cancel_booking', booking_id=booking.id) }}" class="btn btn-outline-danger">
+                                    <i class="fas fa-times-circle me-2"></i>{{ _('إلغاء الحجز') }}
+                                </a>
+                            {% elif booking.status == 'in_progress' %}
+                                <a href="{{ url_for('guide.update_progress', booking_id=booking.id) }}" class="btn btn-info">
+                                    <i class="fas fa-clipboard-list me-2"></i>{{ _('تحديث التقدم') }}
+                                </a>
+                                <a href="{{ url_for('guide.complete_tour', booking_id=booking.id) }}" class="btn btn-success">
+                                    <i class="fas fa-check-circle me-2"></i>{{ _('إكمال الرحلة') }}
+                                </a>
+                            {% endif %}
+                            
+                            <a href="{{ url_for('guide.contact_tourist', tourist_id=booking.tourist.id) }}" class="btn btn-outline-primary">
+                                <i class="fas fa-comments me-2"></i>{{ _('التواصل مع السائح') }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0">{{ _('خطة الرحلة') }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <img src="{{ booking.tour_plan.image_url or url_for('static', filename='img/default-tour.jpg') }}" alt="{{ booking.tour_plan.title }}" class="img-fluid rounded">
+                        </div>
+                        <h5>{{ booking.tour_plan.title }}</h5>
+                        <p class="text-muted">{{ booking.tour_plan.description|truncate(150) }}</p>
+                        <a href="{{ url_for('guide.tour_plan_detail', tour_plan_id=booking.tour_plan.id) }}" class="btn btn-outline-primary btn-sm">
+                            {{ _('عرض التفاصيل الكاملة') }}
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+    
+    <style>
+        .progress-bar.bg-success {
+            background-color: #28a745 !important;
+        }
+    </style>
 {% endblock %}
