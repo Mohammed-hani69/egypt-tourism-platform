@@ -1,89 +1,122 @@
-{% extends "layout.html" %}
 
-{% block styles %}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}{{ _('حجز جولة') }} - {{ plan.title }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>{{ _('Book Tour') }}</h1>
-    <h4>{{ plan.title }}</h4>
-    
-    <div class="row mt-4">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-body">
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container text-center">
+        <h1 class="mb-3">{{ _('حجز جولة سياحية') }}</h1>
+        <div class="d-flex justify-content-center align-items-center">
+            <span class="badge bg-light text-dark me-3">
+                <i class="fas fa-map-marker-alt text-danger me-1"></i> {{ plan.title }}
+            </span>
+            <div class="text-warning">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
                     <form method="POST" action="">
                         {{ form.hidden_tag() }}
                         
-                        <div class="mb-3">
-                            <label for="tour_details" class="form-label">{{ _('Tour Details') }}</label>
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                    <p><strong>{{ _('Duration') }}:</strong> {{ plan.duration }} {{ _('days') }}</p>
-                                    <p><strong>{{ _('Price') }}:</strong> {{ plan.price }} {{ _('EGP') }}</p>
-                                    
-                                    <div class="mb-3">
-                                        <p><strong>{{ _('Attractions Included') }}:</strong></p>
-                                        <ul>
-                                            {% for day, destinations in plan.destinations|groupby('day_number') %}
-                                                {% for destination in destinations %}
-                                                <li>{{ destination.attraction.name }}</li>
-                                                {% endfor %}
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
+                        <div class="mb-4">
+                            <h4 class="text-primary-red mb-3">{{ _('تفاصيل الجولة') }}</h4>
+                            <div class="bg-light p-4 rounded-3">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span><i class="fas fa-clock me-2"></i>{{ _('المدة') }}</span>
+                                    <strong>{{ plan.duration }} {{ _('أيام') }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span><i class="fas fa-tag me-2"></i>{{ _('السعر') }}</span>
+                                    <strong>{{ plan.price }} {{ _('جنيه مصري') }}</strong>
+                                </div>
+                                
+                                <hr class="my-3">
+                                
+                                <h5 class="mb-3">{{ _('المعالم المشمولة') }}</h5>
+                                <div class="row">
+                                    {% for day, destinations in plan.destinations|groupby('day_number') %}
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-monument text-primary-red me-2"></i>
+                                                <span>{{ destination.attraction.name }}</span>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="mb-3">
-                            {{ form.start_date.label(class="form-label") }}
+                        <div class="mb-4">
+                            {{ form.start_date.label(class="form-label fw-bold") }}
                             {{ form.start_date(class="form-control datepicker", placeholder="YYYY-MM-DD") }}
                             {% if form.start_date.errors %}
                                 {% for error in form.start_date.errors %}
-                                    <span class="text-danger">{{ error }}</span>
+                                    <div class="text-danger mt-1">{{ error }}</div>
                                 {% endfor %}
                             {% endif %}
-                            <div class="form-text">{{ _('Tour will end on') }}: <span id="end_date">--</span></div>
+                            <div class="form-text mt-2">
+                                <i class="fas fa-info-circle me-1"></i>
+                                {{ _('تنتهي الجولة في') }}: <span id="end_date" class="fw-bold">--</span>
+                            </div>
                         </div>
                         
-                        <div class="alert alert-info mb-3">
-                            <p><i class="bi bi-info-circle"></i> {{ _('Your booking will be reviewed by an administrator who will assign a guide.') }}</p>
-                            <p>{{ _('You will receive confirmation within 24 hours.') }}</p>
+                        <div class="alert alert-info border-0 rounded-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <span>{{ _('سيتم مراجعة حجزك من قبل المسؤول وتعيين مرشد سياحي.') }}</span>
+                            <br>
+                            <small class="text-muted">{{ _('ستتلقى تأكيداً خلال 24 ساعة.') }}</small>
                         </div>
                         
-                        <div class="d-grid">
-                            {{ form.submit(class="btn btn-success btn-lg") }}
+                        <div class="d-grid gap-2">
+                            {{ form.submit(class="btn btn-primary btn-lg") }}
                         </div>
                     </form>
                 </div>
             </div>
         </div>
         
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5>{{ _('Booking Information') }}</h5>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary-red text-white py-3">
+                    <h5 class="mb-0">{{ _('معلومات الحجز') }}</h5>
                 </div>
-                <div class="card-body">
-                    <h6>{{ _('Cancellation Policy') }}</h6>
-                    <ul>
-                        <li>{{ _('Free cancellation up to 3 days before the tour') }}</li>
-                        <li>{{ _('50% refund for cancellations 1-2 days before') }}</li>
-                        <li>{{ _('No refund for same-day cancellations') }}</li>
-                    </ul>
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <h6 class="mb-3"><i class="fas fa-ban me-2"></i>{{ _('سياسة الإلغاء') }}</h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>{{ _('إلغاء مجاني حتى 3 أيام قبل الجولة') }}</li>
+                            <li class="mb-2"><i class="fas fa-check text-warning me-2"></i>{{ _('استرداد 50٪ للإلغاء قبل 1-2 يوم') }}</li>
+                            <li class="mb-2"><i class="fas fa-times text-danger me-2"></i>{{ _('لا يوجد استرداد للإلغاء في نفس اليوم') }}</li>
+                        </ul>
+                    </div>
                     
-                    <h6>{{ _('Payment') }}</h6>
-                    <p>{{ _('Payment is collected upon confirmation by the guide at the start of the tour.') }}</p>
+                    <div class="mb-4">
+                        <h6 class="mb-3"><i class="fas fa-money-bill-wave me-2"></i>{{ _('الدفع') }}</h6>
+                        <p class="text-muted">{{ _('يتم تحصيل المبلغ عند بداية الجولة من قبل المرشد السياحي.') }}</p>
+                    </div>
                     
-                    <h6>{{ _('Requirements') }}</h6>
-                    <ul>
-                        <li>{{ _('Valid ID/Passport') }}</li>
-                        <li>{{ _('Comfortable walking shoes') }}</li>
-                        <li>{{ _('Sun protection') }}</li>
-                        <li>{{ _('Water bottle') }}</li>
-                    </ul>
+                    <div>
+                        <h6 class="mb-3"><i class="fas fa-clipboard-list me-2"></i>{{ _('المتطلبات') }}</h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-id-card me-2"></i>{{ _('هوية/جواز سفر ساري') }}</li>
+                            <li class="mb-2"><i class="fas fa-shoe-prints me-2"></i>{{ _('حذاء مريح للمشي') }}</li>
+                            <li class="mb-2"><i class="fas fa-sun me-2"></i>{{ _('واقي شمس') }}</li>
+                            <li class="mb-2"><i class="fas fa-tint me-2"></i>{{ _('زجاجة مياه') }}</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -95,8 +128,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize date picker
-        const datePicker = flatpickr(".datepicker", {
+        flatpickr(".datepicker", {
             minDate: "today",
             dateFormat: "Y-m-d",
             onChange: function(selectedDates, dateStr, instance) {
@@ -104,7 +136,6 @@
             }
         });
         
-        // Calculate end date based on tour duration
         function updateEndDate(startDateStr) {
             const tourDuration = {{ plan.duration }};
             const startDate = new Date(startDateStr);
@@ -118,7 +149,7 @@
             endDate.setDate(startDate.getDate() + tourDuration - 1);
             
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('end_date').textContent = endDate.toLocaleDateString(undefined, options);
+            document.getElementById('end_date').textContent = endDate.toLocaleDateString('ar-EG', options);
         }
     });
 </script>
