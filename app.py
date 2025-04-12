@@ -1,6 +1,7 @@
 import os
 import logging
-from flask import Flask
+from flask import Flask, redirect, url_for, flash, session
+from flask_login import current_user, logout_user
 from extensions import db, login_manager, babel, migrate
 
 # Configure logging
@@ -64,6 +65,8 @@ def create_app():
         def load_user(user_id):
             return User.query.get(int(user_id))
             
+        from datetime import datetime, timedelta
+        
         @app.before_request
         def before_request():
             # تحديث وقت آخر نشاط للمستخدم
