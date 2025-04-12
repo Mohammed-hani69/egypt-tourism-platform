@@ -110,6 +110,12 @@ def attraction_detail(attraction_id):
         avg_rating = sum(review.rating for review in reviews) / len(reviews)
     else:
         avg_rating = 0
+        
+    # Find nearby attractions (in the same region)
+    nearby_attractions = Attraction.query.filter(
+        Attraction.region_id == attraction.region_id,
+        Attraction.id != attraction.id
+    ).limit(3).all()
 
     return render_template('attraction_detail.html',
                            title=attraction.name,
@@ -117,7 +123,9 @@ def attraction_detail(attraction_id):
                            reviews=reviews,
                            restaurants=restaurants,
                            activities=activities,
-                           avg_rating=avg_rating)
+                           avg_rating=avg_rating,
+                           nearby_attractions=nearby_attractions,
+                           Review=Review)
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():

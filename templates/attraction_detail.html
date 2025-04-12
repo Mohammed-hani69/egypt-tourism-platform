@@ -167,7 +167,7 @@
                         </div>
                     </div>
 
-                    {% for review in attraction.reviews.order_by(Review.created_at.desc()).limit(5).all() %}
+                    {% for review in attraction.reviews.order_by(Review.date_posted.desc()).limit(5).all() %}
                         <div class="card mb-3">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between mb-2">
