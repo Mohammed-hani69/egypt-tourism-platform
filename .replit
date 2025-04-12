@@ -68,7 +68,16 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python main.py"
+args = "python init_db.py && python main.py"
+
+[[workflows.workflow]]
+name = "تجهيز قاعدة البيانات"
+author = 41419533
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python init_db.py"
 
 [[ports]]
 localPort = 5000

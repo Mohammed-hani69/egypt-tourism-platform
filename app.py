@@ -7,22 +7,26 @@ from extensions import db, login_manager, babel, migrate
 logging.basicConfig(level=logging.DEBUG)
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, instance_relative_config=True)
     
     # Configure app
     app.secret_key = os.environ.get("SESSION_SECRET", "dev_secret_key")
     
     # التأكد من وجود مجلد instance
-    instance_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance')
-    if not os.path.exists(instance_path):
-        os.makedirs(instance_path, exist_ok=True)
-        print(f"تم إنشاء مجلد instance: {instance_path}")
+    try:
+        os.makedirs(app.instance_path, exist_ok=True)
+        print(f"تم التأكد من وجود مجلد instance: {app.instance_path}")
+    except OSError:
+        print(f"غير قادر على إنشاء مجلد instance")
     
     # Database configuration
+    sqlite_path = os.path.join(app.instance_path, 'egypt_tourism.db')
     app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
         "DATABASE_URL",
-        "sqlite:///instance/egypt_tourism.db"
+        f"sqlite:///{sqlite_path}"
     )
+    print(f"مسار قاعدة البيانات: {sqlite_path}")
+    
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
         "pool_recycle": 300,
         "pool_pre_ping": True,
