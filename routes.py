@@ -117,53 +117,89 @@ def attraction_detail(attraction_id):
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
+    # إذا كان المستخدم مسجل بالفعل، يتم توجيهه للصفحة الرئيسية
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     
     form = RegistrationForm()
     if form.validate_on_submit():
-        # Check if user selected at least one role
-        if not (form.is_guide.data or form.is_student.data or form.is_tourist.data):
-            flash('Please select at least one user type.', 'danger')
-            return render_template('register.html', title='Register', form=form)
-        
-        # Create new user with basic info
-        user = User(
-            username=form.username.data, 
-            email=form.email.data,
-            is_guide=form.is_guide.data,
-            is_student=form.is_student.data,
-            is_tourist=form.is_tourist.data,
-            phone=form.phone.data,
-            country=form.country.data
-        )
-        
-        # Add additional information for guides and students
-        if form.is_guide.data or form.is_student.data:
-            user.governorate = form.governorate.data
-            user.city = form.city.data
-            user.education_level = form.education_level.data
-            user.university = form.university.data
-        
-        # Set password and save user
-        user.set_password(form.password.data)
-        
-        # Check if profile is complete
-        user.profile_completed = user.is_profile_complete()
-        
-        db.session.add(user)
-        db.session.commit()
-        
-        # If user is a guide, create guide profile
-        if form.is_guide.data:
-            guide = Guide(user_id=user.id)
-            db.session.add(guide)
+        try:
+            # التحقق من اختيار نوع المستخدم
+            if not (form.is_guide.data or form.is_student.data or form.is_tourist.data):
+                flash('يرجى اختيار نوع المستخدم على الأقل.', 'danger')
+                return render_template('register.html', title='إنشاء حساب جديد', form=form)
+            
+            # التحقق من أن البريد الإلكتروني واسم المستخدم غير موجودين
+            existing_email = User.query.filter_by(email=form.email.data).first()
+            if existing_email:
+                flash('البريد الإلكتروني مسجل بالفعل. يرجى استخدام بريد إلكتروني آخر.', 'danger')
+                return render_template('register.html', title='إنشاء حساب جديد', form=form)
+                
+            existing_username = User.query.filter_by(username=form.username.data).first()
+            if existing_username:
+                flash('اسم المستخدم مستخدم بالفعل. يرجى اختيار اسم مستخدم آخر.', 'danger')
+                return render_template('register.html', title='إنشاء حساب جديد', form=form)
+            
+            # إنشاء مستخدم جديد بالمعلومات الأساسية
+            user = User(
+                username=form.username.data, 
+                email=form.email.data,
+                is_guide=form.is_guide.data,
+                is_student=form.is_student.data,
+                is_tourist=form.is_tourist.data,
+                phone=form.phone.data,
+                country=form.country.data,
+                date_joined=datetime.now()
+            )
+            
+            # إضافة معلومات إضافية للمرشدين والطلاب
+            if form.is_guide.data or form.is_student.data:
+                user.governorate = form.governorate.data
+                user.city = form.city.data
+                user.education_level = form.education_level.data
+                user.university = form.university.data
+            
+            # تعيين كلمة المرور وحفظ المستخدم
+            user.set_password(form.password.data)
+            
+            # التحقق مما إذا كان الملف الشخصي مكتمل
+            user.profile_completed = user.is_profile_complete()
+            
+            # حفظ في قاعدة البيانات في transaction واحدة
+            db.session.add(user)
+            db.session.flush()  # للحصول على user.id قبل الالتزام النهائي
+            
+            # إذا كان المستخدم مرشدًا، قم بإنشاء ملف مرشد
+            if form.is_guide.data:
+                guide = Guide(user_id=user.id)
+                db.session.add(guide)
+            
             db.session.commit()
-        
-        flash('Your account has been created! You can now login.', 'success')
-        return redirect(url_for('main.login'))
+            
+            # قم بتسجيل الدخول تلقائيًا بعد التسجيل
+            login_user(user)
+            session['user_id'] = user.id
+            session['username'] = user.username
+            
+            flash('تم إنشاء حسابك بنجاح وتم تسجيل دخولك تلقائيًا!', 'success')
+            
+            # توجيه حسب نوع المستخدم
+            if user.is_guide:
+                return redirect(url_for('main.guide_dashboard'))
+            elif user.is_student:
+                return redirect(url_for('main.student_dashboard'))
+            elif user.is_tourist:
+                return redirect(url_for('main.tourist_dashboard'))
+            else:
+                return redirect(url_for('main.index'))
+                
+        except Exception as e:
+            # استرجاع قاعدة البيانات في حالة حدوث خطأ
+            db.session.rollback()
+            flash(f'حدث خطأ أثناء إنشاء الحساب: {str(e)}', 'danger')
+            return render_template('register.html', title='إنشاء حساب جديد', form=form)
     
-    return render_template('register.html', title='Register', form=form)
+    return render_template('register.html', title='إنشاء حساب جديد', form=form)
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
@@ -175,18 +211,39 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         
         if user and user.check_password(form.password.data):
-            login_user(user, remember=form.remember.data)
+            # تعيين وقت انتهاء الجلسة (جلسة دائمة إذا تم اختيار تذكرني)
+            session.permanent = form.remember.data
+            
+            # تسجيل دخول المستخدم
+            login_user(user, remember=form.remember.data, duration=datetime.timedelta(days=30) if form.remember.data else None)
+            
+            # تخزين معلومات إضافية في الجلسة
+            session['user_id'] = user.id
+            session['username'] = user.username
+            session['user_roles'] = []
+            if user.is_admin: session['user_roles'].append('admin')
+            if user.is_guide: session['user_roles'].append('guide')
+            if user.is_student: session['user_roles'].append('student')
+            if user.is_tourist: session['user_roles'].append('tourist')
+            
+            # توجيه المستخدم لصفحة التالية أو الرئيسية
             next_page = request.args.get('next')
-            flash('Login successful!', 'success')
+            flash('تم تسجيل الدخول بنجاح!', 'success')
             return redirect(next_page or url_for('main.index'))
         else:
-            flash('Login unsuccessful. Please check email and password.', 'danger')
+            flash('فشل تسجيل الدخول. تأكد من صحة البريد الإلكتروني وكلمة المرور.', 'danger')
     
-    return render_template('login.html', title='Login', form=form)
+    return render_template('login.html', title='تسجيل الدخول', form=form)
 
 @main.route('/logout')
 def logout():
+    # تسجيل خروج المستخدم وإزالة بيانات الجلسة
     logout_user()
+    
+    # مسح جميع بيانات الجلسة للأمان
+    session.clear()
+    
+    flash('تم تسجيل الخروج بنجاح!', 'info')
     return redirect(url_for('main.index'))
 
 @main.route('/profile')

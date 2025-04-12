@@ -8,6 +8,8 @@ class Base(DeclarativeBase):
     pass
 
 db = SQLAlchemy(model_class=Base)
+# إعداد مدير تسجيل الدخول مع خيارات أمان إضافية
 login_manager = LoginManager()
+login_manager.session_protection = 'strong'  # حماية الجلسة القوية
 migrate = Migrate()
 babel = Babel()
