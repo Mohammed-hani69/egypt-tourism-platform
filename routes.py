@@ -22,10 +22,14 @@ def get_locale():
     # Default to English
     return 'en'
 
+def count_reviews_by_rating(reviews, rating):
+    return sum(1 for review in reviews if review.rating == rating)
+
 @main.before_app_request
 def before_request():
     g.locale = str(get_locale())
     g.search_form = SearchForm()
+    g.count_reviews_by_rating = count_reviews_by_rating
 
 # Replace all @app decorators with @main decorators
 @main.route('/set_language/<language>')
