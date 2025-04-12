@@ -154,7 +154,7 @@
                             <div class="rating-bars">
                                 {% for i in range(5, 0, -1) %}
                                     {% set count = g.count_reviews_by_rating(attraction.reviews, i) %}
-                                    {% set percentage = (count / attraction.reviews|length * 100) if attraction.reviews else 0 %}
+                                    {% set percentage = (count / reviews|length * 100) if reviews|length > 0 else 0 %}
                                     <div class="d-flex align-items-center mb-2">
                                         <span class="me-2">{{ i }} <i class="fas fa-star text-warning"></i></span>
                                         <div class="progress flex-grow-1" style="height: 8px;">
