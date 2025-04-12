@@ -1,7 +1,6 @@
 import os
 import logging
-from flask import Flask, redirect, url_for, flash, session
-from flask_login import current_user, logout_user
+from flask import Flask
 from extensions import db, login_manager, babel, migrate
 
 # Configure logging
@@ -12,9 +11,6 @@ def create_app():
     
     # Configure app
     app.secret_key = os.environ.get("SESSION_SECRET", "dev_secret_key")
-    app.config['PERMANENT_SESSION_LIFETIME'] = 86400  # حفظ الجلسة لمدة يوم (24 ساعة)
-    app.config['SESSION_COOKIE_SECURE'] = True  # تأمين ملف تعريف الارتباط
-    app.config['SESSION_COOKIE_HTTPONLY'] = True  # منع الوصول عبر جافا سكريبت
     
     # التأكد من وجود مجلد instance
     try:
@@ -49,43 +45,14 @@ def create_app():
     
     # Configure login
     login_manager.login_view = 'main.login'
-    login_manager.login_message = 'يرجى تسجيل الدخول للوصول إلى هذه الصفحة.'
-    login_manager.login_message_category = 'info'
-    login_manager.refresh_view = 'main.login'
-    login_manager.needs_refresh_message = 'يرجى إعادة تسجيل الدخول لتأكيد هويتك.'
-    login_manager.needs_refresh_message_category = 'info'
     
     with app.app_context():
         # Import models here to avoid circular imports
         from models import User
-        from datetime import datetime, timedelta
-        from flask import session
         
         @login_manager.user_loader
         def load_user(user_id):
             return User.query.get(int(user_id))
-            
-        from datetime import datetime, timedelta
-        
-        @app.before_request
-        def before_request():
-            # تحديث وقت آخر نشاط للمستخدم
-            if current_user.is_authenticated:
-                # فحص وقت آخر نشاط، إذا مر وقت طويل، أعد تحقق من صلاحية الجلسة
-                if 'last_activity' in session:
-                    last_activity = datetime.fromisoformat(session['last_activity'])
-                    # فحص إذا مرت ساعة دون نشاط
-                    if datetime.now() - last_activity > timedelta(hours=1):
-                        # تحقق من المستخدم في قاعدة البيانات للتأكد من أن الحساب لم يتم حظره أو تعديله
-                        user = User.query.get(current_user.id)
-                        if not user:
-                            logout_user()
-                            session.clear()
-                            flash('انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى.', 'warning')
-                            return redirect(url_for('main.login'))
-                
-                # تحديث وقت آخر نشاط
-                session['last_activity'] = datetime.now().isoformat()
         
         # Import and register blueprints
         from routes import main, get_locale
