@@ -118,7 +118,7 @@
                             <h5 class="card-title">{{ guide.user.username }}</h5>
 
                             <div class="mb-2">
-                                {% set rating = guide.average_rating or 0 %}
+                                {% set rating = 0 %}
                                 {% for i in range(5) %}
                                     {% if i < rating|int %}
                                         <i class="fas fa-star text-warning"></i>
@@ -128,7 +128,7 @@
                                         <i class="far fa-star text-warning"></i>
                                     {% endif %}
                                 {% endfor %}
-                                <small class="text-muted">({{ guide.reviews.count() }})</small>
+                                <small class="text-muted">(0)</small>
                             </div>
 
                             <p class="card-text">{{ guide.bio[:100] }}{% if guide.bio|length > 100 %}...{% endif %}</p>
