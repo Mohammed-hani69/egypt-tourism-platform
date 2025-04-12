@@ -738,12 +738,32 @@ def tourist_dashboard():
 @main.route('/tourist/tour_plans')
 @login_required
 def tour_plans():
-    # Get all tour plans
-    plans = TourPlan.query.all()
+    # الحصول على معرف المعلم السياحي إذا تم توفيره في عنوان URL
+    attraction_id = request.args.get('attraction_id', type=int)
+    
+    # الحصول على جميع خطط الرحلات
+    query = TourPlan.query
+    
+    # تصفية الخطط حسب المعلم السياحي إذا تم توفيره
+    if attraction_id:
+        # الحصول على الخطط التي تشمل هذا المعلم السياحي
+        plans_with_attraction = []
+        all_plans = query.all()
+        
+        for plan in all_plans:
+            # التحقق مما إذا كانت الخطة تتضمن معلمًا سياحيًا محددًا
+            destinations = plan.destinations.all()
+            if any(dest.attraction_id == attraction_id for dest in destinations):
+                plans_with_attraction.append(plan)
+        
+        plans = plans_with_attraction
+    else:
+        plans = query.all()
 
     return render_template('tourist/tour_plans.html',
                           title='Tour Plans',
-                          plans=plans)
+                          plans=plans,
+                          Attraction=Attraction)
 
 @main.route('/tour_plan/<int:plan_id>')
 @main.route('/tourist/tour_plan/<int:plan_id>')
