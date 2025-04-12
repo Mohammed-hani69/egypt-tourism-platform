@@ -223,6 +223,8 @@ class TourBooking(db.Model):
     end_date = db.Column(db.Date, nullable=False)
     status = db.Column(db.String(20), default='pending')  # pending, confirmed, completed, cancelled
     booking_date = db.Column(db.DateTime, default=datetime.utcnow)
+    number_of_people = db.Column(db.Integer, nullable=False)
+    notes = db.Column(db.Text, nullable=True)
     
     # Relationships
     tourist = db.relationship('User', foreign_keys=[tourist_id], backref=db.backref('tour_bookings', lazy='dynamic'))
