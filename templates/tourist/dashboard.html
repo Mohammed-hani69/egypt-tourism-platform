@@ -21,7 +21,7 @@
                         </div>
                         <h5 class="card-title">{{ _('جميع الحجوزات') }}</h5>
                         <h3 class="card-text">{{ booking_count }}</h3>
-                        <a href="{{ url_for('tourist.bookings') }}" class="btn btn-sm btn-outline-primary mt-3">{{ _('إدارة الحجوزات') }}</a>
+                        <a href="{{ url_for('main.tourist_dashboard') }}" class="btn btn-sm btn-outline-primary mt-3">{{ _('إدارة الحجوزات') }}</a>
                     </div>
                 </div>
             </div>
@@ -34,7 +34,7 @@
                         </div>
                         <h5 class="card-title">{{ _('الرحلات النشطة') }}</h5>
                         <h3 class="card-text">{{ active_tour_count }}</h3>
-                        <a href="{{ url_for('tourist.active_tours') }}" class="btn btn-sm btn-outline-success mt-3">{{ _('استعراض الرحلات') }}</a>
+                        <a href="{{ url_for('main.tour_plans') }}" class="btn btn-sm btn-outline-success mt-3">{{ _('استعراض الرحلات') }}</a>
                     </div>
                 </div>
             </div>
@@ -47,7 +47,7 @@
                         </div>
                         <h5 class="card-title">{{ _('المراجعات المقدمة') }}</h5>
                         <h3 class="card-text">{{ review_count }}</h3>
-                        <a href="{{ url_for('tourist.my_reviews') }}" class="btn btn-sm btn-outline-info mt-3">{{ _('عرض المراجعات') }}</a>
+                        <a href="{{ url_for('main.profile') }}" class="btn btn-sm btn-outline-info mt-3">{{ _('عرض المراجعات') }}</a>
                     </div>
                 </div>
             </div>
