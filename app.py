@@ -25,6 +25,7 @@ def create_app():
         "DATABASE_URL",
         f"sqlite:///{sqlite_path}"
     )
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     print(f"مسار قاعدة البيانات: {sqlite_path}")
     
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {

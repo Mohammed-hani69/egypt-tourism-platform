@@ -10,7 +10,7 @@ def create_directory(path):
         os.makedirs(path, exist_ok=True)
         print(f"تم إنشاء المجلد: {path}")
 
-def initialize_database():
+def init_db():
     """تهيئة قاعدة البيانات وإنشاء البيانات الأساسية"""
     print("بدء تهيئة قاعدة البيانات...")
     
@@ -24,8 +24,13 @@ def initialize_database():
     except OSError:
         print(f"غير قادر على إنشاء مجلد instance")
     
-    # إعداد قاعدة البيانات
+    # حذف قاعدة البيانات القديمة إذا كانت موجودة
     sqlite_path = os.path.join(app.instance_path, 'egypt_tourism.db')
+    if os.path.exists(sqlite_path):
+        os.remove(sqlite_path)
+        print(f"تم حذف قاعدة البيانات القديمة: {sqlite_path}")
+    
+    # إعداد قاعدة البيانات
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{sqlite_path}"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     
@@ -37,46 +42,49 @@ def initialize_database():
     
     with app.app_context():
         # استيراد النماذج هنا لتجنب الدوائر المتداخلة
-        from models import User, Region
+        from models import User, Region, Attraction, Restaurant, Activity, Review, Guide, ChatGroup, ChatGroupMember, ChatMessage, TourPlan, TourPlanDestination, TourBooking, TourProgress, TourPhoto, LanguagePractice
         
         # إنشاء جميع الجداول
         db.create_all()
         print("تم إنشاء جميع الجداول بنجاح!")
         
-        # التحقق من وجود مسؤول النظام
-        admin = User.query.filter_by(is_admin=True).first()
-        if not admin:
-            # إنشاء مستخدم مسؤول
-            admin = User(
-                username="admin",
-                email="admin@example.com",
-                is_admin=True,
-                phone="+201234567890",
-                country="مصر"
-            )
-            admin.set_password("admin123")
-            db.session.add(admin)
-            db.session.commit()
-            print("تم إنشاء حساب المسؤول بنجاح!")
-        
-        # التحقق من وجود منطقة واحدة على الأقل
-        region_count = Region.query.count()
-        if region_count == 0:
-            # إنشاء منطقة افتراضية
-            region = Region(
-                name="القاهرة",
-                name_ar="القاهرة",
-                description="The capital city of Egypt",
-                description_ar="عاصمة جمهورية مصر العربية"
-            )
-            db.session.add(region)
-            db.session.commit()
-            print("تم إنشاء منطقة افتراضية!")
+        try:
+            # إنشاء مستخدم مسؤول افتراضي
+            admin = User.query.filter_by(is_admin=True).first()
+            if not admin:
+                admin = User(
+                    username="admin",
+                    email="admin@example.com",
+                    is_admin=True,
+                    is_guide=False,
+                    is_student=False,
+                    is_tourist=False,
+                    phone="123456789",
+                    country="Egypt",
+                    profile_completed=True
+                )
+                admin.set_password("admin123")
+                db.session.add(admin)
+                db.session.commit()
+                print("تم إنشاء مستخدم مسؤول افتراضي")
+                
+            # إضافة بعض البيانات الأساسية
+            if Region.query.count() == 0:
+                # إضافة المناطق الأساسية
+                regions = [
+                    Region(name="Cairo", name_ar="القاهرة", description="Egypt's capital city", description_ar="عاصمة مصر"),
+                    Region(name="Luxor", name_ar="الأقصر", description="Ancient Egyptian city", description_ar="مدينة مصرية قديمة"),
+                    Region(name="Alexandria", name_ar="الإسكندرية", description="Coastal Mediterranean city", description_ar="مدينة ساحلية على البحر المتوسط"),
+                ]
+                db.session.add_all(regions)
+                db.session.commit()
+                print("تم إضافة المناطق الأساسية")
+
+            print("تم تهيئة قاعدة البيانات بنجاح!")
+            
+        except Exception as e:
+            print(f"حدث خطأ أثناء تهيئة قاعدة البيانات: {str(e)}")
+            db.session.rollback()
 
 if __name__ == "__main__":
-    try:
-        initialize_database()
-        print("تم تهيئة قاعدة البيانات بنجاح!")
-    except Exception as e:
-        print(f"حدث خطأ أثناء تهيئة قاعدة البيانات: {str(e)}")
-        sys.exit(1)
+    init_db()
