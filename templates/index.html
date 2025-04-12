@@ -19,6 +19,19 @@
             --gold: #ffd700;
         }
         
+        .page-header {
+            background: linear-gradient(rgba(231, 76, 60, 0.9), rgba(192, 57, 43, 0.8));
+            color: var(--white);
+            padding: 2rem 0;
+            margin-bottom: 0;
+        }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
         body {
             font-family: 'Cairo', sans-serif;
             background: linear-gradient(135deg, var(--off-white) 0%, var(--white) 100%);
@@ -744,8 +757,25 @@
     </header>
 
     <!-- Main Content -->
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container text-center">
+            <h1 class="mb-3">{{ _('اكتشف مصر') }}</h1>
+            <div class="d-flex justify-content-center align-items-center">
+                <span class="badge bg-light text-dark me-3"><i class="fas fa-globe text-danger me-1"></i> {{ _('وجهتك السياحية المفضلة') }}</span>
+                <div class="text-warning">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Hero Section with Slider -->
-    <section class="hero-section">
+    <section class="hero-section" style="height: 500px;">
         <div class="slider-container">
             <img class="slider-image active" src="https://www.emaratalyoum.com/polopoly_fs/1.1127101.1534438109!/image/image.jpg" alt="Egypt 1">
             <img class="slider-image" src="https://www.sis.gov.eg/Content/Upload/slider/4201612105041387.jpg" alt="Egypt 2">
