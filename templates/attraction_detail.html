@@ -220,7 +220,7 @@
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i> {{ _('يمكنك أيضًا إضافة هذا المعلم إلى خطة رحلتك المخصصة.') }}
                     {% if current_user.is_authenticated %}
-                        <a href="{{ url_for('main.custom_tour_plan') }}" class="alert-link">{{ _('اصنع خطتك الخاصة') }}</a>
+                        <a href="{{ url_for('main.tour_plans') }}" class="alert-link">{{ _('اصنع خطتك الخاصة') }}</a>
                     {% else %}
                         <a href="{{ url_for('main.login') }}" class="alert-link">{{ _('سجل دخولك لإنشاء خطة') }}</a>
                     {% endif %}
