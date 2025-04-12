@@ -19,7 +19,7 @@
             --gold: #ffd700;
             --dark-gold: #d4af37;
         }
-        
+
         body {
             font-family: 'Cairo', sans-serif;
             background-color: #fcf7f7;
@@ -27,7 +27,7 @@
             color: #333;
             overflow-x: hidden;
         }
-        
+
         /* Header Styles */
         .top-header {
             background: linear-gradient(120deg, var(--primary-red), var(--deep-red));
@@ -39,7 +39,7 @@
         .top-header .contact-info {
             font-size: 0.9rem;
         }
-        
+
         .social-icons a {
             display: inline-flex;
             align-items: center;
@@ -52,7 +52,7 @@
             margin: 0 5px;
             transition: all 0.3s;
         }
-        
+
         .social-icons a:hover {
             background-color: var(--gold);
             color: var(--primary-red);
@@ -68,12 +68,12 @@
             top: 0;
             z-index: 1000;
         }
-        
+
         .navbar {
             background-color: transparent;
             padding: 0;
         }
-        
+
         .navbar-brand {
             font-weight: 700;
             color: var(--primary-red);
@@ -81,17 +81,17 @@
             text-shadow: 1px 1px 0px rgba(0,0,0,0.1);
             transition: all 0.3s;
         }
-        
+
         .navbar-brand:hover {
             color: var(--deep-red);
             transform: scale(1.05);
         }
-        
+
         .navbar-brand i {
             color: var(--gold);
             margin-right: 5px;
         }
-        
+
         .nav-link {
             color: #333;
             font-weight: 600;
@@ -100,11 +100,11 @@
             transition: all 0.3s;
             padding: 10px 5px;
         }
-        
+
         .nav-link:hover {
             color: var(--primary-red);
         }
-        
+
         .nav-link::after {
             content: '';
             position: absolute;
@@ -115,11 +115,11 @@
             left: 0;
             transition: width 0.3s ease;
         }
-        
+
         .nav-link:hover::after {
             width: 100%;
         }
-        
+
         .nav-item .btn {
             padding: 8px 20px;
             margin: 5px;
@@ -128,12 +128,12 @@
             transition: all 0.3s;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        
+
         .nav-item .btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 15px rgba(0,0,0,0.2);
         }
-        
+
         .dropdown-menu {
             border-radius: 10px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
@@ -141,18 +141,18 @@
             padding: 10px;
             margin-top: 10px;
         }
-        
+
         .dropdown-item {
             padding: 10px 20px;
             border-radius: 5px;
             transition: all 0.2s;
         }
-        
+
         .dropdown-item:hover {
             background-color: var(--light-gray);
             color: var(--primary-red);
         }
-        
+
         .dropdown-item i {
             margin-right: 8px;
             width: 20px;
@@ -162,7 +162,7 @@
         .navbar-nav {
             align-items: center;
         }
-        
+
         /* Hero Section */
         .attractions-hero {
             height: 60vh;
@@ -174,7 +174,7 @@
             border-bottom: 5px solid var(--gold);
             animation: heroGradient 10s infinite alternate;
         }
-        
+
         @keyframes heroGradient {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -186,7 +186,7 @@
             opacity: 0.1;
             z-index: 1;
         }
-        
+
         .floating-shape.circle {
             width: 300px;
             height: 300px;
@@ -196,7 +196,7 @@
             right: -150px;
             animation: float 15s infinite linear;
         }
-        
+
         .floating-shape.triangle {
             width: 0;
             height: 0;
@@ -207,7 +207,7 @@
             left: -200px;
             animation: float 20s infinite linear reverse;
         }
-        
+
         .floating-shape.square {
             width: 200px;
             height: 200px;
@@ -217,7 +217,7 @@
             transform: rotate(45deg);
             animation: float 18s infinite linear;
         }
-        
+
         @keyframes float {
             0% { transform: translate(0, 0) rotate(0deg); }
             33% { transform: translate(20px, 10px) rotate(120deg); }
@@ -237,7 +237,7 @@
             z-index: 2;
             padding: 0 2rem;
         }
-        
+
         .attractions-hero-content h1 {
             font-size: 3.5rem;
             font-weight: 900;
@@ -245,7 +245,7 @@
             margin-bottom: 1.5rem;
             animation: fadeInDown 1.2s ease-out;
         }
-        
+
         .attractions-hero-content p {
             font-size: 1.5rem;
             font-weight: 400;
@@ -253,7 +253,7 @@
             text-shadow: 2px 2px 3px rgba(0,0,0,0.3);
             animation: fadeInUp 1.2s ease-out;
         }
-        
+
         @keyframes fadeInDown {
             from {
                 opacity: 0;
@@ -264,7 +264,7 @@
                 transform: translateY(0);
             }
         }
-        
+
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -275,7 +275,7 @@
                 transform: translateY(0);
             }
         }
-        
+
         /* Filters Section */
         .filter-section {
             background: var(--white);
@@ -287,7 +287,7 @@
             position: relative;
             transition: all 0.5s;
         }
-        
+
         .filter-section::before {
             content: '';
             position: absolute;
@@ -303,7 +303,7 @@
             mask-composite: exclude;
             pointer-events: none;
         }
-        
+
         .filter-section:hover {
             box-shadow: 0 20px 40px rgba(231, 76, 60, 0.15);
             transform: translateY(-5px);
@@ -330,14 +330,14 @@
             background: linear-gradient(to right, var(--primary-red), var(--gold));
             border-radius: 4px;
         }
-        
+
         .form-label {
             font-weight: 600;
             color: var(--primary-red);
             font-size: 1.1rem;
             margin-bottom: 0.8rem;
         }
-        
+
         .form-select {
             border: 2px solid var(--light-red);
             border-radius: 15px;
@@ -347,12 +347,12 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             cursor: pointer;
         }
-        
+
         .form-select:focus {
             border-color: var(--gold);
             box-shadow: 0 0 0 0.25rem rgba(231, 76, 60, 0.25);
         }
-        
+
         /* Attractions Grid */
         .attraction-card {
             border: none;
@@ -381,7 +381,7 @@
             transform-origin: left;
             transition: transform 0.4s ease;
         }
-        
+
         .attraction-card:hover::after {
             transform: scaleX(1);
         }
@@ -391,30 +391,30 @@
             object-fit: cover;
             transition: all 0.7s;
         }
-        
+
         .attraction-card:hover img {
             transform: scale(1.1);
         }
-        
+
         .card-title {
             font-weight: 700;
             color: var(--primary-red);
             font-size: 1.4rem;
             margin-bottom: 1rem;
         }
-        
+
         .card-text {
             color: #555;
             font-size: 1rem;
             line-height: 1.6;
         }
-        
+
         .card-footer {
             background-color: transparent;
             border-top: none;
             padding: 1.5rem;
         }
-        
+
         .btn-outline-primary {
             color: var(--primary-red);
             border-color: var(--primary-red);
@@ -423,14 +423,14 @@
             transition: all 0.3s;
             padding: 10px 25px;
         }
-        
+
         .btn-outline-primary:hover {
             background-color: var(--primary-red);
             color: var(--white);
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3);
         }
-        
+
         /* Practice Card Styles */
         .practice-card {
             border: none;
@@ -556,7 +556,7 @@
             transform-origin: left;
             transition: transform 0.4s ease;
         }
-        
+
         .benefits-card:hover::after {
             transform: scaleX(1);
         }
@@ -623,18 +623,18 @@
             opacity: 0;
             animation: fadeIn 1.2s ease-in forwards;
         }
-        
+
         @keyframes fadeIn {
-            from { 
+            from {
                 opacity: 0;
                 transform: translateY(30px);
             }
-            to { 
+            to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        
+
         /* Footer */
         .main-footer {
             background: linear-gradient(135deg, var(--primary-red), var(--deep-red));
@@ -656,7 +656,7 @@
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
             opacity: 0.1;
         }
-        
+
         .footer-heading {
             color: var(--white);
             position: relative;
@@ -664,7 +664,7 @@
             margin-bottom: 2rem;
             font-size: 1.4rem;
         }
-        
+
         .footer-heading::after {
             content: '';
             position: absolute;
@@ -675,21 +675,21 @@
             background: var(--gold);
             border-radius: 3px;
         }
-        
+
         .footer-links {
             list-style: none;
             padding: 0;
         }
-        
+
         .footer-links li {
             margin-bottom: 15px;
             transition: all 0.3s;
         }
-        
+
         .footer-links li:hover {
             transform: translateX(5px);
         }
-        
+
         .footer-links a {
             color: var(--white);
             text-decoration: none;
@@ -697,7 +697,7 @@
             opacity: 0.9;
             display: inline-block;
         }
-        
+
         .footer-links a:hover {
             color: var(--gold);
             opacity: 1;
@@ -707,7 +707,7 @@
             margin-right: 10px;
             color: var(--gold);
         }
-        
+
         .footer-bottom {
             background: var(--secondary-red);
             padding: 20px 0;
@@ -747,7 +747,7 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
-        
+
         /* Responsive Styles */
         @media (max-width: 991px) {
             .navbar-collapse {
@@ -757,37 +757,37 @@
                 box-shadow: 0 10px 30px rgba(0,0,0,0.1);
                 margin-top: 10px;
             }
-            
+
             .attractions-hero-content h1 {
                 font-size: 2.5rem;
             }
-            
+
             .attractions-hero-content p {
                 font-size: 1.2rem;
             }
-            
+
             .section-heading {
                 font-size: 2rem;
             }
         }
-        
+
         @media (max-width: 768px) {
             .attractions-hero {
                 height: 50vh;
             }
-            
+
             .attractions-hero-content h1 {
                 font-size: 2rem;
             }
-            
+
             .attractions-hero-content p {
                 font-size: 1.1rem;
             }
-            
+
             .floating-shape {
                 display: none;
             }
-            
+
             .practice-card {
                 margin-bottom: 2rem;
             }
@@ -796,33 +796,33 @@
                 width: 100px;
                 height: 100px;
             }
-            
+
             .section-heading {
                 font-size: 1.8rem;
             }
-            
+
             .filter-section {
                 padding: 1.5rem;
             }
         }
-        
+
         @media (max-width: 576px) {
             .attractions-hero {
                 height: 40vh;
             }
-            
+
             .top-header .contact-info {
                 display: none;
             }
-            
+
             .social-icons {
                 text-align: center !important;
             }
-            
+
             .navbar-brand {
                 font-size: 1.5rem;
             }
-            
+
             .section-heading {
                 font-size: 1.6rem;
             }
@@ -830,233 +830,199 @@
     </style>
 </head>
 <body>
-<!-- Top Header -->
-<div class="top-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <div class="contact-info">
-                    <span class="me-3"><i class="fas fa-phone me-2"></i>+20 123 456 789</span>
-                    <span><i class="fas fa-envelope me-2"></i>info@discovergypt.com</span>
-                </div>
-            </div>
-            <div class="col-md-6 text-end">
-                <div class="social-icons">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                </div>
-            </div>
-        </div>
+{% extends "base.html" %}
+
+{% block title %}{{ _('تعلم اللغات - اكتشف مصر') }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container text-center">
+        <h1 class="mb-3">{{ _('تعلم اللغات') }}</h1>
+        <p class="lead mb-0">{{ _('تحسين مهاراتك اللغوية مع متحدثين أصليين') }}</p>
     </div>
-</div>
+</section>
 
-<!-- Main Header -->
-<header class="main-header">
-    <div class="container">
-        <nav class="navbar navbar-expand-lg">
-            <a class="navbar-brand logo" href="{{ url_for('main.index') }}">
-                <i class="fas fa-pyramid"></i> {{ _('اكتشف مصر') }}
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.index') }}">{{ _('الرئيسية') }}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.attractions') }}">{{ _('المعالم السياحية') }}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.guides') }}">{{ _('المرشدين السياحيين') }}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.language_practice') }}">{{ _('تعلم اللغات') }}</a>
-                    </li>
-                    {% if current_user.is_authenticated %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user-circle"></i> {{ _('حسابي') }}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="{{ url_for('main.profile') }}"><i class="fas fa-user"></i> {{ _('الملف الشخصي') }}</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt"></i> {{ _('تسجيل الخروج') }}</a></li>
-                            </ul>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="btn btn-outline-primary btn-sm ms-2" href="{{ url_for('main.login') }}">{{ _('تسجيل الدخول') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn btn-primary btn-sm ms-2" href="{{ url_for('main.register') }}">{{ _('التسجيل') }}</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </nav>
-    </div>
-</header>
-
-
-    <!-- Hero Section -->
-    <div class="attractions-hero">
-        <div class="floating-shape circle"></div>
-        <div class="floating-shape triangle"></div>
-        <div class="attractions-hero-content">
-            <h1>Language Practice</h1>
-            <p>Connect with language students and practice your language skills while exploring Egypt</p>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Language Filter Section -->
-        <div class="filter-section fade-in">
-            <h2 class="section-heading">Choose Your Language</h2>
-            <div class="row">
-                <div class="col-md-6 mx-auto">
-                    <label for="language-filter" class="form-label">Filter by Language:</label>
-                    <select id="language-filter" class="form-select" onchange="window.location.href='{{ url_for('main.language_practice') }}?language=' + this.value">
-                        <option value="">All Languages</option>
-                        <option value="English" {% if selected_language == 'English' %}selected{% endif %}>English</option>
-                        <option value="Arabic" {% if selected_language == 'Arabic' %}selected{% endif %}>Arabic</option>
-                        <option value="French" {% if selected_language == 'French' %}selected{% endif %}>French</option>
-                        <option value="German" {% if selected_language == 'German' %}selected{% endif %}>German</option>
-                        <option value="Spanish" {% if selected_language == 'Spanish' %}selected{% endif %}>Spanish</option>
-                        <option value="Italian" {% if selected_language == 'Italian' %}selected{% endif %}>Italian</option>
-                        <option value="Russian" {% if selected_language == 'Russian' %}selected{% endif %}>Russian</option>
-                        <option value="Chinese" {% if selected_language == 'Chinese' %}selected{% endif %}>Chinese</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- Language Practice Opportunities -->
+<div class="container">
+    <!-- Search and Filters -->
+    <div class="content-section">
         <div class="row">
-            {% if opportunities %}
-                {% for opportunity in opportunities %}
-                    <div class="col-md-4 mb-4">
-                        <div class="card practice-card h-100">
-                            <div class="card-body text-center">
-                                <img src="{{ opportunity.student.profile_pic or 'https://via.placeholder.com/150' }}" class="student-avatar mb-3" alt="{{ opportunity.student.username }}">
-                                <h5 class="card-title">{{ opportunity.student.username }}</h5>
-                                <p class="badge bg-primary mb-2">{{ opportunity.language }} - {{ opportunity.proficiency_level }}</p>
-                                {% if opportunity.availability %}
-                                    <p><strong>Availability:</strong> {{ opportunity.availability }}</p>
-                                {% endif %}
-                                {% if opportunity.interests %}
-                                    <p><strong>Interests:</strong> {{ opportunity.interests }}</p>
-                                {% endif %}
-                                {% if opportunity.student.bio %}
-                                    <p class="card-text">{{ opportunity.student.bio[:150] }}{% if opportunity.student.bio|length > 150 %}...{% endif %}</p>
-                                {% endif %}
-                                <a href="mailto:{{ opportunity.student.email }}" class="btn btn-primary">
-                                    <i class="fas fa-envelope me-2"></i>Contact
-                                </a>
-                            </div>
+            <div class="col-md-6">
+                <form action="{{ url_for('main.language_practice') }}" method="get" class="mb-4">
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control" placeholder="{{ _('ابحث عن طلاب اللغة...') }}" value="{{ request.args.get('q', '') }}">
+                        <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <form action="{{ url_for('main.language_practice') }}" method="get" id="filterForm">
+                    <input type="hidden" name="q" value="{{ request.args.get('q', '') }}"><div class="row g-3">
+                        <div class="col-sm-6">
+                            <select name="language" class="form-select" onchange="this.form.submit()">
+                                <option value="">{{ _('جميع اللغات') }}</option>
+                                <option value="ar" {% if request.args.get('language') == 'ar' %}selected{% endif %}>{{ _('العربية') }}</option>
+                                <option value="en" {% if request.args.get('language') == 'en' %}selected{% endif %}>{{ _('الإنجليزية') }}</option>
+                                <option value="fr" {% if request.args.get('language') == 'fr' %}selected{% endif %}>{{ _('الفرنسية') }}</option>
+                                <option value="de" {% if request.args.get('language') == 'de' %}selected{% endif %}>{{ _('الألمانية') }}</option>
+                                <option value="es" {% if request.args.get('language') == 'es' %}selected{% endif %}>{{ _('الإسبانية') }}</option>
+                                <option value="it" {% if request.args.get('language') == 'it' %}selected{% endif %}>{{ _('الإيطالية') }}</option>
+                                <option value="ru" {% if request.args.get('language') == 'ru' %}selected{% endif %}>{{ _('الروسية') }}</option>
+                                <option value="zh" {% if request.args.get('language') == 'zh' %}selected{% endif %}>{{ _('الصينية') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6">
+                            <select name="level" class="form-select" onchange="this.form.submit()">
+                                <option value="">{{ _('جميع المستويات') }}</option>
+                                <option value="beginner" {% if request.args.get('level') == 'beginner' %}selected{% endif %}>{{ _('مبتدئ') }}</option>
+                                <option value="intermediate" {% if request.args.get('level') == 'intermediate' %}selected{% endif %}>{{ _('متوسط') }}</option>
+                                <option value="advanced" {% if request.args.get('level') == 'advanced' %}selected{% endif %}>{{ _('متقدم') }}</option>
+                            </select>
                         </div>
                     </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Language Practice Info -->
+    <div class="content-section">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h3 class="mb-4">{{ _('لماذا تعلم اللغة؟') }}</h3>
+                <p>{{ _('يتيح لك تعلم اللغة المحلية تجربة أكثر غنى وتفاعلاً أثناء سفرك في مصر. من خلال منصتنا، يمكنك:') }}</p>
+                <ul class="list-group list-group-flush mb-4">
+                    <li class="list-group-item d-flex align-items-center">
+                        <i class="fas fa-comment-dots text-primary me-3"></i>
+                        {{ _('التواصل مع السكان المحليين بلغتهم') }}
+                    </li>
+                    <li class="list-group-item d-flex align-items-center">
+                        <i class="fas fa-handshake text-primary me-3"></i>
+                        {{ _('بناء صداقات وعلاقات أثناء سفرك') }}
+                    </li>
+                    <li class="list-group-item d-flex align-items-center">
+                        <i class="fas fa-map-marked-alt text-primary me-3"></i>
+                        {{ _('التنقل بسهولة أكبر في المناطق غير السياحية') }}
+                    </li>
+                    <li class="list-group-item d-flex align-items-center">
+                        <i class="fas fa-star text-primary me-3"></i>
+                        {{ _('الحصول على تجربة سفر أكثر أصالة وعمقاً') }}
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <img src="https://source.unsplash.com/800x600/?language,learning" alt="تعلم اللغة" class="img-fluid rounded shadow">
+            </div>
+        </div>
+    </div>
+
+    <!-- Students List -->
+    <section>
+        <h2 class="text-center">{{ _('طلاب اللغة') }}</h2>
+        <div class="row">
+            {% if students %}
+                {% for student in students %}
+                <div class="col-lg-4 col-md-6 mb-4 fade-in" style="animation-delay: {{ loop.index0 * 0.1 }}s">
+                    <div class="card h-100">
+                        <div class="text-center pt-4">
+                            <img src="{{ student.profile_image or 'https://source.unsplash.com/800x600/?student' }}" class="rounded-circle" alt="{{ student.user.username }}" style="width: 120px; height: 120px; object-fit: cover;">
+                        </div>
+                        <div class="card-body text-center">
+                            <h5 class="card-title">{{ student.user.username }}</h5>
+
+                            <div class="mb-3">
+                                <span class="badge bg-primary">{{ student.learning_language }}</span>
+                                <span class="badge bg-secondary">{{ _(student.level|capitalize) }}</span>
+                            </div>
+
+                            <p class="card-text">{{ student.learning_goals[:100] }}{% if student.learning_goals|length > 100 %}...{% endif %}</p>
+
+                            <div class="student-details mb-3">
+                                <p><i class="fas fa-language text-primary me-2"></i> <strong>{{ _('اللغة الأم') }}:</strong> {{ student.native_language }}</p>
+                                <p><i class="fas fa-map-marker-alt text-primary me-2"></i> <strong>{{ _('البلد') }}:</strong> {{ student.user.country }}</p>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{{ url_for('main.student_profile', student_id=student.id) }}" class="btn btn-outline-primary w-100">{{ _('التواصل') }}</a>
+                        </div>
+                    </div>
+                </div>
                 {% endfor %}
             {% else %}
                 <div class="col-12 text-center">
-                    <p>No language practice opportunities found matching your criteria. Please try a different language filter.</p>
+                    <div class="alert alert-info">
+                        {{ _('لا يوجد طلاب لغة مطابقين لمعايير البحث الخاصة بك.') }}
+                    </div>
                 </div>
             {% endif %}
         </div>
 
-        <!-- Join as Language Student Section -->
-        <div class="filter-section mt-5 fade-in">
-            <div class="card bg-light">
-                <div class="card-body text-center p-5">
-                    <h3>Are You a Language Student?</h3>
-                    <p class="mb-4">Join our platform to practice your language skills with locals and tourists in Egypt.</p>
-                    {% if current_user.is_authenticated %}
-                        {% if current_user.is_student %}
-                            <p class="text-success"><i class="fas fa-check-circle me-2"></i>You are registered as a language student!</p>
-                        {% else %}
-                            <a href="{{ url_for('main.profile') }}" class="btn btn-primary">Register as Language Student</a>
-                        {% endif %}
-                    {% else %}
-                        <a href="{{ url_for('main.register') }}" class="btn btn-primary">Register Now</a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+        <!-- Pagination -->
+        {% if pagination and pagination.pages > 1 %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item {% if pagination.page == 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('main.language_practice', page=pagination.prev_num, q=request.args.get('q'), language=request.args.get('language'), level=request.args.get('level')) }}">{{ _('السابق') }}</a>
+                </li>
 
-        <!-- Benefits Section -->
-        <div class="row mt-5 fade-in">
-            <div class="col-12">
-                <h3 class="text-center mb-4">Benefits of Language Practice</h3>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <div class="card h-100 benefits-card">
-                            <div class="card-body text-center">
-                                <i class="fas fa-graduation-cap fa-3x mb-3 text-primary"></i>
-                                <h5>Improve Your Skills</h5>
-                                <p>Practice with native speakers and improve your language skills in real-world situations.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <div class="card h-100 benefits-card">
-                            <div class="card-body text-center">
-                                <i class="fas fa-users fa-3x mb-3 text-primary"></i>
-                                <h5>Cultural Exchange</h5>
-                                <p>Learn about Egyptian culture and share your own culture with others.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <div class="card h-100 benefits-card">
-                            <div class="card-body text-center">
-                                <i class="fas fa-map-marked-alt fa-3x mb-3 text-primary"></i>
-                                <h5>Explore Egypt</h5>
-                                <p>Discover hidden gems and local spots while practicing your language skills.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% for page in pagination.iter_pages() %}
+                    {% if page %}
+                        <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('main.language_practice', page=page, q=request.args.get('q'), language=request.args.get('language'), level=request.args.get('level')) }}">{{ page }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                <li class="page-item {% if pagination.page == pagination.pages %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('main.language_practice', page=pagination.next_num, q=request.args.get('q'), language=request.args.get('language'), level=request.args.get('level')) }}">{{ _('التالي') }}</a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+    </section>
+
+    <!-- Language Exchange Program -->
+    <div class="content-section text-center">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h3 class="mb-3">{{ _('هل ترغب في تحسين مهاراتك اللغوية؟') }}</h3>
+                <p class="mb-4">{{ _('انضم إلى برنامج تبادل اللغات لدينا والتق بمتحدثين أصليين للغة التي ترغب في تعلمها.') }}</p>
+                <a href="{{ url_for('main.register_language_student') }}" class="btn btn-primary btn-lg">{{ _('التسجيل كطالب لغة') }}</a>
             </div>
         </div>
     </div>
+</div>
+{% endblock %}
 
-    <!-- Footer -->
-    <footer class="main-footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h4 class="footer-heading">عن اكتشف مصر</h4>
-                    <p>نحن نقدم لكم أفضل التجارب السياحية في مصر، مع خدمات متميزة وأسعار تنافسية.</p>
-                </div>
-                <div class="col-md-4">
-                    <h4 class="footer-heading">روابط سريعة</h4>
-                    <ul class="footer-links">
-                        <li><a href="/tours">الرحلات السياحية</a></li>
-                        <li><a href="/hotels">الفنادق</a></li>
-                        <li><a href="/transportation">المواصلات</a></li>
-                        <li><a href="/blog">المدونة</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h4 class="footer-heading">تواصل معنا</h4>
-                    <ul class="footer-links">
-                        <li><i class="fas fa-map-marker-alt me-2"></i>القاهرة، مصر</li>
-                        <li><i class="fas fa-phone me-2"></i>+20 123 456 789</li>
-                        <li><i class="fas fa-envelope me-2"></i>info@discovergypt.com</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <div class="container">
-                <p class="mb-0">© 2024 اكتشف مصر. جميع الحقوق محفوظة.</p>
-            </div>
-        </div>
-    </footer>
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animation for student cards on scroll
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.fade-in');
+            elements.forEach(el => {
+                const rect = el.getBoundingClientRect();
+                const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
+                if (isVisible) {
+                    el.style.opacity = 1;
+                    el.style.transform = 'translateY(0)';
+                }
+            });
+        };
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+        // Add initial styles to fade-in elements
+        document.querySelectorAll('.fade-in').forEach(el => {
+            el.style.opacity = 0;
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        });
+
+        window.addEventListener('scroll', animateOnScroll);
+        animateOnScroll(); // Call once on page load
+    });
+</script>
+{% endblock %}
