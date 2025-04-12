@@ -733,7 +733,22 @@ def tour_plans():
                           title='Tour Plans',
                           plans=plans)
 
+@main.route('/tour_plan/<int:plan_id>')
 @main.route('/tourist/tour_plan/<int:plan_id>')
+def tour_plan_detail(plan_id):
+    plan = TourPlan.query.get_or_404(plan_id)
+    
+    # الحصول على الخطط السياحية المشابهة (نفس المدة أو السعر المشابه)
+    similar_tours = TourPlan.query.filter(
+        TourPlan.id != plan_id,
+        (TourPlan.duration == plan.duration) | 
+        (TourPlan.price.between(plan.price * 0.8, plan.price * 1.2))
+    ).limit(3).all()
+    
+    return render_template('tour_plan_detail.html',
+                          title=plan.title,
+                          plan=plan,
+                          similar_tours=similar_tours)
 def tour_plan_detail(plan_id):
     # Get tour plan
     plan = TourPlan.query.get_or_404(plan_id)
