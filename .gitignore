@@ -24,3 +24,5 @@ venv/
 instance/
 .webassets-cache
 .vscode/
+"config/" 
+"config/" 

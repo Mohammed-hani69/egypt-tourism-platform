@@ -1,148 +1,205 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
-{% block styles %}
-<style>
-    .chat-container {
-        height: 50vh;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        padding: 15px;
-        background-color: rgba(0, 0, 0, 0.05);
-        border-radius: 8px;
-    }
-    
-    .message {
-        margin-bottom: 15px;
-        max-width: 80%;
-    }
-    
-    .message-content {
-        padding: 10px 15px;
-        border-radius: 15px;
-    }
-    
-    .my-message {
-        align-self: flex-end;
-    }
-    
-    .my-message .message-content {
-        background-color: var(--bs-primary);
-        color: white;
-        border-top-right-radius: 0;
-    }
-    
-    .other-message {
-        align-self: flex-start;
-    }
-    
-    .other-message .message-content {
-        background-color: var(--bs-secondary);
-        color: white;
-        border-top-left-radius: 0;
-    }
-    
-    .message-meta {
-        font-size: 0.8rem;
-        margin-top: 5px;
-        color: var(--bs-gray);
-    }
-    
-    .members-list {
-        max-height: 50vh;
-        overflow-y: auto;
-    }
-</style>
-{% endblock %}
+{% block title %}{{ _('محادثة') }} - {{ chat_group.name }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row mb-3">
-        <div class="col-md-8">
-            <h1>{{ chat_group.name }}</h1>
-            <p class="lead">{{ chat_group.description }}</p>
-            <div class="d-flex align-items-center mb-3">
-                <span class="badge bg-primary me-2">{{ chat_group.language }}</span>
-                {% if is_guide %}
-                <a href="{{ url_for('main.add_chat_member', chat_id=chat_group.id) }}" class="btn btn-sm btn-outline-success">{{ _('Add Member') }}</a>
-                {% endif %}
+<!-- Page Header -->
+<div class="page-header text-center">
+    <div class="container">
+        <h1 class="display-4">{{ chat_group.name }}</h1>
+        <div class="d-flex justify-content-center align-items-center">
+            <span class="badge bg-primary me-3">
+                <i class="fas fa-language me-1"></i>{{ chat_group.language }}
+            </span>
+            <div class="text-white">
+                <i class="fas fa-users me-1"></i>{{ members|length + 1 }} {{ _('عضو') }}
             </div>
         </div>
     </div>
-    
+</div>
+
+<div class="container mt-5">
     <div class="row">
-        <div class="col-md-8">
-            <!-- Chat Messages -->
-            <div class="chat-container mb-3">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="message {% if message.user_id == current_user.id %}my-message{% else %}other-message{% endif %}">
-                            <div class="message-content">
-                                {{ message.content }}
-                            </div>
-                            <div class="message-meta">
-                                {{ message.user.username }} - {{ message.timestamp.strftime('%H:%M, %d %b') }}
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="text-center text-muted p-4">
-                        {{ _('No messages yet. Start the conversation!') }}
-                    </div>
-                {% endif %}
-            </div>
-            
-            <!-- Message Form -->
-            <form method="POST" action="">
-                {{ form.hidden_tag() }}
-                <div class="input-group">
-                    {{ form.content(class="form-control", placeholder=_("Type your message...")) }}
-                    <button type="submit" class="btn btn-primary">{{ _('Send') }}</button>
+        <div class="col-lg-8 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-comments me-2"></i>{{ _('المحادثة') }}
+                    </h5>
+                    {% if is_guide %}
+                    <a href="{{ url_for('main.add_chat_member', chat_id=chat_group.id) }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-user-plus me-1"></i>{{ _('إضافة عضو') }}
+                    </a>
+                    {% endif %}
                 </div>
-                {% if form.content.errors %}
-                    {% for error in form.content.errors %}
-                        <span class="text-danger">{{ error }}</span>
-                    {% endfor %}
-                {% endif %}
-            </form>
+                <div class="card-body">
+                    <div class="chat-container mb-3">
+                        {% if messages %}
+                            {% for message in messages %}
+                            <div class="message {% if message.user_id == current_user.id %}my-message{% else %}other-message{% endif %}">
+                                <div class="message-content">
+                                    {{ message.content }}
+                                </div>
+                                <div class="message-meta">
+                                    <i class="fas fa-user me-1"></i>{{ message.user.username }} 
+                                    <i class="fas fa-clock ms-2 me-1"></i>{{ message.timestamp.strftime('%H:%M, %d %b') }}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-comments text-muted fa-3x mb-3"></i>
+                                <p class="text-muted mb-0">{{ _('لا توجد رسائل بعد. ابدأ المحادثة!') }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+                        <div class="input-group">
+                            {{ form.content(class="form-control", placeholder=_("اكتب رسالتك...")) }}
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-1"></i>{{ _('إرسال') }}
+                            </button>
+                        </div>
+                        {% if form.content.errors %}
+                            {% for error in form.content.errors %}
+                                <div class="text-danger mt-1">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
         </div>
         
-        <div class="col-md-4">
-            <!-- Members List -->
-            <div class="card">
-                <div class="card-header">
-                    <h5>{{ _('Members') }} ({{ members|length + 1 }})</h5>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-users me-2"></i>{{ _('الأعضاء') }}</h5>
                 </div>
                 <div class="card-body p-0">
-                    <div class="members-list">
-                        <ul class="list-group list-group-flush">
-                            <!-- Guide -->
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                {{ chat_group.guide.username }}
-                                <span class="badge bg-primary">{{ _('Guide') }}</span>
-                            </li>
-                            
-                            <!-- Members -->
-                            {% for member in members %}
-                                <li class="list-group-item">
-                                    {{ member.user.username }}
-                                </li>
-                            {% endfor %}
-                        </ul>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle me-2">{{ chat_group.guide.username[0].upper() }}</div>
+                                <span>{{ chat_group.guide.username }}</span>
+                            </div>
+                            <span class="badge bg-primary">{{ _('مرشد') }}</span>
+                        </li>
+                        {% for member in members %}
+                        <li class="list-group-item d-flex align-items-center">
+                            <div class="avatar-circle me-2">{{ member.user.username[0].upper() }}</div>
+                            <span>{{ member.user.username }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>{{ _('معلومات المجموعة') }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">{{ chat_group.description }}</p>
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>{{ _('المحادثة مخصصة لممارسة اللغة') }} {{ chat_group.language }}
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
+
+<style>
+    .avatar-circle {
+        width: 35px;
+        height: 35px;
+        background-color: var(--primary-red);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    
+    .chat-container {
+        height: 400px;
+        overflow-y: auto;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .message {
+        margin-bottom: 1rem;
+        max-width: 80%;
+    }
+
+    .my-message {
+        margin-left: auto;
+    }
+
+    .message-content {
+        padding: 0.75rem 1rem;
+        border-radius: 15px;
+        margin-bottom: 0.25rem;
+        color: white;
+    }
+    
+    .my-message .message-content {
+        background-color: var(--primary-red);
+        border-top-right-radius: 5px;
+    }
+    
+    .other-message .message-content {
+        background-color: #6c757d;
+        border-top-left-radius: 5px;
+    }
+
+    .message-meta {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+
+    .my-message .message-meta {
+        text-align: right;
+    }
+    
+    .card {
+        transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    /* Custom Scrollbar */
+    .chat-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chat-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .chat-container::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 3px;
+    }
+
+    .chat-container::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+</style>
 
 {% block scripts %}
 <script>
-    // Auto-scroll to bottom of chat container on page load
     document.addEventListener('DOMContentLoaded', function() {
         const chatContainer = document.querySelector('.chat-container');
         chatContainer.scrollTop = chatContainer.scrollHeight;
     });
 </script>
+{% endblock %}
 {% endblock %}

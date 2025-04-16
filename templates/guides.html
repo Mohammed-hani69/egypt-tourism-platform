@@ -118,34 +118,39 @@
                             <h5 class="card-title">{{ guide.user.username }}</h5>
 
                             <div class="mb-2">
-                                {% set rating = 0 %}
+                                {% set rating = guide.average_rating|default(0) %}
                                 {% for i in range(5) %}
-                                    {% if i < rating|int %}
-                                        <i class="fas fa-star text-warning"></i>
-                                    {% elif i < rating|round(0, 'ceil') and rating|int != rating|round(0, 'ceil') %}
-                                        <i class="fas fa-star-half-alt text-warning"></i>
-                                    {% else %}
-                                        <i class="far fa-star text-warning"></i>
-                                    {% endif %}
+                                    <i class="{% if i < rating %}fas{% else %}far{% endif %} fa-star text-warning"></i>
                                 {% endfor %}
-                                <small class="text-muted">(0)</small>
+                                <small class="text-muted">({{ guide.reviews|default([])|length }})</small>
                             </div>
 
-                            <p class="card-text">{{ guide.bio[:100] }}{% if guide.bio|length > 100 %}...{% endif %}</p>
+                            <p class="card-text">
+                                {% if guide.user.bio %}
+                                    {{ guide.user.bio[:100] }}{% if guide.user.bio|length > 100 %}...{% endif %}
+                                {% else %}
+                                    {{ _('لم يتم إضافة نبذة بعد') }}
+                                {% endif %}
+                            </p>
 
                             <div class="guide-details mb-3">
                                 <div class="row">
                                     <div class="col-6 text-start">
                                         <i class="fas fa-language text-primary"></i> 
-                                        {% for language in guide.languages.split(',')[:2] %}
-                                            <span class="badge bg-light text-dark">{{ language }}</span>
-                                        {% endfor %}
-                                        {% if guide.languages.split(',')|length > 2 %}
-                                            <span class="badge bg-light text-dark">+{{ guide.languages.split(',')|length - 2 }}</span>
+                                        {% if guide.user.languages %}
+                                            {% for language in guide.user.languages.split(',')[:2] %}
+                                                <span class="badge bg-light text-dark">{{ language }}</span>
+                                            {% endfor %}
+                                            {% if guide.user.languages.split(',')|length > 2 %}
+                                                <span class="badge bg-light text-dark">+{{ guide.user.languages.split(',')|length - 2 }}</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="badge bg-light text-dark">{{ _('غير محدد') }}</span>
                                         {% endif %}
                                     </div>
                                     <div class="col-6 text-end">
-                                        <i class="fas fa-briefcase text-primary"></i> {{ guide.years_experience }} {{ _('سنوات') }}
+                                        <i class="fas fa-briefcase text-primary"></i> 
+                                        {{ guide.years_experience|default(0) }} {{ _('سنوات') }}
                                     </div>
                                 </div>
                             </div>

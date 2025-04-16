@@ -56,7 +56,7 @@ git init
 2. Add your files to Git
 ```bash
 git add .
-git commit -m "version 1.0.3"
+git commit -m "version 1.0.4"
 ```
 
 3. Create a new repository on GitHub

@@ -1,77 +1,116 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
+
+{% block title %}{{ _('إنشاء مجموعة محادثة جديدة') }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>{{ _('Create Chat Group') }}</h1>
-    
+<!-- Page Header -->
+<div class="page-header text-center">
+    <div class="container">
+        <h1 class="display-4">{{ _('إنشاء مجموعة محادثة جديدة') }}</h1>
+    </div>
+</div>
+
+<div class="container mt-5">
     <div class="row">
-        <div class="col-md-6">
-            <div class="card">
+        <div class="col-lg-7 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">{{ _('معلومات المجموعة') }}</h5>
+                </div>
                 <div class="card-body">
                     <form method="POST" action="">
                         {{ form.hidden_tag() }}
                         
-                        <div class="mb-3">
+                        <div class="mb-4">
                             {{ form.name.label(class="form-label") }}
-                            {{ form.name(class="form-control") }}
+                            {{ form.name(class="form-control", placeholder=_('اسم المجموعة')) }}
                             {% if form.name.errors %}
                                 {% for error in form.name.errors %}
-                                    <span class="text-danger">{{ error }}</span>
+                                    <div class="text-danger mt-1">{{ error }}</div>
                                 {% endfor %}
                             {% endif %}
                         </div>
                         
-                        <div class="mb-3">
+                        <div class="mb-4">
                             {{ form.description.label(class="form-label") }}
-                            {{ form.description(class="form-control", rows=4) }}
+                            {{ form.description(class="form-control", rows=4, placeholder=_('وصف المجموعة والأهداف')) }}
                             {% if form.description.errors %}
                                 {% for error in form.description.errors %}
-                                    <span class="text-danger">{{ error }}</span>
+                                    <div class="text-danger mt-1">{{ error }}</div>
                                 {% endfor %}
                             {% endif %}
                         </div>
                         
-                        <div class="mb-3">
+                        <div class="mb-4">
                             {{ form.language.label(class="form-label") }}
                             {{ form.language(class="form-select") }}
                             {% if form.language.errors %}
                                 {% for error in form.language.errors %}
-                                    <span class="text-danger">{{ error }}</span>
+                                    <div class="text-danger mt-1">{{ error }}</div>
                                 {% endfor %}
                             {% endif %}
                         </div>
                         
                         <div class="d-grid">
-                            {{ form.submit(class="btn btn-primary") }}
+                            {{ form.submit(class="btn btn-primary btn-lg") }}
                         </div>
                     </form>
                 </div>
             </div>
         </div>
         
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5>{{ _('About Chat Groups') }}</h5>
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">{{ _('معلومات مفيدة') }}</h5>
                 </div>
                 <div class="card-body">
-                    <p>{{ _('Chat groups are a great way to help language students practice their language skills in a group setting.') }}</p>
-                    
-                    <h6>{{ _('Tips for successful language groups:') }}</h6>
-                    <ul>
-                        <li>{{ _('Choose a specific topic for each session') }}</li>
-                        <li>{{ _('Encourage all members to participate') }}</li>
-                        <li>{{ _('Correct errors gently') }}</li>
-                        <li>{{ _('Use a mix of writing and conversation practice') }}</li>
-                        <li>{{ _('Share cultural insights related to the language') }}</li>
+                    <h6 class="text-primary mb-3">{{ _('إرشادات لمجموعة ناجحة:') }}</h6>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            {{ _('اختر موضوعاً محدداً لكل جلسة') }}
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            {{ _('شجع جميع الأعضاء على المشاركة') }}
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            {{ _('صحح الأخطاء بلطف') }}
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            {{ _('استخدم مزيجاً من الكتابة والمحادثة') }}
+                        </li>
                     </ul>
                     
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> {{ _('You can add students to your chat groups after creation.') }}
+                    <div class="alert alert-info mt-4 mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        {{ _('يمكنك إضافة الطلاب إلى مجموعتك بعد إنشائها.') }}
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .form-label {
+        font-weight: 600;
+    }
+    
+    .list-group-item {
+        border: none;
+        padding: 0.75rem 0;
+    }
+    
+    .card {
+        transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+    }
+</style>
 {% endblock %}

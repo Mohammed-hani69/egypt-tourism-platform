@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('البحث عن مرشد لغوي') }}{% endblock %}
+
+{% block content %}
+<div class="page-header text-center">
+    <div class="container">
+        <h1 class="display-4">{{ _('البحث عن مرشد لغوي') }}</h1>
+        <p class="lead">{{ _('مرشدون متخصصون في') }} 
+            {% if student_language == 'ar' %}
+                {{ _('العربية') }}
+            {% elif student_language == 'en' %}
+                {{ _('الإنجليزية') }}
+            {% elif student_language == 'fr' %}
+                {{ _('الفرنسية') }}
+            {% elif student_language == 'de' %}
+                {{ _('الألمانية') }}
+            {% elif student_language == 'es' %}
+                {{ _('الإسبانية') }}
+            {% elif student_language == 'it' %}
+                {{ _('الإيطالية') }}
+            {% elif student_language == 'ru' %}
+                {{ _('الروسية') }}
+            {% elif student_language == 'zh' %}
+                {{ _('الصينية') }}
+            {% else %}
+                {{ student_language }}
+            {% endif %}
+        </p>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        {% if guides %}
+            {% for guide in guides %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <img src="{{ guide.user.profile_pic or url_for('static', filename='img/default-avatar.png') }}" 
+                             class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                        <h5 class="card-title">{{ guide.user.username }}</h5>
+                        
+                        <div class="mb-3">
+                            <i class="fas fa-language text-primary"></i>
+                            {% for language in guide.user.languages.split(',') %}
+                                <span class="badge bg-light text-dark">
+                                    {% if language.strip() == 'ar' %}
+                                        {{ _('العربية') }}
+                                    {% elif language.strip() == 'en' %}
+                                        {{ _('الإنجليزية') }}
+                                    {% elif language.strip() == 'fr' %}
+                                        {{ _('الفرنسية') }}
+                                    {% elif language.strip() == 'de' %}
+                                        {{ _('الألمانية') }}
+                                    {% elif language.strip() == 'es' %}
+                                        {{ _('الإسبانية') }}
+                                    {% elif language.strip() == 'it' %}
+                                        {{ _('الإيطالية') }}
+                                    {% elif language.strip() == 'ru' %}
+                                        {{ _('الروسية') }}
+                                    {% elif language.strip() == 'zh' %}
+                                        {{ _('الصينية') }}
+                                    {% else %}
+                                        {{ language.strip() }}
+                                    {% endif %}
+                                </span>
+                            {% endfor %}
+                        </div>
+                        
+                        {% if guide.years_experience %}
+                        <p class="text-muted">
+                            <i class="fas fa-briefcase me-2"></i>
+                            {{ guide.years_experience }} {{ _('سنوات خبرة') }}
+                        </p>
+                        {% endif %}
+                        
+                        <div class="mt-3">
+                            <form action="{{ url_for('main.select_language_guide', guide_user_id=guide.user.id) }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-user-plus me-2"></i>{{ _('اختيار كمرشد') }}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle me-2"></i>
+                    {{ _('لا يوجد مرشدون متاحون للغة') }} {{ student_language }}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,8 +1,11 @@
-
 import os
 import sys
 from flask import Flask
 from extensions import db, login_manager
+from models import ChatGroup, ChatGroupMember, User
+from datetime import datetime
+
+
 
 def create_directory(path):
     """إنشاء مجلد إذا لم يكن موجودًا"""
@@ -86,5 +89,19 @@ def init_db():
             print(f"حدث خطأ أثناء تهيئة قاعدة البيانات: {str(e)}")
             db.session.rollback()
 
+def init_chat_groups():
+    # Drop and recreate tables
+    db.drop_all()
+    db.create_all()
+    
+    # Create sample chat groups if needed
+    try:
+        # Add any initial chat groups here if needed
+        db.session.commit()
+        print("Database initialized successfully")
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error initializing database: {str(e)}")
+
 if __name__ == "__main__":
-    init_db()
+    init_chat_groups()

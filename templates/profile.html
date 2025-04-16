@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% block title %}{{ _('الملف الشخصي') }}{% endblock %}
@@ -26,6 +25,9 @@
                     <p class="text-muted">
                         {% if current_user.is_admin %}
                             <span class="badge bg-danger me-1">{{ _('مسؤول') }}</span>
+                            <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-sm btn-danger ms-2">
+                                <i class="fas fa-columns me-1"></i> {{ _('لوحة تحكم الأدمن') }}
+                            </a>
                         {% endif %}
                         {% if current_user.is_guide %}
                             <span class="badge bg-primary me-1">{{ _('مرشد سياحي') }}</span>
@@ -79,6 +81,41 @@
                     </div>
                 </div>
             </div>
+            {% if current_user.is_tourist %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ _('الرسائل') }}</h5>
+                    <div class="position-relative">
+                        <a href="#" class="btn btn-outline-primary" data-bs-toggle="dropdown">
+                            <i class="fas fa-envelope"></i>
+                            {% if unread_count > 0 %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ unread_count }}
+                            </span>
+                            {% endif %}
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end p-0" style="width: 300px;">
+                            <div class="p-3">
+                                <h6 class="mb-3">{{ _('آخر الرسائل') }}</h6>
+                                {% if latest_messages %}
+                                    {% for msg in latest_messages %}
+                                    <a href="{{ url_for('main.guide_tourist_chat', tourist_id=msg.guide_id) }}" class="text-decoration-none">
+                                        <div class="notification-item {% if not msg.is_read %}unread{% endif %} p-2">
+                                            <small class="text-muted float-end">{{ msg.created_at.strftime('%H:%M') }}</small>
+                                            <p class="mb-1">{{ msg.message[:50] }}...</p>
+                                            <small>{{ msg.guide.username }}</small>
+                                        </div>
+                                    </a>
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="text-muted text-center mb-0">{{ _('لا توجد رسائل') }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
         
         <!-- القسم الرئيسي - البيانات حسب نوع المستخدم -->
@@ -93,37 +130,78 @@
                         </a>
                     </div>
                     <div class="card-body">
-                        {% if guide_info %}
+                        {% if guide_info and current_user.languages and guide_info.years_experience and guide_info.certification %}
                             <div class="row">
                                 <div class="col-md-6">
                                     <h6 class="mb-3">{{ _('اللغات') }}</h6>
-                                    {% if current_user.languages %}
-                                        <p>{{ current_user.languages }}</p>
-                                    {% else %}
-                                        <p class="text-muted">{{ _('لم يتم تحديد لغات بعد') }}</p>
-                                    {% endif %}
+                                    <p>
+                                        {% set languages = current_user.languages.split(',') if current_user.languages else [] %}
+                                        {% for lang in languages %}
+                                            {% if lang.strip() == 'ar' %}
+                                                {{ _('العربية') }}
+                                            {% elif lang.strip() == 'en' %}
+                                                {{ _('الإنجليزية') }}
+                                            {% elif lang.strip() == 'fr' %}
+                                                {{ _('الفرنسية') }}
+                                            {% elif lang.strip() == 'de' %}
+                                                {{ _('الألمانية') }}
+                                            {% elif lang.strip() == 'es' %}
+                                                {{ _('الإسبانية') }}
+                                            {% elif lang.strip() == 'it' %}
+                                                {{ _('الإيطالية') }}
+                                            {% elif lang.strip() == 'ru' %}
+                                                {{ _('الروسية') }}
+                                            {% elif lang.strip() == 'zh' %}
+                                                {{ _('الصينية') }}
+                                            {% else %}
+                                                {{ lang }}
+                                            {% endif %}
+                                            {% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </p>
                                 </div>
                                 <div class="col-md-6">
                                     <h6 class="mb-3">{{ _('سنوات الخبرة') }}</h6>
-                                    <p>{{ guide_info.years_experience or 0 }} {{ _('سنوات') }}</p>
+                                    <p>{{ guide_info.years_experience }} {{ _('سنوات') }}</p>
                                 </div>
                             </div>
                             <hr>
                             <div class="row mt-3">
-                                <div class="col-12">
+                                <div class="col-md-6">
                                     <h6 class="mb-3">{{ _('التخصص') }}</h6>
-                                    {% if guide_info.specialty %}
-                                        <p>{{ guide_info.specialty }}</p>
-                                    {% else %}
-                                        <p class="text-muted">{{ _('لم يتم تحديد تخصص بعد') }}</p>
-                                    {% endif %}
+                                    <p>{{ guide_info.specialization }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">{{ _('الشهادات') }}</h6>
+                                    <p>{{ guide_info.certification }}</p>
                                 </div>
                             </div>
                         {% else %}
                             <div class="alert alert-warning">
-                                {{ _('يرجى إكمال معلومات المرشد السياحي الخاصة بك.') }}
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                <span>{{ _('لم يتم إكمال معلومات المرشد') }}</span>
+                                <div class="mt-2">
+                                    <a href="{{ url_for('main.guide_setup') }}" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-plus-circle me-1"></i>{{ _('إكمال معلومات المرشد') }}
+                                    </a>
+                                </div>
                             </div>
                         {% endif %}
+                    </div>
+                </div>
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{{ _('المراسلات مع السياح') }}</h5>
+                        <div class="position-relative">
+                            <a href="{{ url_for('main.guide_messages') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-envelope"></i>
+                                {% if unread_count > 0 %}
+                                    <span class="badge bg-danger badge-pill position-absolute top-0 start-100 translate-middle">
+                                        {{ unread_count }}
+                                    </span>
+                                {% endif %}
+                            </a>
+                        </div>
                     </div>
                 </div>
             {% endif %}
@@ -142,7 +220,27 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <h6 class="mb-3">{{ _('اللغة') }}</h6>
-                                    <p>{{ language_practice.language }}</p>
+                                    <p>
+                                        {% if language_practice.language == 'ar' %}
+                                            {{ _('العربية') }}
+                                        {% elif language_practice.language == 'en' %}
+                                            {{ _('الإنجليزية') }}
+                                        {% elif language_practice.language == 'fr' %}
+                                            {{ _('الفرنسية') }}
+                                        {% elif language_practice.language == 'de' %}
+                                            {{ _('الألمانية') }}
+                                        {% elif language_practice.language == 'es' %}
+                                            {{ _('الإسبانية') }}
+                                        {% elif language_practice.language == 'it' %}
+                                            {{ _('الإيطالية') }}
+                                        {% elif language_practice.language == 'ru' %}
+                                            {{ _('الروسية') }}
+                                        {% elif language_practice.language == 'zh' %}
+                                            {{ _('الصينية') }}
+                                        {% else %}
+                                            {{ language_practice.language }}
+                                        {% endif %}
+                                    </p>
                                 </div>
                                 <div class="col-md-6">
                                     <h6 class="mb-3">{{ _('مستوى الإجادة') }}</h6>
@@ -165,6 +263,14 @@
                                     <h6 class="mb-3">{{ _('الاهتمامات') }}</h6>
                                     <p>{{ language_practice.interests or _('لم يتم تحديد اهتمامات بعد') }}</p>
                                 </div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-4">
+                                <a href="{{ url_for('main.language_setup') }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-edit me-2"></i>{{ _('تعديل الإعدادات') }}
+                                </a>
+                                <a href="{{ url_for('main.student_find_language_guide') }}" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>{{ _('البحث عن مرشد لغوي') }}
+                                </a>
                             </div>
                         {% else %}
                             <div class="alert alert-warning">
@@ -241,6 +347,39 @@
                                 </a>
                             </div>
                         {% endif %}
+                    </div>
+                </div>
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{{ _('المراسلات مع المرشدين') }}</h5>
+                        <span class="badge bg-primary rounded-pill">{{ unread_messages_count|default(0) }}</span>
+                    </div>
+                    <div class="card-body">
+                        <!-- منطقة عرض الرسائل - تم زيادة الارتفاع -->
+                        <div class="chat-messages" style="height: 400px; overflow-y: auto;">
+                            {% if latest_messages %}
+                                {% for msg in latest_messages %}
+                                <div class="message-item p-3 mb-3 {% if not msg.is_read %}unread{% endif %}" 
+                                     onclick="window.location.href='{{ url_for('main.guide_tourist_chat', tourist_id=msg.guide_id) }}'">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle me-3">{{ msg.guide.username[0].upper() }}</div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <h6 class="mb-0">{{ msg.guide.username }}</h6>
+                                                <small class="text-muted">{{ msg.created_at.strftime('%H:%M') }}</small>
+                                            </div>
+                                            <p class="mb-0 text-truncate" style="max-width: 250px;">{{ msg.message }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-5">
+                                    <i class="fas fa-comments text-muted fa-3x mb-3"></i>
+                                    <p class="text-muted">{{ _('لا توجد رسائل حالياً') }}</p>
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             {% endif %}
@@ -321,4 +460,47 @@
         </div>
     </div>
 </div>
+
+<style>
+.chat-messages {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.message-item {
+    background: white;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.message-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.message-item.unread {
+    background: #fff3cd;
+    border-right: 3px solid var(--primary-red);
+}
+
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary-red);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.badge-notification {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+}
+</style>
 {% endblock %}

@@ -1,0 +1,432 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('محادثة مع') }} {{ other_user.username }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="chat-container">
+                <!-- رأس الصفحة بتصميم واتساب -->
+                <div class="chat-header">
+                    <div class="header-content">
+                        <a href="{{ url_for('main.profile') }}" class="back-button">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <div class="user-info">
+                            <div class="avatar-circle">{{ other_user.username[0].upper() }}</div>
+                            <div class="user-details">
+                                <h6 class="user-name">{{ other_user.username }}</h6>
+                                <small class="user-status">
+                                    {{ _('مرشد سياحي') if other_user.is_guide else _('سائح') }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </div>
+                </div>
+
+                <!-- منطقة الرسائل -->
+                <div class="chat-messages" id="chat-messages-container">
+                    {% if chats %}
+                        {% for chat in chats %}
+                        <div class="message-wrapper {% if chat.guide_id == current_user.id or (current_user.is_tourist and chat.tourist_id == current_user.id) %}my-message{% else %}other-message{% endif %}">
+                            <div class="message-bubble">
+                                <div class="message-text">{{ chat.message }}</div>
+                                <div class="message-meta">
+                                    <span class="message-time">{{ chat.created_at.strftime('%H:%M') }}</span>
+                                    {% if chat.guide_id == current_user.id or (current_user.is_tourist and chat.tourist_id == current_user.id) %}
+                                    <i class="fas fa-check-double message-status {% if chat.is_read %}read{% endif %}" data-message-id="{{ chat.id }}"></i>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-messages">
+                            <div class="no-messages-content">
+                                <i class="fas fa-comments"></i>
+                                <p>{{ _('لا توجد رسائل بعد. ابدأ المحادثة!') }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- نموذج إدخال الرسائل -->
+                <div class="message-input-container">
+                    <div class="message-input-wrapper">
+                        <div class="input-actions left">
+                            <i class="far fa-smile"></i>
+                            <i class="fas fa-paperclip"></i>
+                        </div>
+                        <form method="POST" class="message-form">
+                            {{ form.hidden_tag() }}
+                            <div class="input-group">
+                                {{ form.content(class="form-control message-input", placeholder="اكتب رسالتك...") }}
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i> إرسال
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* تصميم شامل */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f0f2f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    direction: rtl;
+}
+
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
+    background-color: #e5ddd5;
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* خلفية نمط واتساب */
+.chat-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #e5ddd5;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23d1d7db' fill-opacity='0.2' fill-rule='evenodd'/%3E%3C/svg%3E");
+    opacity: 0.5;
+    z-index: 0;
+}
+
+/* رأس الصفحة */
+.chat-header {
+    background-color: #075E54;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    height: 60px;
+    z-index: 10;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+}
+
+.back-button {
+    color: white;
+    margin-left: 15px;
+    font-size: 1.2rem;
+    text-decoration: none;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    background-color: #128C7E;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.user-status {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.header-actions {
+    display: flex;
+    gap: 20px;
+}
+
+.header-actions i {
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* منطقة الرسائل */
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.message-wrapper {
+    display: flex;
+    margin-bottom: 8px;
+    max-width: 75%;
+}
+
+/* رسائل المستخدم الحالي (تظهر على اليمين بلون أخضر) */
+.my-message {
+    justify-content: flex-end;
+    margin-left: auto;
+}
+
+.my-message .message-bubble {
+    background-color: #dcf8c6; /* اللون الأخضر الفاتح للرسائل التي أرسلها المستخدم الحالي */
+    border-top-right-radius: 0;
+    color: #303030; /* لون النص الأسود الداكن للرسائل الخاصة بي */
+}
+
+/* رسائل الطرف الآخر (تظهر على اليسار بلون أبيض) */
+.other-message .message-bubble {
+    background-color: white; /* اللون الأبيض للرسائل التي استلمها من المرشد */
+    border-top-left-radius: 0;
+    color: #262626; /* لون النص الأسود للرسائل الأخرى */
+}
+
+.message-bubble {
+    padding: 8px 12px;
+    border-radius: 7.5px;
+    position: relative;
+    box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
+}
+
+.message-text {
+    font-size: 14px;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.message-meta {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 2px;
+    gap: 4px;
+}
+
+.message-time {
+    font-size: 11px;
+    color: #8696a0;
+}
+
+.message-status {
+    font-size: 12px;
+    color: #8696a0;
+}
+
+.my-message .message-status.read {
+    color: #53bdeb;
+}
+
+/* حالة عدم وجود رسائل */
+.no-messages {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.no-messages-content {
+    text-align: center;
+    color: #8696a0;
+    padding: 20px;
+}
+
+.no-messages-content i {
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+
+.no-messages-content p {
+    font-size: 14px;
+}
+
+/* منطقة إدخال الرسائل */
+.message-input-container {
+    background-color: #f0f2f5;
+    padding: 10px;
+    z-index: 10;
+}
+
+.message-input-wrapper {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border-radius: 24px;
+    padding: 8px 12px;
+}
+
+.input-actions {
+    display: flex;
+    gap: 16px;
+    color: #8696a0;
+    font-size: 20px;
+}
+
+.input-actions i {
+    cursor: pointer;
+}
+
+.input-actions.left {
+    margin-left: 10px;
+}
+
+.message-form {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.message-input {
+    width: 100%;
+    border: none;
+    outline: none;
+    padding: 8px 12px;
+    font-size: 15px;
+    max-height: 100px;
+    resize: none;
+    font-family: inherit;
+}
+
+.send-button {
+    background: none;
+    border: none;
+    color: #128C7E;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    margin-right: 5px;
+}
+
+/* تجاوز نمط التمرير */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.message-form');
+    const input = form.querySelector('.message-input');
+    const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        try {
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    content: input.value,
+                    csrf_token: csrfToken
+                })
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                input.value = '';
+                // Refresh chat or append message
+                window.location.reload();
+            } else {
+                alert('Error sending message: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to send message');
+        }
+    });
+
+    const chatContainer = document.getElementById('chat-messages-container');
+
+    // Mark messages as read when they become visible
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const messageStatus = entry.target.querySelector('.message-status');
+                if (messageStatus && !messageStatus.classList.contains('read')) {
+                    const messageId = messageStatus.dataset.messageId;
+                    markMessageAsRead(messageId);
+                }
+            }
+        });
+    });
+
+    // Observe all message wrappers
+    document.querySelectorAll('.message-wrapper').forEach(msg => {
+        observer.observe(msg);
+    });
+
+    async function markMessageAsRead(messageId) {
+        try {
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    mark_read: true,
+                    message_id: messageId
+                })
+            });
+
+            if (response.ok) {
+                const status = document.querySelector(`.message-status[data-message-id="${messageId}"]`);
+                if (status) {
+                    status.classList.add('read');
+                }
+            }
+        } catch (error) {
+            console.error('Error marking message as read:', error);
+        }
+    }
+
+    const chat = new ChatManager('chat-messages-container', {{ current_user.id }});
+});
+</script>
+{% endblock %}

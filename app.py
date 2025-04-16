@@ -1,13 +1,16 @@
 import os
 import logging
 from flask import Flask
+from config import Config
 from extensions import db, login_manager, babel, migrate
+from routes import main, get_locale, csrf
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
+    app.config.from_object(Config)
     
     # Configure app
     app.secret_key = os.environ.get("SESSION_SECRET", "dev_secret_key")
@@ -42,6 +45,7 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
     migrate.init_app(app, db)
+    csrf.init_app(app)  # Initialize CSRF protection
     
     # Configure login
     login_manager.login_view = 'main.login'
@@ -55,11 +59,11 @@ def create_app():
             return User.query.get(int(user_id))
         
         # Import and register blueprints
-        from routes import main, get_locale
         app.register_blueprint(main)
         
-        # Initialize babel after registering blueprints
-        babel.init_app(app, locale_selector=get_locale)
+        # Initialize babel with locale selector
+        babel.init_app(app)
+        babel.localeselector(get_locale)
         
         # Create database tables
         db.create_all()

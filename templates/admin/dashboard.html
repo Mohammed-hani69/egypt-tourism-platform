@@ -20,7 +20,7 @@
                         </div>
                         <h5 class="card-title">{{ _('المستخدمين') }}</h5>
                         <h3 class="card-text">{{ user_count }}</h3>
-                        <a href="{{ url_for('admin.users') }}" class="btn btn-sm btn-outline-primary mt-3">{{ _('عرض المستخدمين') }}</a>
+                        <a href="{{ url_for('main.admin_users') }}" class="btn btn-sm btn-outline-primary mt-3">{{ _('عرض المستخدمين') }}</a>
                     </div>
                 </div>
             </div>
@@ -33,7 +33,7 @@
                         </div>
                         <h5 class="card-title">{{ _('المعالم السياحية') }}</h5>
                         <h3 class="card-text">{{ attraction_count }}</h3>
-                        <a href="{{ url_for('admin.attractions') }}" class="btn btn-sm btn-outline-success mt-3">{{ _('إدارة المعالم') }}</a>
+                        <a href="{{ url_for('main.admin_attractions') }}" class="btn btn-sm btn-outline-success mt-3">{{ _('إدارة المعالم') }}</a>
                     </div>
                 </div>
             </div>
@@ -46,7 +46,7 @@
                         </div>
                         <h5 class="card-title">{{ _('خطط الرحلات') }}</h5>
                         <h3 class="card-text">{{ tour_plan_count }}</h3>
-                        <a href="{{ url_for('admin.tour_plans') }}" class="btn btn-sm btn-outline-info mt-3">{{ _('إدارة الخطط') }}</a>
+                        <a href="{{ url_for('main.admin_tour_plans') }}" class="btn btn-sm btn-outline-info mt-3">{{ _('إدارة الخطط') }}</a>
                     </div>
                 </div>
             </div>
@@ -59,7 +59,7 @@
                         </div>
                         <h5 class="card-title">{{ _('الحجوزات') }}</h5>
                         <h3 class="card-text">{{ booking_count }}</h3>
-                        <a href="{{ url_for('admin.bookings') }}" class="btn btn-sm btn-outline-warning mt-3">{{ _('عرض الحجوزات') }}</a>
+                        <a href="{{ url_for('main.admin_bookings') }}" class="btn btn-sm btn-outline-warning mt-3">{{ _('عرض الحجوزات') }}</a>
                     </div>
                 </div>
             </div>
@@ -89,8 +89,14 @@
                                     <tr>
                                         <td>{{ booking.reference }}</td>
                                         <td>{{ booking.tourist.username }}</td>
-                                        <td>{{ booking.tour_plan.guide.username }}</td>
-                                        <td>{{ booking.created_at.strftime('%Y-%m-%d') }}</td>
+                                        <td>
+                                            {% if booking.guide %}
+                                                {{ booking.guide.username }}
+                                            {% else %}
+                                                <span class="text-muted">{{ _('لم يتم تعيين بعد') }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ booking.booking_date.strftime('%Y-%m-%d') }}</td>
                                         <td>
                                             {% if booking.status == 'pending' %}
                                             <span class="badge bg-warning">{{ _('قيد الانتظار') }}</span>
@@ -103,7 +109,7 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            <a href="{{ url_for('admin.booking_detail', booking_id=booking.id) }}" class="btn btn-sm btn-primary">
+                                            <a href="{{ url_for('main.admin_booking_detail', booking_id=booking.id) }}" class="btn btn-sm btn-primary">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                         </td>
@@ -114,7 +120,7 @@
                         </div>
                     </div>
                     <div class="card-footer bg-white text-center">
-                        <a href="{{ url_for('admin.bookings') }}" class="btn btn-link">{{ _('عرض جميع الحجوزات') }}</a>
+                        <a href="{{ url_for('main.admin_bookings') }}" class="btn btn-link">{{ _('عرض جميع الحجوزات') }}</a>
                     </div>
                 </div>
             </div>
@@ -166,13 +172,13 @@
                     </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
-                            <a href="{{ url_for('admin.add_attraction') }}" class="btn btn-outline-primary">
+                            <a href="{{ url_for('main.admin_attractions') }}" class="btn btn-outline-primary">
                                 <i class="fas fa-plus-circle me-2"></i>{{ _('إضافة معلم سياحي') }}
                             </a>
-                            <a href="{{ url_for('admin.add_region') }}" class="btn btn-outline-success">
+                            <a href="{{ url_for('main.admin_regions') }}" class="btn btn-outline-success">
                                 <i class="fas fa-plus-circle me-2"></i>{{ _('إضافة منطقة') }}
                             </a>
-                            <a href="{{ url_for('admin.add_user') }}" class="btn btn-outline-info">
+                            <a href="{{ url_for('main.admin_users') }}" class="btn btn-outline-info">
                                 <i class="fas fa-plus-circle me-2"></i>{{ _('إضافة مستخدم') }}
                             </a>
                         </div>

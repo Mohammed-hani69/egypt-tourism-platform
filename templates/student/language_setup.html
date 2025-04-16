@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% block title %}{{ _('إعداد ممارسة اللغة') }}{% endblock %}
@@ -60,11 +59,13 @@
                             
                             <div class="form-group mb-4">
                                 <label class="form-label">{{ _('هدف التعلم') }}</label>
-                                {{ form.learning_goal(class="form-control", rows=3) }}
-                                {% if form.learning_goal.errors %}
-                                    {% for error in form.learning_goal.errors %}
-                                        <div class="text-danger">{{ error }}</div>
-                                    {% endfor %}
+                                {% if form.learning_goal %}
+                                    {{ form.learning_goal(class="form-control", rows=3) }}
+                                    {% if form.learning_goal.errors %}
+                                        {% for error in form.learning_goal.errors %}
+                                            <div class="text-danger">{{ error }}</div>
+                                        {% endfor %}
+                                    {% endif %}
                                 {% endif %}
                                 <small class="text-muted">{{ _('مثال: السفر إلى بلد ناطق باللغة، إجراء محادثات أساسية، قراءة كتب') }}</small>
                             </div>

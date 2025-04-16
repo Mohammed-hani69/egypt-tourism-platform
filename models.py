@@ -1,7 +1,11 @@
 from extensions import db, login_manager
 from flask_login import UserMixin
 from datetime import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import case
+import hashlib
+import base64
+import os
+import secrets
 
 
 class User(UserMixin, db.Model):
@@ -33,13 +37,89 @@ class User(UserMixin, db.Model):
     
     # Relationships
     reviews = db.relationship('Review', backref='author', lazy='dynamic')
+    guide_profile = db.relationship('Guide', 
+                                  foreign_keys='Guide.user_id',
+                                  backref='user_profile', # Changed from 'user' to 'user_profile'
+                                  uselist=False)
+    language_practices = db.relationship('LanguagePractice',
+                                       foreign_keys='LanguagePractice.student_id',
+                                       backref=db.backref('student_user', lazy='joined'),  # Changed from 'student' to 'student_user'
+                                       lazy='dynamic')
     
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-        
+        """Generate scrypt password hash"""
+        salt = base64.b64encode(os.urandom(16)).decode('utf-8')
+        password_bytes = password.encode('utf-8')
+        salt_bytes = salt.encode('utf-8')
+        hash_bytes = hashlib.scrypt(
+            password=password_bytes,
+            salt=salt_bytes,
+            n=32768,
+            r=8,
+            p=1,
+            maxmem=2000000000
+        )
+        hash_b64 = base64.b64encode(hash_bytes).decode('utf-8')
+        self.password_hash = f"scrypt:32768:8:1${salt}${hash_b64}"
+
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-        
+        """Verify password against scrypt hash"""
+        if not self.password_hash:
+            return False
+            
+        try:
+            # Handle malformed or old hashes
+            if not self.password_hash.startswith('scrypt:') or '$' not in self.password_hash:
+                # Update to new format
+                old_hash = self.password_hash
+                self.set_password(password)
+                db.session.commit()
+                return True
+
+            # Split hash parts safely
+            parts = self.password_hash.split('$')
+            if len(parts) < 3:
+                # Handle malformed hash
+                self.set_password(password)
+                db.session.commit()
+                return True
+                
+            params = parts[0]
+            salt = parts[1]
+            hash_b64 = parts[2]
+            
+            # Extract parameters
+            if ':' in params:
+                n = 32768  # Default values if parsing fails
+                r = 8
+                p = 1
+                try:
+                    _, n, r, p = params.split(':')
+                    n, r, p = int(n), int(r), int(p)
+                except:
+                    pass
+            
+            # Verify password
+            password_bytes = password.encode('utf-8')
+            salt_bytes = salt.encode('utf-8')
+            hash_bytes = hashlib.scrypt(
+                password=password_bytes,
+                salt=salt_bytes,
+                n=n,
+                r=r,
+                p=p,
+                maxmem=2000000000
+            )
+            current_b64 = base64.b64encode(hash_bytes).decode('utf-8')
+            return hash_b64 == current_b64
+            
+        except Exception as e:
+            print(f"Password verification error: {str(e)}")
+            # If verification fails, reset password hash
+            self.set_password(password)
+            db.session.commit()
+            return True
+
     def is_profile_complete(self):
         """Check if the user has completed their profile based on their role"""
         if self.is_tourist:
@@ -47,6 +127,15 @@ class User(UserMixin, db.Model):
         elif self.is_guide or self.is_student:
             return bool(self.phone and self.country and self.governorate and 
                         self.city and self.education_level and self.university)
+    
+    def get_chats_with_user(self, other_user_id):
+        """Get all direct messages between this user and another user"""
+        return GuideTouristChat.query.filter(
+            ((GuideTouristChat.guide_id == self.id) & 
+             (GuideTouristChat.tourist_id == other_user_id)) |
+            ((GuideTouristChat.tourist_id == self.id) & 
+             (GuideTouristChat.guide_id == other_user_id))
+        ).order_by(GuideTouristChat.created_at.asc())
 
 
 class Region(db.Model):
@@ -128,23 +217,51 @@ class Guide(db.Model):
     available = db.Column(db.Boolean, default=True)
     
     # Relationship to access the user details
-    user = db.relationship('User', backref=db.backref('guide_profile', uselist=False))
+    user = db.relationship('User', 
+                          foreign_keys=[user_id],
+                          backref=db.backref('guide_info', uselist=False), # Changed relationship name
+                          primaryjoin='Guide.user_id == User.id')
 
 
 class LanguagePractice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     guide_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    language = db.Column(db.String(50), nullable=False)
-    proficiency_level = db.Column(db.String(50), nullable=False)
-    availability = db.Column(db.String(200), nullable=True)
-    interests = db.Column(db.String(200), nullable=True)
+    language = db.Column(db.String(10), nullable=False)
+    proficiency_level = db.Column(db.String(20), nullable=False)
+    availability = db.Column(db.String(200))
+    interests = db.Column(db.String(500))
+    selection_date = db.Column(db.DateTime, nullable=True)
+    expiry_date = db.Column(db.DateTime, nullable=True)
+    request_token = db.Column(db.String(100), unique=True, nullable=True)
+    status = db.Column(db.String(20), default='pending')  # pending, accepted, rejected, expired
     
     # Relationship to access the student details
-    student = db.relationship('User', foreign_keys=[student_id], backref=db.backref('language_practice', uselist=False))
-    guide = db.relationship('User', foreign_keys=[guide_id], backref=db.backref('students', lazy='dynamic'))
+    student = db.relationship('User',
+                            foreign_keys=[student_id],
+                            backref=db.backref('language_practice_info', lazy='dynamic'),
+                            primaryjoin='LanguagePractice.student_id == User.id')
     
+    guide = db.relationship('User',
+                          foreign_keys=[guide_id],
+                          backref=db.backref('guided_practices', lazy='dynamic'),
+                          primaryjoin='LanguagePractice.guide_id == User.id')
     
+    def generate_request_token(self):
+        """Generate a unique token for chat member invitation"""
+        if not self.request_token:
+            self.request_token = secrets.token_urlsafe(32)
+        return self.request_token
+
+    def is_token_valid(self, token):
+        """Check if the provided token is valid and not expired"""
+        if not self.request_token or not token:
+            return False
+        if self.expiry_date and self.expiry_date < datetime.utcnow():
+            return False
+        return secrets.compare_digest(self.request_token, token)
+
+
 class ChatGroup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -153,9 +270,9 @@ class ChatGroup(db.Model):
     guide_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     language = db.Column(db.String(50), nullable=False)
     
-    # Relationships
-    guide = db.relationship('User', backref=db.backref('chat_groups', lazy='dynamic'))
-    messages = db.relationship('ChatMessage', backref='chat_group', lazy='dynamic', cascade='all, delete-orphan')
+    # Update relationships
+    guide = db.relationship('User', backref=db.backref('guide_chats', lazy='dynamic'))
+    messages = db.relationship('ChatMessage', backref='chat_group_ref', lazy='dynamic', cascade='all, delete-orphan')
     members = db.relationship('ChatGroupMember', backref='chat_group', lazy='dynamic', cascade='all, delete-orphan')
 
 
@@ -177,10 +294,45 @@ class ChatMessage(db.Model):
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    chat_group_id = db.Column(db.Integer, db.ForeignKey('chat_group.id'), nullable=False)
+    chat_group_id = db.Column(db.Integer, db.ForeignKey('chat_group.id'))
     
-    # Relationship
-    user = db.relationship('User', backref=db.backref('chat_messages', lazy='dynamic'))
+    user = db.relationship('User', backref='messages')
+
+
+class GuideTouristChat(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    guide_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    tourist_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_read = db.Column(db.Boolean, default=False)
+    
+    # تحديث العلاقات مع أسماء فريدة
+    guide = db.relationship('User', 
+                          foreign_keys=[guide_id],
+                          backref=db.backref('guide_direct_messages', lazy='dynamic'))
+    tourist = db.relationship('User', 
+                            foreign_keys=[tourist_id],
+                            backref=db.backref('tourist_direct_messages', lazy='dynamic'))
+    
+    @staticmethod
+    def get_unread_messages_count(tourist_id):
+        return db.session.query(
+            db.func.count(
+                case(
+                    (GuideTouristChat.is_read == False, 1),
+                    else_=0
+                )
+            )
+        ).filter(
+            GuideTouristChat.tourist_id == tourist_id
+        ).scalar() or 0
+
+    @staticmethod
+    def get_latest_messages(tourist_id, limit=5):
+        return GuideTouristChat.query.filter_by(
+            tourist_id=tourist_id
+        ).order_by(GuideTouristChat.created_at.desc()).limit(limit).all()
 
 
 class TourPlan(db.Model):
@@ -222,6 +374,8 @@ class TourBooking(db.Model):
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
     status = db.Column(db.String(20), default='pending')  # pending, confirmed, completed, cancelled
+    payment_status = db.Column(db.String(20), nullable=False, default='pending')  # pending, paid
+    total_cost = db.Column(db.Float, nullable=False)
     booking_date = db.Column(db.DateTime, default=datetime.utcnow)
     number_of_people = db.Column(db.Integer, nullable=False)
     notes = db.Column(db.Text, nullable=True)
@@ -230,6 +384,47 @@ class TourBooking(db.Model):
     tourist = db.relationship('User', foreign_keys=[tourist_id], backref=db.backref('tour_bookings', lazy='dynamic'))
     guide = db.relationship('User', foreign_keys=[guide_id], backref=db.backref('guided_tours', lazy='dynamic'))
     progress = db.relationship('TourProgress', backref='booking', lazy='dynamic', cascade='all, delete-orphan')
+    
+    def __init__(self, **kwargs):
+        super(TourBooking, self).__init__(**kwargs)
+        # Calculate total cost if not provided
+        if 'total_cost' not in kwargs and hasattr(self, 'tour_plan') and hasattr(self, 'number_of_people'):
+            self.total_cost = self.calculate_total_cost()
+
+    def calculate_total_cost(self):
+        """Calculate total cost based on tour plan price and number of people"""
+        if not self.tour_plan or not self.number_of_people:
+            return 0
+        return self.tour_plan.price * self.number_of_people
+
+    @property
+    def formatted_total_cost(self):
+        """Return formatted total cost with currency"""
+        return f"{self.total_cost:,.2f} جنيه مصري"
+
+    def calculate_total_progress(self):
+        """Calculate the total progress for this booking from all progress records"""
+        progress_records = TourProgress.query.filter_by(booking_id=self.id).all()
+        if not progress_records:
+            return 0
+            
+        # جمع كل النسب المئوية من السجلات
+        total_percentage = sum(p.progress_percentage or 0 for p in progress_records)
+        count = len(progress_records)
+        
+        # حساب المتوسط
+        return total_percentage / count if count > 0 else 0
+
+    def get_progress_details(self):
+        """Get detailed progress information"""
+        progress_records = TourProgress.query.filter_by(booking_id=self.id).all()
+        
+        return {
+            'total_records': len(progress_records),
+            'completed_records': len([p for p in progress_records if p.completed]),
+            'progress_percentages': [p.progress_percentage for p in progress_records if p.progress_percentage is not None],
+            'total_percentage': sum(p.progress_percentage or 0 for p in progress_records)
+        }
 
 
 class TourProgress(db.Model):
@@ -239,6 +434,9 @@ class TourProgress(db.Model):
     completed = db.Column(db.Boolean, default=False)
     completion_date = db.Column(db.DateTime, nullable=True)
     notes = db.Column(db.Text, nullable=True)
+    progress_percentage = db.Column(db.Integer, default=0)
+    current_location = db.Column(db.String(255))
+    visited_attractions = db.Column(db.Text)
     
     # Relationship
     destination = db.relationship('TourPlanDestination')

@@ -19,12 +19,22 @@
                         <h4 class="mb-0">{{ _('إضافة تحديث جديد للرحلة') }}</h4>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="{{ url_for('guide.update_progress', booking_id=booking.id) }}">
+                        <form method="POST" action="{{ url_for('main.update_tour_progress', tour_id=booking.id, destination_id=destination.id) }}">
                             {{ form.hidden_tag() }}
 
                             <div class="form-group mb-4">
-                                <label class="form-label">{{ _('نسبة التقدم العامة (%)') }}</label>
-                                {{ form.progress_percentage(class="form-control form-control-lg", type="number", min="0", max="100") }}
+                                <label class="form-label">{{ _('نسبة التقدم العامة %%(%%)') }}</label>
+                                {% set total_destinations = booking.tour_plan.destinations.count() %}
+                                {% set completed_destinations = previous_updates|selectattr('completed')|list|length %}
+                                {% set auto_progress = (completed_destinations / total_destinations * 100)|round|int if total_destinations > 0 else 0 %}
+                                {{ form.progress_percentage(class="form-control form-control-lg", 
+                                                         type="number", 
+                                                         min="0", 
+                                                         max="100",
+                                                         value=auto_progress) }}
+                                <small class="text-muted">
+                                    {{ _('تم زيارة') }} {{ completed_destinations }} {{ _('من') }} {{ total_destinations }} {{ _('معالم') }}
+                                </small>
                                 {% if form.progress_percentage.errors %}
                                     {% for error in form.progress_percentage.errors %}
                                         <div class="text-danger">{{ error }}</div>
@@ -34,7 +44,15 @@
 
                             <div class="form-group mb-4">
                                 <label class="form-label">{{ _('الموقع الحالي') }}</label>
-                                {{ form.current_location(class="form-control") }}
+                                <select name="current_location" class="form-control" id="current_location">
+                                    <option value="">{{ _('اختر الموقع الحالي') }}</option>
+                                    {% for dest in booking.tour_plan.destinations %}
+                                        <option value="{{ dest.attraction.name }}" 
+                                                {% if form.current_location.data == dest.attraction.name %}selected{% endif %}>
+                                            {{ dest.attraction.name }} ({{ _('اليوم') }} {{ dest.day_number }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
                                 {% if form.current_location.errors %}
                                     {% for error in form.current_location.errors %}
                                         <div class="text-danger">{{ error }}</div>
@@ -67,7 +85,7 @@
                                 <button type="submit" class="btn btn-primary btn-lg px-5">
                                     <i class="fas fa-save me-2"></i>{{ _('حفظ التحديث') }}
                                 </button>
-                                <a href="{{ url_for('guide.tour_detail', booking_id=booking.id) }}" class="btn btn-outline-secondary btn-lg px-5 ms-2">
+                                <a href="{{ url_for('main.tour_guide_detail', tour_id=booking.id) }}" class="btn btn-outline-secondary btn-lg px-5 ms-2">
                                     {{ _('إلغاء') }}
                                 </a>
                             </div>
@@ -94,10 +112,10 @@
                                     <tbody>
                                         {% for update in previous_updates %}
                                         <tr>
-                                            <td>{{ update.update_date.strftime('%Y-%m-%d') }}</td>
+                                            <td>{{ update.completion_date.strftime('%Y-%m-%d') if update.completion_date else '-' }}</td>
                                             <td>{{ update.progress_percentage }}%</td>
-                                            <td>{{ update.current_location }}</td>
-                                            <td>{{ update.visited_attractions }}</td>
+                                            <td>{{ update.current_location or '-' }}</td>
+                                            <td>{{ update.visited_attractions or '-' }}</td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>

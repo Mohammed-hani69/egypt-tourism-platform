@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField, IntegerField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField, IntegerField, SelectMultipleField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, NumberRange
 from models import User
+from flask_babel import gettext as _
 
 
 class RegistrationForm(FlaskForm):
@@ -65,21 +66,45 @@ class ReviewForm(FlaskForm):
 
 
 class GuideForm(FlaskForm):
-    languages = StringField('Languages (comma separated)', validators=[DataRequired()])
-    bio = TextAreaField('Bio', validators=[DataRequired()])
-    phone = StringField('Contact Phone', validators=[DataRequired()])
-    years_experience = IntegerField('Years of Experience', validators=[NumberRange(min=0)])
-    specialization = StringField('Specialization')
-    certification = StringField('Certification')
-    submit = SubmitField('Update Guide Profile')
+    languages = SelectMultipleField(_('اللغات'),
+        choices=[
+            ('ar', _('العربية')),
+            ('en', _('الإنجليزية')),
+            ('fr', _('الفرنسية')),
+            ('de', _('الألمانية')),
+            ('es', _('الإسبانية')),
+            ('it', _('الإيطالية')),
+            ('ru', _('الروسية')),
+            ('zh', _('الصينية'))
+        ],
+        validators=[DataRequired()],
+        description=_('اختر اللغات التي تجيدها'))
+    specialization = StringField(_('التخصص'),
+                            description=_('مثال: الآثار الفرعونية، التاريخ الإسلامي'))
+    years_experience = IntegerField(_('سنوات الخبرة'),
+                                  validators=[DataRequired(), NumberRange(min=0)])
+    certification = StringField(_('الشهادات'),
+                              description=_('مثال: شهادة الإرشاد السياحي المعتمدة'))
+    submit = SubmitField(_('حفظ المعلومات'))
+
+
+class GuideLanguageForm(FlaskForm):
+    languages = StringField('Languages',
+                          validators=[DataRequired()],
+                          description='Separate languages with commas (e.g. Arabic, English, French)')
+    submit = SubmitField('Save Languages')
 
 
 class LanguagePracticeForm(FlaskForm):
     language = SelectField('Language', 
-                          choices=[('English', 'English'), ('Arabic', 'Arabic'), 
-                                   ('French', 'French'), ('German', 'German'),
-                                   ('Spanish', 'Spanish'), ('Italian', 'Italian'),
-                                   ('Russian', 'Russian'), ('Chinese', 'Chinese')],
+                          choices=[('ar', _('العربية')),
+                                    ('en', _('الإنجليزية')),
+                                    ('fr', _('الفرنسية')),
+                                    ('de', _('الألمانية')),
+                                    ('es', _('الإسبانية')),
+                                    ('it', _('الإيطالية')),
+                                    ('ru', _('الروسية')),
+                                    ('zh', _('الصينية'))],
                           validators=[DataRequired()])
     proficiency_level = SelectField('Proficiency Level',
                                    choices=[('Beginner', 'Beginner'), 
@@ -88,6 +113,7 @@ class LanguagePracticeForm(FlaskForm):
                                    validators=[DataRequired()])
     availability = StringField('Availability', validators=[DataRequired()])
     interests = StringField('Interests')
+    learning_goal = TextAreaField('Learning Goal')
     submit = SubmitField('Update Language Practice Profile')
 
 
@@ -136,10 +162,14 @@ class ChatGroupForm(FlaskForm):
     name = StringField('Group Name', validators=[DataRequired(), Length(max=100)])
     description = TextAreaField('Description')
     language = SelectField('Language', 
-                          choices=[('English', 'English'), ('Arabic', 'Arabic'), 
-                                   ('French', 'French'), ('German', 'German'),
-                                   ('Spanish', 'Spanish'), ('Italian', 'Italian'),
-                                   ('Russian', 'Russian'), ('Chinese', 'Chinese')],
+                          choices=[('ar', _('العربية')),
+                                    ('en', _('الإنجليزية')),
+                                    ('fr', _('الفرنسية')),
+                                    ('de', _('الألمانية')),
+                                    ('es', _('الإسبانية')),
+                                    ('it', _('الإيطالية')),
+                                    ('ru', _('الروسية')),
+                                    ('zh', _('الصينية'))],
                           validators=[DataRequired()])
     submit = SubmitField('Create Chat Group')
 
@@ -186,11 +216,21 @@ class AssignGuideForm(FlaskForm):
 
 
 class TourProgressForm(FlaskForm):
+    progress_percentage = IntegerField('Progress Percentage', 
+        validators=[DataRequired(), NumberRange(min=0, max=100)])
+    current_location = StringField('Current Location',
+        validators=[DataRequired()])
+    visited_attractions = TextAreaField('Visited Attractions')
     notes = TextAreaField('Notes')
-    submit = SubmitField('Mark as Completed')
+    submit = SubmitField('Update Progress')
 
 
 class TourPhotoForm(FlaskForm):
     image_url = StringField('Image URL', validators=[DataRequired()])
     caption = StringField('Caption', validators=[Length(max=200)])
     submit = SubmitField('Add Photo')
+
+
+class ResetPasswordRequestForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')

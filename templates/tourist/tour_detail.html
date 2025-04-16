@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% block title %}{{ _('تفاصيل الرحلة') }}{% endblock %}
@@ -16,6 +15,87 @@
             <div class="col-lg-8">
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">{{ _('تقدم الرحلة') }}</h4>
+                        {% set progress_details = booking.get_progress_details() %}
+                        <div class="d-flex align-items-center">
+                            <div class="progress-stats me-3">
+                                <small class="text-muted d-block">
+                                    {{ _('المعالم المكتملة') }}: {{ progress_details.completed_records }} / {{ progress_details.total_records }}
+                                </small>
+                                <small class="text-muted d-block">
+                                    {{ _('مجموع النسب') }}: {{ progress_details.total_percentage }}%
+                                </small>
+                                <small class="text-muted d-block">
+                                    {{ _('المتوسط') }}: {{ booking.calculate_total_progress()|round|int }}%
+                                </small>
+                            </div>
+                            
+                            <div class="progress-circle-container">
+                                <div class="progress-circle" 
+                                     data-progress="{{ progress_details.total_percentage|round|int }}">
+                                    <div class="inner-circle">
+                                        <span class="progress-text">
+                                            {{ progress_details.total_percentage }}%
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% if booking.status in ['in_progress', 'completed'] %}
+                            <div class="tour-progress-container">
+                                <div class="tour-route">
+                                    <div class="route-path"></div>
+                                    <div class="route-start">
+                                        <i class="fas fa-flag-checkered"></i>
+                                    </div>
+                                    <div class="route-end">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </div>
+                                    
+                                    {% for destination in destinations %}
+                                        {% set progress = progress_by_dest.get(destination.id) %}
+                                        {% set is_completed = progress and progress.completed %}
+                                        {% set is_current = not is_completed and (loop.first or (destinations[loop.index0 - 1].id in progress_by_dest and progress_by_dest[destinations[loop.index0 - 1].id].completed)) %}
+                                        
+                                        <div class="tour-stop {% if is_completed %}completed{% endif %} {% if is_current %}current{% endif %}" 
+                                             style="--stop-position: {{ (loop.index0 / (destinations|length - 1)) * 100 }}%">
+                                            
+                                            <div class="stop-marker">
+                                                {% if is_completed %}
+                                                    <i class="fas fa-check"></i>
+                                                {% else %}
+                                                    {{ loop.index }}
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <div class="stop-content">
+                                                <div class="stop-card">
+                                                    <div class="stop-image">
+                                                        <img src="{{ destination.attraction.image_url or url_for('static', filename='img/default-attraction.jpg') }}" 
+                                                             alt="{{ destination.attraction.name }}">
+                                                        <div class="day-badge">{{ _('اليوم') }} {{ destination.day_number }}</div>
+                                                    </div>
+                                                    <div class="stop-info">
+                                                        <h6>{{ destination.attraction.name }}</h6>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                {{ _('سيتم عرض تقدم الرحلة هنا بمجرد بدء الرحلة.') }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
                         <h4 class="mb-0">{{ _('معلومات الحجز') }}</h4>
                         <span class="badge {% if booking.status == 'pending' %}bg-warning{% elif booking.status == 'confirmed' %}bg-success{% elif booking.status == 'cancelled' %}bg-danger{% elif booking.status == 'in_progress' %}bg-info{% elif booking.status == 'completed' %}bg-primary{% else %}bg-secondary{% endif %} px-3 py-2">
                             {% if booking.status == 'pending' %}
@@ -45,13 +125,17 @@
                             </div>
                             <div class="col-md-6">
                                 <h5 class="text-muted mb-3">{{ _('معلومات المرشد') }}</h5>
-                                <p><strong>{{ _('اسم المرشد') }}:</strong> {% if booking.guide %}{{ booking.guide.username }}{% else %}{{ _('لم يتم تعيين مرشد بعد') }}{% endif %}</p>
-                                <p><strong>{{ _('البريد الإلكتروني') }}:</strong> {{ booking.tour_plan.guide.email }}</p>
-                                {% if booking.tour_plan.guide.phone %}
-                                <p><strong>{{ _('رقم الهاتف') }}:</strong> {{ booking.tour_plan.guide.phone }}</p>
-                                {% endif %}
-                                {% if booking.tour_plan.guide.languages %}
-                                <p><strong>{{ _('اللغات') }}:</strong> {{ booking.tour_plan.guide.languages }}</p>
+                                {% if booking.guide %}
+                                    <p><strong>{{ _('اسم المرشد') }}:</strong> {{ booking.guide.username }}</p>
+                                    <p><strong>{{ _('البريد الإلكتروني') }}:</strong> {{ booking.guide.email }}</p>
+                                    {% if booking.guide.phone %}
+                                        <p><strong>{{ _('رقم الهاتف') }}:</strong> {{ booking.guide.phone }}</p>
+                                    {% endif %}
+                                    {% if booking.guide.languages %}
+                                        <p><strong>{{ _('اللغات') }}:</strong> {{ booking.guide.languages }}</p>
+                                    {% endif %}
+                                {% else %}
+                                    <p class="text-muted">{{ _('لم يتم تعيين مرشد بعد') }}</p>
                                 {% endif %}
                             </div>
                         </div>
@@ -71,66 +155,13 @@
                     </div>
                 </div>
                 
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white">
-                        <h4 class="mb-0">{{ _('تقدم الرحلة') }}</h4>
-                    </div>
-                    <div class="card-body">
-                        {% if booking.status in ['in_progress', 'completed'] %}
-                            {% if tour_progress %}
-                                <div class="progress mb-4" style="height: 25px; border-radius: 10px;">
-                                    <div class="progress-bar bg-success" role="progressbar" 
-                                        style="width: {{ tour_progress.progress_percentage }}%;" 
-                                        aria-valuenow="{{ tour_progress.progress_percentage }}" 
-                                        aria-valuemin="0" 
-                                        aria-valuemax="100">
-                                        {{ tour_progress.progress_percentage }}%
-                                    </div>
-                                </div>
-                                
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>{{ _('التاريخ') }}</th>
-                                                <th>{{ _('الموقع الحالي') }}</th>
-                                                <th>{{ _('المعالم المزارة') }}</th>
-                                                <th>{{ _('ملاحظات') }}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for update in progress_updates %}
-                                            <tr>
-                                                <td>{{ update.update_date.strftime('%Y-%m-%d') }}</td>
-                                                <td>{{ update.current_location }}</td>
-                                                <td>{{ update.visited_attractions }}</td>
-                                                <td>{{ update.notes }}</td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            {% else %}
-                                <div class="text-center py-4">
-                                    <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
-                                    <p>{{ _('لم يقم المرشد بإضافة تحديثات للتقدم بعد') }}</p>
-                                </div>
-                            {% endif %}
-                        {% else %}
-                            <div class="alert alert-info">
-                                {{ _('سيتم عرض تقدم الرحلة هنا بمجرد بدء الرحلة.') }}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-                
                 {% if booking.status == 'completed' and not has_reviewed %}
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-header bg-white">
                         <h4 class="mb-0">{{ _('إضافة تقييم') }}</h4>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="{{ url_for('tourist.add_review', booking_id=booking.id) }}">
+                        <form method="POST" action="{{ url_for('main.add_review', booking_id=booking.id) }}">
                             {{ review_form.hidden_tag() }}
                             
                             <div class="form-group mb-4">
@@ -190,7 +221,7 @@
                             {% endif %}
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 {{ _('المجموع') }}
-                                <span class="fw-bold">{{ booking.total_cost }} {{ _('جنيه مصري') }}</span>
+                                <span class="fw-bold">{{ booking.formatted_total_cost }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 {{ _('حالة الدفع') }}
@@ -208,7 +239,7 @@
                         
                         {% if booking.payment_status != 'paid' and booking.status not in ['cancelled', 'completed'] %}
                         <div class="d-grid gap-2 mt-3">
-                            <a href="{{ url_for('tourist.payment', booking_id=booking.id) }}" class="btn btn-success">
+                            <a href="{{ url_for('main.process_payment', booking_id=booking.id) }}" class="btn btn-success">
                                 <i class="fas fa-credit-card me-2"></i>{{ _('دفع الآن') }}
                             </a>
                         </div>
@@ -223,16 +254,18 @@
                     <div class="card-body">
                         <div class="d-grid gap-2">
                             {% if booking.status in ['pending', 'confirmed'] %}
-                                <a href="{{ url_for('tourist.cancel_booking', booking_id=booking.id) }}" class="btn btn-danger">
+                                <a href="{{ url_for('main.cancel_booking', booking_id=booking.id) }}" class="btn btn-danger">
                                     <i class="fas fa-times-circle me-2"></i>{{ _('إلغاء الحجز') }}
                                 </a>
                             {% endif %}
                             
-                            <a href="{{ url_for('tourist.contact_guide', guide_id=booking.tour_plan.guide.id) }}" class="btn btn-outline-primary">
+                            {% if booking.guide %}
+                            <a href="{{ url_for('main.contact_guide', guide_id=booking.guide.id) }}" class="btn btn-outline-primary {% if not booking.guide %}disabled{% endif %}">
                                 <i class="fas fa-comments me-2"></i>{{ _('التواصل مع المرشد') }}
                             </a>
+                            {% endif %}
                             
-                            <a href="{{ url_for('tourist.download_itinerary', booking_id=booking.id) }}" class="btn btn-outline-info">
+                            <a href="{{ url_for('main.download_itinerary', booking_id=booking.id) }}" class="btn btn-outline-info">
                                 <i class="fas fa-download me-2"></i>{{ _('تحميل جدول الرحلة') }}
                             </a>
                         </div>
@@ -249,7 +282,7 @@
                         </div>
                         <h5>{{ booking.tour_plan.title }}</h5>
                         <p class="text-muted">{{ booking.tour_plan.description|truncate(150) }}</p>
-                        <a href="{{ url_for('tourist.tour_plan_detail', tour_plan_id=booking.tour_plan.id) }}" class="btn btn-outline-primary btn-sm">
+                        <a href="{{ url_for('main.tour_plan_detail', plan_id=booking.tour_plan.id) }}" class="btn btn-outline-primary btn-sm">
                             {{ _('عرض التفاصيل الكاملة') }}
                         </a>
                     </div>
@@ -262,5 +295,257 @@
         .progress-bar.bg-success {
             background-color: #28a745 !important;
         }
+
+        /* Progress Circle Styles */
+        .progress-circle-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+        
+        .progress-circle {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                #28a745 calc(var(--progress) * 1%),
+                #e9ecef calc(var(--progress) * 1%)
+            );
+            transform: rotate(-90deg);
+        }
+        
+        .inner-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(90deg);
+            width: 85%;
+            height: 85%;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .progress-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        /* Tour Progress Styles - Enhanced Version */
+        .tour-progress-container {
+            padding: 3rem 1rem;
+            overflow-x: auto;
+            direction: ltr;
+        }
+
+        .tour-route {
+            position: relative;
+            min-height: 240px;
+            padding: 20px 0;
+            min-width: max-content;
+        }
+
+        .route-path {
+            position: absolute;
+            top: 50px;
+            left: 30px;
+            right: 30px;
+            height: 4px;
+            background: linear-gradient(to right, #e9ecef, #e9ecef);
+            border-radius: 4px;
+            z-index: 1;
+        }
+
+        .route-start, .route-end {
+            position: absolute;
+            top: 40px;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            z-index: 3;
+        }
+
+        .route-start {
+            left: 15px;
+            color: #198754;
+            border: 2px solid #198754;
+        }
+
+        .route-end {
+            right: 15px;
+            color: #dc3545;
+            border: 2px solid #dc3545;
+        }
+
+        .tour-stop {
+            position: absolute;
+            top: 0;
+            left: calc(var(--stop-position) + 30px);
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .stop-marker {
+            width: 26px;
+            height: 26px;
+            background: #fff;
+            border: 2px solid #6c757d;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            top: 35px;
+            color: #6c757d;
+            font-weight: bold;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .tour-stop.completed .stop-marker {
+            background: #28a745;
+            border-color: #28a745;
+            color: #fff;
+        }
+
+        .tour-stop.current .stop-marker {
+            background: #fff;
+            border: 3px solid #007bff;
+            color: #007bff;
+            transform: scale(1.1);
+            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.2);
+        }
+
+        .stop-content {
+            position: relative;
+            top: 50px;
+            transition: transform 0.3s ease;
+        }
+
+        .stop-card {
+            width: 150px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .tour-stop.completed .stop-card {
+            border-left: 3px solid #28a745;
+        }
+
+        .tour-stop.current .stop-card {
+            border-left: 3px solid #007bff;
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .stop-image {
+            position: relative;
+            height: 90px;
+            overflow: hidden;
+        }
+
+        .stop-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .tour-stop:hover .stop-image img {
+            transform: scale(1.05);
+        }
+
+        .day-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #6c757d;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .stop-info {
+            padding: 0.8rem;
+            text-align: center;
+        }
+
+        .stop-info h6 {
+            margin-bottom: 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #343a40;
+        }
+
+        .tour-stop:hover .stop-content {
+            transform: translateY(-5px);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .tour-progress-container {
+                padding: 2rem 0.5rem;
+            }
+            
+            .stop-card {
+                width: 130px;
+            }
+            
+            .stop-image {
+                height: 80px;
+            }
+            
+            .stop-info {
+                padding: 0.6rem;
+            }
+            
+            .stop-info h6 {
+                font-size: 0.8rem;
+            }
+        }
     </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize progress circle
+            const progressCircle = document.querySelector('.progress-circle');
+            const progress = progressCircle.dataset.progress;
+            progressCircle.style.setProperty('--progress', progress);
+            
+            // Calculate and set completed path in the route
+            const tourStops = document.querySelectorAll('.tour-stop');
+            if (tourStops.length > 0) {
+                let completedStops = document.querySelectorAll('.tour-stop.completed').length;
+                let totalStops = tourStops.length;
+                let completedPercent = (completedStops / totalStops) * 100;
+                
+                // Update route path with gradient showing completion
+                const routePath = document.querySelector('.route-path');
+                if (routePath && completedPercent > 0) {
+                    routePath.style.background = `linear-gradient(to right, 
+                        #28a745 ${completedPercent}%, 
+                        #e9ecef ${completedPercent}%)`;
+                }
+            }
+        });
+    </script>
 {% endblock %}
